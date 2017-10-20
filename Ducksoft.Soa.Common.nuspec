@@ -2,16 +2,16 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
     <id>Ducksoft.Soa.Common</id>
-    <version>1.1.0.0</version>
+    <version>2.0.0.0</version>
     <title>Ducksoft.Soa.Common</title>
     <authors>hpsanampudi</authors>
     <owners>Duck Software Limited</owners>
-    <licenseUrl>http://ducksoftware.co.uk/SOA/license</licenseUrl>
-    <projectUrl>https://www.nuget.org/packages/Ducksoft.Soa.Common</projectUrl>
+    <licenseUrl>https://github.com/hpsanampudi/Ducksoft.Soa.Common/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/hpsanampudi/Ducksoft.Soa.Common</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Common utilities used across SOA application.</description>
     <copyright>Copyright © Duck Software Limited 2017</copyright>
     <developmentDependency>true</developmentDependency>
-    <tags>On post build, automatically builds NuGet package from VS project using PowerShell commands.</tags>    
+    <tags>Ducksoft SOA Common Utilities</tags>    
   </metadata>
 </package>
