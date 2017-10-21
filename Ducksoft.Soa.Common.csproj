@@ -193,6 +193,7 @@
     <Compile Include="Filters\FilterTypes.cs" />
     <Compile Include="Filters\NotifyListChangedEventArgs.cs" />
     <Compile Include="Filters\PropertyComparer.cs" />
+    <Compile Include="Filters\SortBuilder.cs" />
     <Compile Include="Filters\SortChangedEventArgs.cs" />
     <Compile Include="Handler\GlobalWcfErrorHandlerAttribute.cs" />
     <Compile Include="Helpers\AjaxRequestAttribute.cs" />

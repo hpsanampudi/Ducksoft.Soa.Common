@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ducksoft.Soa.Common.Utilities;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -96,8 +97,7 @@ namespace Ducksoft.Soa.Common.Filters
         /// </returns>
         private static bool CanSortWithIComparable(Type type)
         {
-            return (type.GetInterface(nameof(IComparable)) != null ||
-                   (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)));
+            return ((type.GetInterface(nameof(IComparable)) != null) || (type.IsNullableType()));
         }
 
         /// <summary>

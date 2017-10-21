@@ -1,135 +1,141 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using System.Runtime.Serialization;
 
 namespace Ducksoft.Soa.Common.Filters
 {
     /// <summary>
     /// Enum which holds linq filter logical operator types.
     /// </summary>
+    [DataContract(Name = "FilterLogicalOperatorTypes",
+        Namespace = "http://ducksoftware.co.uk/SOA/WCF/DataContracts")]
     public enum FilterLogicalOperatorTypes
     {
         /// <summary>
         /// The none
         /// </summary>
-        [EnumDescription("None")]
+        [EnumMember]
         None = -1,
         /// <summary>
         /// The and
         /// </summary>
-        [EnumDescription("And")]
+        [EnumMember]
         And,
         /// <summary>
         /// The or
         /// </summary>
-        [EnumDescription("Or")]
-        Or
+        [EnumMember]
+        Or,
     }
 
     /// <summary>
     /// Enum which holds linq filter expression comparer operator types.
     /// </summary>
+    [DataContract(Name = "FilterCompareOperatorTypes",
+        Namespace = "http://ducksoftware.co.uk/SOA/WCF/DataContracts")]
     public enum FilterCompareOperatorTypes
     {
         /// <summary>
         /// The none
         /// </summary>
-        [EnumDescription("None")]
+        [EnumMember]
         None = -1,
         /// <summary>
         /// The equal to
         /// </summary>
-        [EnumDescription("Equal To")]
+        [EnumMember]
         EqualTo,
         /// <summary>
         /// The not equal to
         /// </summary>
-        [EnumDescription("Not Equal To")]
+        [EnumMember]
         NotEqualTo,
         /// <summary>
         /// The less than
         /// </summary>
-        [EnumDescription("Less Than")]
+        [EnumMember]
         LessThan,
         /// <summary>
         /// The less than or equal to
         /// </summary>
-        [EnumDescription("Less Than Or Equal To")]
+        [EnumMember]
         LessThanOrEqualTo,
         /// <summary>
         /// The greater than
         /// </summary>
-        [EnumDescription("Greater Than")]
+        [EnumMember]
         GreaterThan,
         /// <summary>
         /// The greater than or equal to
         /// </summary>
-        [EnumDescription("Greater Than Or Equal To")]
+        [EnumMember]
         GreaterThanOrEqualTo,
         /// <summary>
         /// The starts with
         /// </summary>
-        [EnumDescription("Starts With")]
+        [EnumMember]
         StartsWith,
         /// <summary>
         /// The ends with
         /// </summary>
-        [EnumDescription("Ends With")]
+        [EnumMember]
         EndsWith,
         /// <summary>
         /// The contains
         /// </summary>
-        [EnumDescription("Contains")]
+        [EnumMember]
         Contains,
         /// <summary>
         /// The does not contain
         /// </summary>
-        [EnumDescription("Does Not Contain")]
-        DoesNotContain,
+        [EnumMember]
+        NotContains,
         /// <summary>
         /// The is null
         /// </summary>
-        [EnumDescription("Is Null")]
+        [EnumMember]
         IsNull,
         /// <summary>
         /// The is not null
         /// </summary>
-        [EnumDescription("Is Not Null")]
+        [EnumMember]
         IsNotNull,
         /// <summary>
         /// The is empty
         /// </summary>
-        [EnumDescription("Is Empty")]
+        [EnumMember]
         IsEmpty,
         /// <summary>
         /// The is not empty
         /// </summary>
-        [EnumDescription("Is Not Empty")]
+        [EnumMember]
         IsNotEmpty
     }
 
     /// <summary>
     /// Enum which holds binding list changed notification types.
     /// </summary>
+    [DataContract(Name = "ListChangedNotifyTypes",
+        Namespace = "http://ducksoftware.co.uk/SOA/WCF/DataContracts")]
     public enum ListChangedNotifyTypes
     {
         /// <summary>
         /// The none
         /// </summary>
-        [EnumDescription("None")]
+        [EnumMember]
         None = -1,
         /// <summary>
         /// The added
         /// </summary>
-        [EnumDescription("Added")]
+        [EnumMember]
         Added,
         /// <summary>
         /// The deleted
         /// </summary>
-        [EnumDescription("Deleted")]
+        [EnumMember]
         Deleted,
         /// <summary>
         /// The updated
         /// </summary>
-        [EnumDescription("Updated")]
+        [EnumMember]
         Updated,
     }
 }

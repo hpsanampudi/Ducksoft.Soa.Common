@@ -3,12 +3,15 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace Ducksoft.Soa.Common.Filters
 {
     /// <summary>
     /// Class which is used to build Linq filter expression. 
     /// </summary>
+    [DataContract(Name = "FilterBuilder",
+        Namespace = "http://ducksoftware.co.uk/SOA/WCF/DataContracts")]
     public class FilterBuilder
     {
         /// <summary>
@@ -17,6 +20,7 @@ namespace Ducksoft.Soa.Common.Filters
         /// <value>
         /// The name of the property.
         /// </value>
+        [DataMember]
         public string PropertyName { get; set; }
 
         /// <summary>
@@ -25,6 +29,7 @@ namespace Ducksoft.Soa.Common.Filters
         /// <value>
         /// The type of the operator.
         /// </value>
+        [DataMember]
         public FilterCompareOperatorTypes OperatorType { get; set; }
 
         /// <summary>
@@ -33,7 +38,17 @@ namespace Ducksoft.Soa.Common.Filters
         /// <value>
         /// The value.
         /// </value>
+        [IgnoreDataMember]
         public object Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value as string.
+        /// </summary>
+        /// <value>
+        /// The value as string.
+        /// </value>
+        [DataMember(Name = "Value", IsRequired = true)]
+        public string ValueAsStr { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterBuilder"/> class.
@@ -44,6 +59,36 @@ namespace Ducksoft.Soa.Common.Filters
             OperatorType = FilterCompareOperatorTypes.None;
             Value = null;
         }
+
+        #region SerializeToXml/DeserializeFromXml
+        [OnSerializing]
+        void OnSerializing(StreamingContext context)
+        {
+            //Hp --> Logic: Converts value to string.
+            var propType = Value?.GetType();
+            ValueAsStr = $"{propType}::{Value}";
+        }
+
+        /// <summary>
+        /// Called when [deserializing].
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        void OnDeserializing(StreamingContext context)
+        {
+            //Hp --> Logic: Converts string value to corresponding object type.
+            var delimeter = new string[] { "::" };
+            var data = ValueAsStr?.Split(delimeter, StringSplitOptions.RemoveEmptyEntries);
+            if ((data?.Length ?? -1) == 2)
+            {
+                Value = Utility.ConvertTo(data[1], data[0]);
+            }
+            else
+            {
+                Value = null;
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Creates the linq expression.
@@ -122,9 +167,9 @@ namespace Ducksoft.Soa.Common.Filters
             var leftExp = Expression.Property(parameter, propInfo.Name);
 
             //Hp --> Logic: Create 'id' portion of lambda expression (right)
-            var rightExp = (null != Value) ? Expression.Constant(
-               ((typeof(string) != propType) ? Value : Value.ToString().Trim()), propType) :
-               expNullObject;
+            var rightExp = (null != Value) ? (Expression.Constant(
+                ((typeof(string) != propType) ? Value : Value.ToString().Trim()), propType)) :
+                expNullObject;
 
             // create E.Id == 'id' portion of lambda expression    
             switch (OperatorType)
@@ -210,7 +255,7 @@ namespace Ducksoft.Soa.Common.Filters
                     }
                     break;
 
-                case FilterCompareOperatorTypes.DoesNotContain:
+                case FilterCompareOperatorTypes.NotContains:
                     {
                         //Hp --> Note: Contains doesnot have overload to take string comparer.
                         //In this case, call string.IndexOf method and check its value ge -1

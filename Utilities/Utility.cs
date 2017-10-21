@@ -1,8 +1,8 @@
-﻿using Microsoft.Win32;
+﻿using Ducksoft.Soa.Common.DataContracts;
+using Ducksoft.Soa.Common.Filters;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Filters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -2355,8 +2355,105 @@ namespace Ducksoft.Soa.Common.Utilities
             ErrorBase.CheckArgIsNull(srcObject, () => srcObject);
             ErrorBase.CheckArgIsNullOrDefault(propertyName, () => propertyName);
 
+            var srcObjType = srcObject.GetType();
+            var propInfo = srcObjType.GetProperty(propertyName);
+
+            //Hp --> Note: Convert.ChangeType does not handle conversion to nullable types
+            //if the property type is nullable, we need to get the underlying type of the property
+            var targetType = propInfo.PropertyType.GetGenericInnerType();
+
+            //Returns an System.Object with the specified System.Type and whose value is
+            //equivalent to the specified object.
+            propertyValue = Convert.ChangeType(propertyValue, targetType);
+
             //Hp --> Logic: Using reflection set given property value by its name.
-            srcObject.GetType().GetProperty(propertyName).SetValue(srcObject, propertyValue, null);
+            propInfo.SetValue(srcObject, propertyValue, null);
+        }
+
+        /// <summary>
+        /// Determines whether [is nullable type] [the specified type].
+        /// </summary>
+        /// <param name="srcType">Type of the source.</param>
+        /// <returns>
+        ///   <c>true</c> if [is nullable type] [the specified type]; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsNullableType(this Type srcType)
+        {
+            return ((srcType.IsGenericType) &&
+                (srcType.GetGenericTypeDefinition().Equals(typeof(Nullable<>))));
+        }
+
+        /// <summary>
+        /// Determines whether [is generic list type].
+        /// </summary>
+        /// <param name="srcType">Type of the source.</param>
+        /// <returns>
+        ///   <c>true</c> if [is list type] [the specified type]; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsGenericListType(this Type srcType)
+        {
+            return ((srcType.IsGenericType) &&
+                (srcType.GetGenericTypeDefinition().Equals(typeof(IList<>))));
+        }
+
+        /// <summary>
+        /// Gets the type of the generic.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static Type GetGenericInnerType(this Type type)
+        {
+            if (!type.IsGenericType)
+            {
+                return (type);
+            }
+
+            //Hp --> Assumption: We are only considering list, concreate class with one type only.
+            var innerType = default(Type);
+            if (type.IsNullableType())
+            {
+                innerType = Nullable.GetUnderlyingType(type);
+            }
+            else if ((type.IsGenericListType()) || (type.GetGenericArguments().Count() == 1))
+            {
+                innerType = type.GetGenericArguments()[0];
+            }
+            else
+            {
+                innerType = type;
+            }
+
+            return (innerType);
+        }
+
+        /// <summary>
+        /// Converts the given string value to desired target type string.
+        /// </summary>
+        /// <param name="valueAsStr">The value as string.</param>
+        /// <param name="targetTypeAsStr">The type as string.</param>
+        /// <returns></returns>
+        public static object ConvertTo(string valueAsStr, string targetTypeAsStr)
+        {
+            if (string.IsNullOrWhiteSpace(targetTypeAsStr))
+            {
+                return (valueAsStr);
+            }
+
+            //Hp --> Note: Convert.ChangeType does not handle conversion to nullable types
+            //if the property type is nullable, we need to get the underlying type of the property
+            var targetType = Type.GetType(targetTypeAsStr);
+            return (ConvertTo(valueAsStr, targetType));
+        }
+
+        /// <summary>
+        /// Converts the given string value to desired target type.
+        /// </summary>
+        /// <param name="valueAsStr">The value as string.</param>
+        /// <param name="targetType">The type as string.</param>
+        /// <returns></returns>
+        public static object ConvertTo(string valueAsStr, Type targetType)
+        {
+            return (Convert.ChangeType(valueAsStr, targetType));
         }
 
         /// <summary>
@@ -2373,7 +2470,7 @@ namespace Ducksoft.Soa.Common.Utilities
 
             foreach (var item in source)
             {
-                myObjectType.GetProperty(item.Key).SetValue(myObject, item.Value, null);
+                myObject.SetPropertyValue(item.Key, item.Value);
             }
 
             return (myObject);

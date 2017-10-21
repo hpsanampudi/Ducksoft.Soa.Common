@@ -3,12 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.Serialization;
 
 namespace Ducksoft.Soa.Common.Filters
 {
     /// <summary>
     /// Class which is used to build Linq filter expression by groups. 
     /// </summary>
+    [DataContract(Name = "FilterGroup",
+        Namespace = "http://ducksoftware.co.uk/SOA/WCF/DataContracts")]
     public class FilterGroup
     {
         /// <summary>
@@ -17,6 +20,7 @@ namespace Ducksoft.Soa.Common.Filters
         /// <value>
         /// The type of the operator.
         /// </value>
+        [DataMember]
         public FilterLogicalOperatorTypes OperatorType { get; set; }
 
         /// <summary>
@@ -25,6 +29,7 @@ namespace Ducksoft.Soa.Common.Filters
         /// <value>
         /// The filters.
         /// </value>
+        [DataMember]
         public List<FilterBuilder> Filters { get; set; }
 
         /// <summary>
@@ -33,6 +38,7 @@ namespace Ducksoft.Soa.Common.Filters
         /// <value>
         /// The sub groups.
         /// </value>
+        [DataMember]
         public List<FilterGroup> SubGroups { get; set; }
 
         /// <summary>
