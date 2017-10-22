@@ -178,6 +178,7 @@
     <Compile Include="DataContracts\DbConnectionInfo.cs" />
     <Compile Include="DataContracts\DynamicLinqFilter.cs" />
     <Compile Include="DataContracts\LogMessageTypes.cs" />
+    <Compile Include="DataContracts\PaginationQueryBuilder.cs" />
     <Compile Include="DataContracts\PaginationData.cs" />
     <Compile Include="DataContracts\ProgressData.cs" />
     <Compile Include="DataContracts\QueryOption.cs" />
