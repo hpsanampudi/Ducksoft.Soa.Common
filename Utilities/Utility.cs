@@ -23,6 +23,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
 using System.Xml;
@@ -3317,5 +3318,57 @@ namespace Ducksoft.Soa.Common.Utilities
             });
         }
 
+        /// <summary>
+        /// Executes the given function block asynchronously.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="codeBlock">The code block.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
+        /// <param name="errMessage">The error message.</param>
+        /// <returns></returns>
+        public static Task<T> ExecuteAsync<T>(this Func<T> codeBlock, bool isIgnoreError = false,
+            string errMessage = "Failed to execute given function block asynchronously!")
+        {
+            return (Task.Run(codeBlock)
+            .ContinueWith((antecedent) =>
+            {
+                if ((!isIgnoreError) && (antecedent.Status != TaskStatus.RanToCompletion))
+                {
+                    var customMessage = $"{errMessage} in method {nameof(ExecuteAsync)}";
+                    var innerExceptions =
+                    antecedent.Exception?.InnerExceptions?.ToList() ?? new List<Exception>();
+
+                    throw (new AggregateException(customMessage, innerExceptions));
+                }
+
+                return (antecedent.Result);
+            }, CancellationToken.None));
+        }
+
+        /// <summary>
+        /// Executes the given action block asynchronously.
+        /// </summary>
+        /// <param name="codeBlock">The code block.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
+        /// <param name="errMessage">The error message.</param>
+        /// <returns></returns>
+        public static Task ExecuteAsync(this Action codeBlock, bool isIgnoreError = false,
+            string errMessage = "Failed to execute given function block asynchronously!")
+        {
+            return (Task.Run(codeBlock)
+            .ContinueWith((antecedent) =>
+            {
+                if ((!isIgnoreError) && (antecedent.Status != TaskStatus.RanToCompletion))
+                {
+                    var customMessage = $"{errMessage} in method {nameof(ExecuteAsync)}";
+                    var innerExceptions =
+                    antecedent.Exception?.InnerExceptions?.ToList() ?? new List<Exception>();
+
+                    throw (new AggregateException(customMessage, innerExceptions));
+                }
+
+                return (Task.CompletedTask);
+            }, CancellationToken.None));
+        }
     }
 }
