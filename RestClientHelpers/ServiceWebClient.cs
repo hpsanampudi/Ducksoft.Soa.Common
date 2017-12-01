@@ -1,4 +1,5 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.Soa.Common.DataContracts;
+using Ducksoft.Soa.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -18,51 +19,34 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
     public class ServiceWebClient : ServiceRestFactory<WebClient>
     {
         /// <summary>
-        /// Gets or sets the client.
+        /// Gets the default client.
         /// </summary>
         /// <value>
-        /// The client.
+        /// The default client.
         /// </value>
-        protected override WebClient Client { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ServiceWebClient" /> class.
-        /// </summary>
-        /// <param name="svcBaseUrl">The service base URL.</param>
-        /// <param name="restMsgFormat">The web request and response message format.</param>
-        /// <param name="defaultNamespace">The default namespace.</param>
-        public ServiceWebClient(string svcBaseUrl, WebMessageFormat restMsgFormat
-            , string defaultNamespace) : base(svcBaseUrl, restMsgFormat, defaultNamespace)
-        {
-            ConfigureClient();
-        }
-
-        /// <summary>
-        /// Configures the client settings.
-        /// </summary>
-        /// <param name="client">The client.</param>
         /// <exception cref="ExceptionBase"></exception>
-        public override void ConfigureClient(WebClient client = null)
+        protected override WebClient DefaultClient
         {
-            if (null == client)
+            get
             {
-                Client = new WebClient
+                var client = new WebClient
                 {
                     BaseAddress = SvcBaseUrl,
                     Encoding = Encoding.UTF8
                 };
 
+                var contentType = string.Empty;
                 switch (RestMsgFormat)
                 {
                     case WebMessageFormat.Xml:
                         {
-                            Client.Headers["Content-type"] = "application/xml";
+                            contentType = "application/xml";
                         }
                         break;
 
                     case WebMessageFormat.Json:
                         {
-                            Client.Headers["Content-type"] = "application/json";
+                            contentType = "application/json";
                         }
                         break;
 
@@ -72,11 +56,48 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                             throw (new ExceptionBase(errMessage));
                         }
                 }
+
+                client.Headers[HttpRequestHeader.ContentType] = contentType;
+                return (client);
             }
-            else
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServiceWebClient" /> class.
+        /// </summary>
+        /// <param name="svcBaseUrl">The service base URL.</param>
+        /// <param name="restMsgFormat">The web request and response message format.</param>
+        /// <param name="defaultNamespace">The default namespace.</param>
+        /// <param name="authType">Type of the authentication.</param>
+        public ServiceWebClient(string svcBaseUrl, WebMessageFormat restMsgFormat,
+            string defaultNamespace, ServiceAuthTypes authType)
+            : base(svcBaseUrl, restMsgFormat, defaultNamespace, authType)
+        {
+        }
+
+        /// <summary>
+        /// Initializes the client.
+        /// </summary>
+        /// <returns></returns>
+        protected WebClient InitializeClient()
+        {
+            var client = ConfigureClient();
+            if (client == null)
             {
-                Client = client;
+                return (client);
             }
+
+            if (AuthType == ServiceAuthTypes.OAuth2)
+            {
+                var tokenResponse = GetOAuth2Token();
+                if (!tokenResponse?.IsError ?? false)
+                {
+                    client.Headers[HttpRequestHeader.Authorization] =
+                        $"{tokenResponse.TokenType} {tokenResponse.AccessToken}";
+                }
+            }
+
+            return (client);
         }
 
         /// <summary>
@@ -84,17 +105,23 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The operation contract path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        public override TResponse GetData<TResponse>(string contractOrApiPath)
+        public override TResponse GetData<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             var result = default(TResponse);
 
             try
             {
-                var response = Client.DownloadData(contractOrApiPath);
-                EnsureValidResponse(response);
+                var client = InitializeClient();
+                var response = client.DownloadData(contractOrApiPath);
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response);
+                }
 
                 //Hp --> Note: WebClient is not deserializing the response properly.
                 //using (var respStream = new MemoryStream(response))
@@ -120,18 +147,23 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        public override async Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath)
+        public override async Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             var result = default(TResponse);
-            var cancelToken = TokenSource.Token;
+            var cancelToken = CancelTokenSource.Token;
 
             try
             {
                 var response = await DownloadDataTaskAsync(contractOrApiPath, cancelToken);
-                EnsureValidResponse(response, cancelToken);
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response, cancelToken);
+                }
 
                 //Hp --> Note: WebClient is not deserializing the response properly.
                 //using (var respStream = new MemoryStream(response))
@@ -157,17 +189,23 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        public override List<TResponse> GetDataList<TResponse>(string contractOrApiPath)
+        public override List<TResponse> GetDataList<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             var result = new List<TResponse>();
 
             try
             {
-                var response = Client.DownloadData(contractOrApiPath);
-                EnsureValidResponse(response);
+                var client = InitializeClient();
+                var response = client.DownloadData(contractOrApiPath);
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response);
+                }
 
                 //Hp --> Note: WebClient is not deserializing the response properly.
                 //using (var respStream = new MemoryStream(response))
@@ -194,19 +232,23 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override async Task<List<TResponse>> GetDataListAsync<TResponse>(
-            string contractOrApiPath)
+            string contractOrApiPath, bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             var result = new List<TResponse>();
-            var cancelToken = TokenSource.Token;
+            var cancelToken = CancelTokenSource.Token;
 
             try
             {
                 var response = await DownloadDataTaskAsync(contractOrApiPath, cancelToken);
-                EnsureValidResponse(response, cancelToken);
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response, cancelToken);
+                }
 
                 //Hp --> Note: WebClient is not deserializing the response properly.
                 //using (var respStream = new MemoryStream(response))
@@ -232,16 +274,21 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// Posts the data.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <exception cref="ExceptionBase"></exception>
-        public override void PostData(string contractOrApiPath)
+        public override void PostData(string contractOrApiPath, bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
 
             try
             {
                 //Hp --> Note: As we are not passing request object set with new instance.
-                var response = Client.UploadData(contractOrApiPath, "POST", new byte[] { });
-                EnsureValidResponse(response);
+                var client = InitializeClient();
+                var response = client.UploadData(contractOrApiPath, "POST", new byte[] { });
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response);
+                }
             }
             catch (Exception ex)
             {
@@ -254,20 +301,26 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// Posts the data asynchronous.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        public override async Task PostDataAsync(string contractOrApiPath)
+        public override async Task PostDataAsync(string contractOrApiPath,
+            bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
-            var cancelToken = TokenSource.Token;
+            var cancelToken = CancelTokenSource.Token;
 
             try
             {
                 var response =
                     await UploadDataTaskAsync(contractOrApiPath, cancelToken: cancelToken);
 
-                EnsureValidResponse(response, cancelToken);
-                await Task.CompletedTask;
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response, cancelToken);
+                }
+
+                await Utility.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -281,9 +334,11 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        public override TResponse PostData<TResponse>(string contractOrApiPath)
+        public override TResponse PostData<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             var result = default(TResponse);
@@ -291,8 +346,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
             try
             {
                 //Hp --> Note: As we are not passing request object set with new instance.
-                var response = Client.UploadData(contractOrApiPath, "POST", new byte[] { });
-                EnsureValidResponse(response);
+                var client = InitializeClient();
+                var response = client.UploadData(contractOrApiPath, "POST", new byte[] { });
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response);
+                }
 
                 //Hp --> Note: WebClient is not deserializing the response properly.
                 //using (var respStream = new MemoryStream(response))
@@ -318,20 +377,25 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        public override async Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath)
+        public override async Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             var result = default(TResponse);
-            var cancelToken = TokenSource.Token;
+            var cancelToken = CancelTokenSource.Token;
 
             try
             {
                 var response =
                     await UploadDataTaskAsync(contractOrApiPath, cancelToken: cancelToken);
 
-                EnsureValidResponse(response, cancelToken);
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response, cancelToken);
+                }
 
                 //Hp --> Note: WebClient is not deserializing the response properly.
                 //using (var respStream = new MemoryStream(response))
@@ -360,10 +424,11 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override TResponse PostData<TRequest, TResponse>(string contractOrApiPath,
-            TRequest requestObject, string requestObjNamespace = "")
+            TRequest requestObject, string requestObjNamespace = "", bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             ErrorBase.CheckArgIsNull(requestObject, () => requestObject);
@@ -378,8 +443,13 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                 //So, instead of using WebClient serializing mechanism use rest sharp serializer.
                 var rawRequestData = SerializeTo(requestObject, requestObjNamespace);
                 var requestInBytes = Encoding.UTF8.GetBytes(rawRequestData);
-                var response = Client.UploadData(contractOrApiPath, "POST", requestInBytes);
-                EnsureValidResponse(response);
+
+                var client = InitializeClient();
+                var response = client.UploadData(contractOrApiPath, "POST", requestInBytes);
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response);
+                }
 
                 //Hp --> Note: WebClient is not deserializing the response properly.
                 //using (var respStream = new MemoryStream(response))
@@ -408,15 +478,17 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override async Task<TResponse> PostDataAsync<TRequest, TResponse>(
-            string contractOrApiPath, TRequest requestObject, string requestObjNamespace = "")
+            string contractOrApiPath, TRequest requestObject, string requestObjNamespace = "",
+            bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             ErrorBase.CheckArgIsNull(requestObject, () => requestObject);
             var result = default(TResponse);
-            var cancelToken = TokenSource.Token;
+            var cancelToken = CancelTokenSource.Token;
 
             try
             {
@@ -430,7 +502,10 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                 var response = await UploadDataTaskAsync(contractOrApiPath,
                     requestObjInBytes: requestInBytes, cancelToken: cancelToken);
 
-                EnsureValidResponse(response, cancelToken);
+                if (!isIgnoreError)
+                {
+                    EnsureValidResponse(response, cancelToken);
+                }
 
                 //Hp --> Note: WebClient is not deserializing the response properly.
                 //using (var respStream = new MemoryStream(response))
@@ -458,10 +533,6 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            if (null != Client)
-            {
-                Client.Dispose();
-            }
         }
 
         /// <summary>
@@ -510,9 +581,11 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
 
             CheckForCancellationRequest(cancelToken);
-            using (cancelToken.Register(Client.CancelAsync))
+
+            var client = InitializeClient();
+            using (cancelToken.Register(client.CancelAsync))
             {
-                return (await Client.DownloadDataTaskAsync(contractOrApiPath));
+                return (await client.DownloadDataTaskAsync(contractOrApiPath));
             }
         }
 
@@ -539,9 +612,10 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                 requestObjInBytes = new byte[] { };
             }
 
-            using (cancelToken.Register(Client.CancelAsync))
+            var client = InitializeClient();
+            using (cancelToken.Register(client.CancelAsync))
             {
-                return (await Client.UploadDataTaskAsync(
+                return (await client.UploadDataTaskAsync(
                     contractOrApiPath, webMethod, requestObjInBytes));
             }
         }

@@ -801,6 +801,27 @@ namespace Ducksoft.Soa.Common.Utilities
         }
 
         /// <summary>
+        /// To the nullable date time.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="defValue">The definition value.</param>
+        /// <returns></returns>
+        public static DateTime? ToNullableDateTime(this string value,
+            DateTime? defValue = default(DateTime?))
+        {
+            var result = defValue;
+            try
+            {
+                result = DateTime.Parse(value);
+            }
+            catch
+            {
+                Debug.WriteLine("Cannot convert given value to datetime: " + value);
+            }
+            return (result);
+        }
+
+        /// <summary>
         /// If given value is default datetime then it reset to null otherwise returns same.
         /// </summary>
         /// <param name="value">The value.</param>
@@ -1224,8 +1245,7 @@ namespace Ducksoft.Soa.Common.Utilities
             try
             {
                 enumValue = GetEnumValues<TEnum>().Single(item =>
-                   GetEnumDescription(item as Enum, IsDisplayError).Equals(description,
-                   StringComparison.CurrentCultureIgnoreCase));
+                   GetEnumDescription(item as Enum, IsDisplayError).IsEqualTo(description));
             }
             catch
             {
@@ -1253,8 +1273,7 @@ namespace Ducksoft.Soa.Common.Utilities
             try
             {
                 enumValue = GetEnumValues<TEnum>().Single(item =>
-                   GetEnumDescription<TAttr>(item as Enum, IsDisplayError).Equals(description,
-                   StringComparison.CurrentCultureIgnoreCase));
+                   GetEnumDescription<TAttr>(item as Enum, IsDisplayError).IsEqualTo(description));
             }
             catch
             {
@@ -1278,8 +1297,7 @@ namespace Ducksoft.Soa.Common.Utilities
             try
             {
                 enumValue = Enum.GetValues(enumType).Cast<Enum>().Single(item =>
-                   GetEnumDescription(item, IsDisplayError).Equals(
-                       description, StringComparison.CurrentCultureIgnoreCase));
+                   GetEnumDescription(item, IsDisplayError).IsEqualTo(description));
             }
             catch
             {
@@ -2812,7 +2830,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <returns></returns>
         public static IEqualityComparer<T> GetEqualityComparer<T>()
         {
-            IEqualityComparer<T> comparer = null;
+            IEqualityComparer<T> comparer = EqualityComparer<T>.Default;
             if (typeof(T).IsValueType)
             {
                 comparer = new CustomEqualityComparer<T>(item => item);
@@ -3167,33 +3185,39 @@ namespace Ducksoft.Soa.Common.Utilities
         public static decimal ToPrecision(this decimal amount, int precision = 2) =>
             Math.Round(amount, precision, MidpointRounding.AwayFromZero);
 
+        /// To the SQL short date "yyyyMMdd".
+        /// </summary>
+        /// <param name="date">The date.</param>
+        /// <param name="delimeter">The delimeter.</param>
+        /// <returns></returns>
+        public static string ToSQLShortDate(this DateTime date, string delimeter = "") =>
+            date.ToString($"yyyy{delimeter}MM{delimeter}dd");
+
         /// <summary>
         /// To the UK short date "dd/MM/yyyy".
         /// </summary>
         /// <param name="date">The date.</param>
+        /// <param name="delimeter">The delimeter.</param>
         /// <returns></returns>
-        public static string ToUKShortDate(this DateTime date) => date.ToString("dd/MM/yyyy");
-
-        /// <summary>
-        /// To the SQL short date "yyyyMMdd".
-        /// </summary>
-        /// <param name="date">The date.</param>
-        /// <returns></returns>
-        public static string ToSQLShortDate(this DateTime date) => date.ToString("yyyyMMdd");
+        public static string ToUKShortDate(this DateTime date, string delimeter = "/") =>
+            date.ToString($"dd{delimeter}MM{delimeter}yyyy");
 
         /// <summary>
         /// To the UK full english date "dd MMMM yyyy".
         /// </summary>
         /// <param name="date">The date.</param>
         /// <returns></returns>
-        public static string ToUKFullEnuDate(this DateTime date) => date.ToString("dd MMMM yyyy");
+        public static string ToUKFullEnuDate(this DateTime date, string delimeter = " ") =>
+            date.ToString($"dd{delimeter}MMMM{delimeter}yyyy");
 
         /// <summary>
         /// To the UK short english date "dd-MMM-yyyy".
         /// </summary>
         /// <param name="date">The date.</param>
+        /// <param name="delimeter">The delimeter.</param>
         /// <returns></returns>
-        public static string ToUKShortEnuDate(this DateTime date) => date.ToString("dd-MMM-yyyy");
+        public static string ToUKShortEnuDate(this DateTime date, string delimeter = "-") =>
+            date.ToString($"dd{delimeter}MMM{delimeter}yyyy");
 
         /// <summary>
         /// To the short year "yy".
@@ -3353,7 +3377,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <param name="errMessage">The error message.</param>
         /// <returns></returns>
         public static Task ExecuteAsync(this Action codeBlock, bool isIgnoreError = false,
-            string errMessage = "Failed to execute given function block asynchronously!")
+            string errMessage = "Failed to execute given action block asynchronously!")
         {
             return (Task.Run(codeBlock)
             .ContinueWith((antecedent) =>
@@ -3370,5 +3394,17 @@ namespace Ducksoft.Soa.Common.Utilities
                 return (Task.CompletedTask);
             }, CancellationToken.None));
         }
+
+        /// <summary>
+        /// Gets the completed task.
+        /// </summary>
+        /// <value>
+        /// The completed task.
+        /// </value>
+        /// <remarks>
+        /// Workaround for Task.CompletedTask in .Net 4.6
+        /// </remarks>
+        public static Task CompletedTask { get; } = Task.FromResult(false);
+
     }
 }

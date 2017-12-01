@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ducksoft.Soa.Common.DataContracts;
+using System;
 using System.Collections.Generic;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
@@ -36,65 +37,90 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         string DefaultNamespace { get; }
 
         /// <summary>
+        /// Gets the type of the authentication.
+        /// </summary>
+        /// <value>
+        /// The type of the authentication.
+        /// </value>
+        ServiceAuthTypes AuthType { get; }
+
+        /// <summary>
+        /// Occurs when [on raise OAuth2 token request].
+        /// </summary>
+        event Func<OAuth2TokenRequest> OnRaiseOAuth2TokenRequest;
+
+        /// <summary>
         /// Gets the data.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        TResponse GetData<TResponse>(string contractOrApiPath);
+        TResponse GetData<TResponse>(string contractOrApiPath, bool isIgnoreError = false);
 
         /// <summary>
         /// Gets the data asynchronous.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath);
+        Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Gets the data list.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        List<TResponse> GetDataList<TResponse>(string contractOrApiPath);
+        List<TResponse> GetDataList<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Gets the data list asynchronous.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        Task<List<TResponse>> GetDataListAsync<TResponse>(string contractOrApiPath);
+        Task<List<TResponse>> GetDataListAsync<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
-        void PostData(string contractOrApiPath);
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
+        void PostData(string contractOrApiPath, bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        Task PostDataAsync(string contractOrApiPath);
+        Task PostDataAsync(string contractOrApiPath, bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        TResponse PostData<TResponse>(string contractOrApiPath);
+        TResponse PostData<TResponse>(string contractOrApiPath, bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath);
+        Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
@@ -104,9 +130,11 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="">The .</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         TResponse PostData<TRequest, TResponse>(string contractOrApiPath, TRequest requestObject,
-            string requestObjNamespace = "");
+            string requestObjNamespace = "", bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
@@ -116,8 +144,9 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         Task<TResponse> PostDataAsync<TRequest, TResponse>(string contractOrApiPath,
-            TRequest requestObject, string requestObjNamespace = "");
+            TRequest requestObject, string requestObjNamespace = "", bool isIgnoreError = false);
     }
 }

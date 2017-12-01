@@ -121,36 +121,11 @@ namespace Ducksoft.Soa.Common.VirtualList
         /// <summary>
         /// Initializes a new instance of the <see cref="VirtualBindingList{T}" /> class.
         /// </summary>
-        public VirtualBindingList() : this(null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VirtualBindingList{T}" /> class.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        public VirtualBindingList(IEnumerable<T> source) : this(source, false)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VirtualBindingList{T}"/> class.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="isFilterDuplicates">if set to <c>true</c> [is filter duplicates].</param>
-        public VirtualBindingList(IEnumerable<T> source, bool isFilterDuplicates)
-            : this(source, isFilterDuplicates, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VirtualBindingList{T}" /> class.
-        /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="isFilterDuplicates">if set to <c>true</c> [is filter duplicates].</param>
         /// <param name="syncObject">The synchronize object.</param>
-        public VirtualBindingList(IEnumerable<T> source, bool isFilterDuplicates,
-            ISynchronizeInvoke syncObject) : base(source?.ToList() ?? new List<T>())
+        public VirtualBindingList(IEnumerable<T> source = null, bool isFilterDuplicates = false,
+            ISynchronizeInvoke syncObject = null) : base(source?.ToList() ?? new List<T>())
         {
             DataSource = new List<T>();
             this.isFilterDuplicates = isFilterDuplicates;

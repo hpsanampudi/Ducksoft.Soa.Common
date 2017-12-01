@@ -1,5 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using Ducksoft.Soa.Common.DataContracts;
+using System;
 using System.ServiceModel.Web;
 
 namespace Ducksoft.Soa.Common.RestClientHelpers
@@ -14,26 +14,34 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// The rest factory
         /// </summary>
         protected readonly ServiceRestFactory<TClient> RestFactory;
+
+        /// <summary>
+        /// Occurs when [register client].
+        /// </summary>
+        public event Func<TClient> RegisterClient;
+
+        /// <summary>
+        /// Occurs when [register OAuth2 token request].
+        /// </summary>
+        public event Func<OAuth2TokenRequest> RegisterOAuth2TokenRequest;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RestServiceClient{TClient}" /> class.
         /// </summary>
         /// <param name="svcBaseUrl">The service base URL.</param>
         /// <param name="restMsgFormat">The rest message format.</param>
         /// <param name="defaultNamespace">The default namespace.</param>
+        /// <param name="authType">Type of the authentication.</param>
         public RestServiceClient(string svcBaseUrl,
-            WebMessageFormat restMsgFormat = WebMessageFormat.Json, string defaultNamespace = "")
+            WebMessageFormat restMsgFormat = WebMessageFormat.Json, string defaultNamespace = "",
+            ServiceAuthTypes authType = ServiceAuthTypes.None)
         {
-            RestFactory =
-                ServiceRestFactory<TClient>.Create(svcBaseUrl, restMsgFormat, defaultNamespace);
+            RestFactory = ServiceRestFactory<TClient>.Create(
+                svcBaseUrl, restMsgFormat, defaultNamespace, authType);
 
-            ConfigureClient();
+            RestFactory.OnRaiseOAuth2TokenRequest += () => RegisterOAuth2TokenRequest?.Invoke();
+            RestFactory.OnInitClient += () => RegisterClient?.Invoke();
         }
-
-        /// <summary>
-        /// Configures the client settings.
-        /// </summary>
-        protected virtual void ConfigureClient()
-            => Debug.WriteLine($"Using default client settings for \"{typeof(TClient)}\" ");
 
         #region Interface: IDisposable implementation
         /// <summary>
@@ -62,7 +70,5 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
             }
         }
         #endregion
-
-
     }
 }

@@ -173,6 +173,7 @@
     <Compile Include="Caching\CacheManager.cs" />
     <Compile Include="Caching\CacheTypes.cs" />
     <Compile Include="Contracts\ILoggingService.cs" />
+    <Compile Include="DataContracts\BatchTaskResult.cs" />
     <Compile Include="DataContracts\CustomMsgHeader.cs" />
     <Compile Include="DataContracts\CustomFault.cs" />
     <Compile Include="DataContracts\DbConnectionInfo.cs" />
@@ -182,6 +183,7 @@
     <Compile Include="DataContracts\PaginationData.cs" />
     <Compile Include="DataContracts\ProgressData.cs" />
     <Compile Include="DataContracts\QueryOption.cs" />
+    <Compile Include="DataContracts\ServiceAuthTypes.cs" />
     <Compile Include="EFHelpers\Models\EFDataServiceBase.cs" />
     <Compile Include="EFHelpers\Models\EFDataServiceRepository.cs" />
     <Compile Include="EFHelpers\Models\EntityLoader.cs" />
@@ -215,6 +217,8 @@
     <Compile Include="RestClientHelpers\CustomHttpBehaviorExtensions.cs" />
     <Compile Include="RestClientHelpers\CustomWebHttpBehavior.cs" />
     <Compile Include="RestClientHelpers\IServiceRestFactory.cs" />
+    <Compile Include="DataContracts\OAuth2TokenRequest.cs" />
+    <Compile Include="DataContracts\OAuth2TokenResponse.cs" />
     <Compile Include="RestClientHelpers\RestServiceClient.cs" />
     <Compile Include="RestClientHelpers\ServiceHttpClient.cs" />
     <Compile Include="RestClientHelpers\ServiceRestFactory.cs" />
@@ -228,7 +232,11 @@
     <Compile Include="T4Helpers\SystemTypeAttribute.cs" />
     <Compile Include="T4Helpers\TypeSelector.cs" />
     <Compile Include="Utilities\CustomNavigationList.cs" />
+    <Compile Include="Utilities\DictionaryComparer.cs" />
+    <Compile Include="Utilities\ListComparer.cs" />
     <Compile Include="Utilities\LogHelper.cs" />
+    <Compile Include="Utilities\ReadOnlyDictionaryWrapper.cs" />
+    <Compile Include="Utilities\ReadOnlyListWrapper.cs" />
     <Compile Include="VirtualList\Model\IVirtualDataGridModel.cs" />
     <Compile Include="VirtualList\View\IVirtualDataGridView.cs" />
     <Compile Include="VirtualList\VirtualBindingList.cs" />

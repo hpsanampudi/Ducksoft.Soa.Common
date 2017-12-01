@@ -1,10 +1,12 @@
-﻿using RestSharp;
+﻿using Ducksoft.Soa.Common.DataContracts;
+using Ducksoft.Soa.Common.Utilities;
+using RestSharp;
 using RestSharp.Deserializers;
 using RestSharp.Serializers;
-using Ducksoft.Soa.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.ServiceModel.Web;
@@ -45,9 +47,22 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         public string DefaultNamespace { get; private set; }
 
         /// <summary>
-        /// The token source
+        /// Gets the type of the authentication.
         /// </summary>
-        public readonly CancellationTokenSource TokenSource;
+        /// <value>
+        /// The type of the authentication.
+        /// </value>
+        public ServiceAuthTypes AuthType { get; private set; }
+
+        /// <summary>
+        /// Occurs when [on raise OAuth2 token request].
+        /// </summary>
+        public event Func<OAuth2TokenRequest> OnRaiseOAuth2TokenRequest;
+
+        /// <summary>
+        /// The cancellation token source
+        /// </summary>
+        public readonly CancellationTokenSource CancelTokenSource;
 
         /// <summary>
         /// The register cancel token
@@ -55,12 +70,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         protected CancellationTokenRegistration registerCancelToken;
 
         /// <summary>
-        /// Gets or sets the client.
+        /// Gets the current OAuth2 token.
         /// </summary>
         /// <value>
-        /// The client.
+        /// The current OAuth2 token.
         /// </value>
-        protected abstract TClient Client { get; set; }
+        protected OAuth2TokenResponse CurrentOAuth2Token { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceRestFactory{TClient}" /> class.
@@ -68,15 +83,17 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="svcBaseUrl">The service base URL.</param>
         /// <param name="restMsgFormat">The web request and response message format.</param>
         /// <param name="defaultNamespace">The default namespace.</param>
+        /// <param name="authType">Type of the authentication.</param>
         public ServiceRestFactory(string svcBaseUrl, WebMessageFormat restMsgFormat,
-            string defaultNamespace)
+            string defaultNamespace, ServiceAuthTypes authType)
         {
             SvcBaseUrl = svcBaseUrl;
             RestMsgFormat = restMsgFormat;
             DefaultNamespace = defaultNamespace;
+            AuthType = authType;
 
-            TokenSource = new CancellationTokenSource();
-            var cancelToken = TokenSource.Token;
+            CancelTokenSource = new CancellationTokenSource();
+            var cancelToken = CancelTokenSource.Token;
             registerCancelToken = cancelToken.Register(() =>
             {
                 Debug.WriteLine($"User canceled the asyncronous task");
@@ -90,33 +107,34 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="svcBaseUrl">The service base URL.</param>
         /// <param name="restMsgFormat">The web request and response message format.</param>
         /// <param name="defaultNamespace">The default namespace.</param>
+        /// <param name="authType">Type of the authentication.</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public static ServiceRestFactory<TClient> Create(string svcBaseUrl,
             WebMessageFormat restMsgFormat = WebMessageFormat.Json,
-            string defaultNamespace = "")
+            string defaultNamespace = "", ServiceAuthTypes authType = ServiceAuthTypes.None)
         {
             var restFactory = default(ServiceRestFactory<TClient>);
             var clientType = typeof(TClient);
             if (typeof(RestClient) == clientType)
             {
-                restFactory = new ServiceRSharpClient(svcBaseUrl, restMsgFormat, defaultNamespace)
-                    as ServiceRestFactory<TClient>;
+                restFactory = new ServiceRSharpClient(svcBaseUrl, restMsgFormat,
+                    defaultNamespace, authType) as ServiceRestFactory<TClient>;
             }
             else if (typeof(HttpClient) == clientType)
             {
-                restFactory = new ServiceHttpClient(svcBaseUrl, restMsgFormat, defaultNamespace)
-                    as ServiceRestFactory<TClient>;
+                restFactory = new ServiceHttpClient(svcBaseUrl, restMsgFormat,
+                    defaultNamespace, authType) as ServiceRestFactory<TClient>;
             }
             else if (typeof(WebClient) == clientType)
             {
-                restFactory = new ServiceWebClient(svcBaseUrl, restMsgFormat, defaultNamespace)
-                    as ServiceRestFactory<TClient>;
+                restFactory = new ServiceWebClient(svcBaseUrl, restMsgFormat,
+                    defaultNamespace, authType) as ServiceRestFactory<TClient>;
             }
             else if (typeof(WebRequest) == clientType)
             {
-                restFactory = new ServiceWebRequest(svcBaseUrl, restMsgFormat, defaultNamespace)
-                    as ServiceRestFactory<TClient>;
+                restFactory = new ServiceWebRequest(svcBaseUrl, restMsgFormat,
+                    defaultNamespace, authType) as ServiceRestFactory<TClient>;
             }
             else
             {
@@ -128,71 +146,102 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         }
 
         /// <summary>
-        /// Configures the client settings.
+        /// Gets the default client.
         /// </summary>
-        /// <param name="client">The client.</param>
-        public abstract void ConfigureClient(TClient client = null);
+        /// <value>
+        /// The default client.
+        /// </value>
+        protected abstract TClient DefaultClient { get; }
+
+        /// <summary>
+        /// Occurs when [on initialize client].
+        /// </summary>
+        public event Func<TClient> OnInitClient;
+
+        /// <summary>
+        /// Configures the client.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual TClient ConfigureClient()
+        {
+            var handler = OnInitClient;
+            return (handler?.Invoke() ?? DefaultClient);
+        }
 
         /// <summary>
         /// Gets the data.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The operation contract path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        public abstract TResponse GetData<TResponse>(string contractOrApiPath);
+        public abstract TResponse GetData<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Gets the data asynchronous.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        public abstract Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath);
+        public abstract Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Gets the data list.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        public abstract List<TResponse> GetDataList<TResponse>(string contractOrApiPath);
+        public abstract List<TResponse> GetDataList<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Gets the data list asynchronous.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        public abstract Task<List<TResponse>> GetDataListAsync<TResponse>(string contractOrApiPath);
+        public abstract Task<List<TResponse>> GetDataListAsync<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
-        public abstract void PostData(string contractOrApiPath);
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
+        public abstract void PostData(string contractOrApiPath, bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        public abstract Task PostDataAsync(string contractOrApiPath);
+        public abstract Task PostDataAsync(string contractOrApiPath, bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        public abstract TResponse PostData<TResponse>(string contractOrApiPath);
+        public abstract TResponse PostData<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        public abstract Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath);
+        public abstract Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath,
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
@@ -202,9 +251,10 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract TResponse PostData<TRequest, TResponse>(string contractOrApiPath,
-            TRequest requestObject, string requestObjNamespace = "");
+            TRequest requestObject, string requestObjNamespace = "", bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
@@ -214,9 +264,10 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract Task<TResponse> PostDataAsync<TRequest, TResponse>(string contractOrApiPath,
-            TRequest requestObject, string requestObjNamespace = "");
+            TRequest requestObject, string requestObjNamespace = "", bool isIgnoreError = false);
 
         #region Interface: IDisposable implementation
         /// <summary>
@@ -244,12 +295,79 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                 registerCancelToken.Dispose();
             }
 
-            if (null != TokenSource)
+            if (null != CancelTokenSource)
             {
-                TokenSource.Dispose();
+                CancelTokenSource.Dispose();
             }
         }
         #endregion
+
+        /// <summary>
+        /// Gets the OAuth2 token.
+        /// </summary>
+        /// <param name="isDisplayError">if set to <c>true</c> [is display error].</param>
+        /// <returns></returns>
+        /// <exception cref="ExceptionBase"></exception>
+        protected virtual OAuth2TokenResponse GetOAuth2Token(bool isDisplayError = true)
+        {
+            if (AuthType != ServiceAuthTypes.OAuth2)
+            {
+                var errMessage = $"Invalid token authorization type: \"{nameof(AuthType)}\"";
+                throw (new ExceptionBase(errMessage));
+            }
+
+            var handler = OnRaiseOAuth2TokenRequest;
+            var tokenRequest = handler?.Invoke();
+            if (tokenRequest == null)
+            {
+                var errMessage = $"Object {nameof(tokenRequest)} instance is null!";
+                throw (new ExceptionBase(errMessage));
+            }
+
+            if ((tokenRequest.Equals(CurrentOAuth2Token?.TokenRequest)) &&
+                (!CurrentOAuth2Token?.IsTokenExpired ?? false))
+            {
+                return (CurrentOAuth2Token);
+            }
+
+            var client = new RestClient(tokenRequest.TokenUrl);
+            var request = new RestRequest(Method.POST);
+            request.RequestFormat = DataFormat.Json;
+
+            if (!tokenRequest.Headers.ContainsKey("content-type"))
+            {
+                tokenRequest.Headers.Add("content-type", "application/x-www-form-urlencoded");
+            }
+
+            foreach (var item in tokenRequest.Headers)
+            {
+                request.AddHeader(item.Key, item.Value);
+            }
+
+            var contentType = tokenRequest.Headers["content-type"];
+            var bodyParmeters = string.Join("&",
+                tokenRequest.BodyParameters.Select(item => $"{item.Key}={item.Value}"));
+
+            request.AddParameter(contentType, bodyParmeters, ParameterType.RequestBody);
+
+            var response = client.Execute(request);
+            if ((isDisplayError) &&
+                ((response.StatusCode != HttpStatusCode.OK) || (response.ErrorException != null)))
+            {
+                var errMessage =
+                        $"{response.StatusDescription}{Environment.NewLine}{response.Content}";
+
+                throw (new ExceptionBase(errMessage, response.ErrorException));
+            }
+
+            var tokenResponse = DeserializeFrom<OAuth2TokenResponse>(response);
+            tokenResponse.StatusCode = response.StatusCode;
+            tokenResponse.Raw = response.Content;
+            tokenResponse.TokenRequest = tokenRequest;
+            CurrentOAuth2Token = tokenResponse;
+
+            return (tokenResponse);
+        }
 
         /// <summary>
         /// Gets the json date.

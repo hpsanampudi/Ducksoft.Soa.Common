@@ -27,6 +27,7 @@ namespace Ducksoft.Soa.Common.RestClientConverters
                 (typeof(float[]) == type) ||
                 (typeof(string[]) == type) ||
                 (typeof(DateTime) == type) ||
+                (typeof(DateTime?) == type) ||
                 (type.IsEnum) ||
                 (base.CanConvert(type)));
         }
@@ -75,7 +76,11 @@ namespace Ducksoft.Soa.Common.RestClientConverters
             }
             else if (typeof(DateTime) == parameterType)
             {
-                return (Utility.ToDateTime(parameter));
+                return (parameter.ToDateTime());
+            }
+            else if (typeof(DateTime?) == parameterType)
+            {
+                return (parameter.ToNullableDateTime());
             }
             else if (parameterType.IsArray)
             {
@@ -139,6 +144,11 @@ namespace Ducksoft.Soa.Common.RestClientConverters
             {
                 //Hp --> Logic: If object value is null then return default value.
                 return ((null != parameter) ? parameter.ToString() : default(DateTime).ToString());
+            }
+            else if (typeof(DateTime?) == parameterType)
+            {
+                //Hp --> Logic: If object value is null then return empty string.
+                return ((null != parameter) ? parameter.ToString() : string.Empty);
             }
             else if (parameterType.IsArray)
             {
