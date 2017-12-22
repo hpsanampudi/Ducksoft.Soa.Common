@@ -215,10 +215,12 @@
     <Compile Include="ODataHelpers\MockDataServiceQuery.cs" />
     <Compile Include="RestClientConverters\CustomQueryStringConverter.cs" />
     <Compile Include="RestClientHelpers\CustomHttpBehaviorExtensions.cs" />
+    <Compile Include="RestClientHelpers\CustomJsonSerializerStrategy.cs" />
     <Compile Include="RestClientHelpers\CustomWebHttpBehavior.cs" />
     <Compile Include="RestClientHelpers\IServiceRestFactory.cs" />
     <Compile Include="DataContracts\OAuth2TokenRequest.cs" />
     <Compile Include="DataContracts\OAuth2TokenResponse.cs" />
+    <Compile Include="RestClientHelpers\JsonStrategyTypes.cs" />
     <Compile Include="RestClientHelpers\RestServiceClient.cs" />
     <Compile Include="RestClientHelpers\ServiceHttpClient.cs" />
     <Compile Include="RestClientHelpers\ServiceRestFactory.cs" />

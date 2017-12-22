@@ -54,18 +54,25 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        TResponse GetData<TResponse>(string contractOrApiPath, bool isIgnoreError = false);
+        TResponse GetData<TResponse>(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Gets the data asynchronous.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath,
+        Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
@@ -73,9 +80,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        List<TResponse> GetDataList<TResponse>(string contractOrApiPath,
+        List<TResponse> GetDataList<TResponse>(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
@@ -83,43 +93,61 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         Task<List<TResponse>> GetDataListAsync<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
-        void PostData(string contractOrApiPath, bool isIgnoreError = false);
+        void PostData(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        Task PostDataAsync(string contractOrApiPath, bool isIgnoreError = false);
+        Task PostDataAsync(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        TResponse PostData<TResponse>(string contractOrApiPath, bool isIgnoreError = false);
+        TResponse PostData<TResponse>(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath,
+        Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
@@ -130,11 +158,14 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
-        /// <param name="">The .</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         TResponse PostData<TRequest, TResponse>(string contractOrApiPath, TRequest requestObject,
-            string requestObjNamespace = "", bool isIgnoreError = false);
+            string requestObjNamespace = "", string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
@@ -144,9 +175,13 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         Task<TResponse> PostDataAsync<TRequest, TResponse>(string contractOrApiPath,
-            TRequest requestObject, string requestObjNamespace = "", bool isIgnoreError = false);
+            TRequest requestObject, string requestObjNamespace = "", string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
     }
 }

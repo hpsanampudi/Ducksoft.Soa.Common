@@ -79,7 +79,7 @@ namespace Ducksoft.Soa.Common.DataContracts
                 var result = Utility.CompareDateTime(ExpiryDateTime, DateTime.Now);
                 return ((IsError) || (!result.IsPast));
             }
-            private set { }
+            set { }
         }
 
         /// <summary>

@@ -3241,6 +3241,20 @@ namespace Ducksoft.Soa.Common.Utilities
         public static string ToODataDate(this DateTime date) => $"datetime'{date.ToString("s")}'";
 
         /// <summary>
+        /// Gets the json date.
+        /// </summary>
+        /// <param name="dateTime">The date time.</param>
+        /// <returns></returns>
+        public static long ToJsonDate(string dateTime)
+        {
+            ErrorBase.CheckArgIsNullOrDefault(dateTime, () => dateTime);
+
+            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            var currentDate = DateTime.Parse(dateTime);
+            return ((currentDate - unixEpoch).Ticks / TimeSpan.TicksPerMillisecond);
+        }
+
+        /// <summary>
         /// To the Odata URL encode.
         /// </summary>
         /// <param name="srcData">The source data.</param>
@@ -3292,6 +3306,39 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <returns></returns>
         public static string ToTitleCase(this string source) =>
             CultureInfo.CurrentUICulture.TextInfo.ToTitleCase(source);
+
+        /// <summary>
+        /// To the camel case.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static string ToCamelCase(this string source)
+        {
+            if ((string.IsNullOrWhiteSpace(source)) || (char.IsLower(source, 0)))
+            {
+                return (source);
+            }
+
+            var subStr = (source.Length <= 1) ? string.Empty : source.Substring(1);
+            return (string.Concat(source[0].ToString().ToLowerInvariant(), subStr).Trim());
+        }
+
+        /// <summary>
+        /// To the snake case.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static string ToSnakeCase(this string source)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                return (source);
+            }
+
+            //PascalCase to snake_case
+            return (string.Concat(source.Select((x, i) => i > 0 && char.IsUpper(x) ?
+            "_" + char.ToLower(x).ToString() : x.ToString())).Trim());
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is design mode.

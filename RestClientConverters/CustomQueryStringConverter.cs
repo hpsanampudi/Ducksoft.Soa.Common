@@ -20,6 +20,7 @@ namespace Ducksoft.Soa.Common.RestClientConverters
         /// <returns></returns>
         public override bool CanConvert(Type type)
         {
+            var nullableType = Nullable.GetUnderlyingType(type);
             return ((typeof(DynamicLinqFilter) == type) ||
                 (typeof(IList<QueryOption>) == type) ||
                 (typeof(int[]) == type) ||
@@ -27,9 +28,8 @@ namespace Ducksoft.Soa.Common.RestClientConverters
                 (typeof(float[]) == type) ||
                 (typeof(string[]) == type) ||
                 (typeof(DateTime) == type) ||
-                (typeof(DateTime?) == type) ||
                 (type.IsEnum) ||
-                (base.CanConvert(type)));
+                (base.CanConvert(nullableType ?? type)));
         }
 
         /// <summary>
@@ -78,10 +78,6 @@ namespace Ducksoft.Soa.Common.RestClientConverters
             {
                 return (parameter.ToDateTime());
             }
-            else if (typeof(DateTime?) == parameterType)
-            {
-                return (parameter.ToNullableDateTime());
-            }
             else if (parameterType.IsArray)
             {
                 var elementType = parameterType.GetElementType();
@@ -116,7 +112,19 @@ namespace Ducksoft.Soa.Common.RestClientConverters
             }
             else
             {
-                return (base.ConvertStringToValue(parameter, parameterType));
+                var srcValue = parameter?.Trim() ?? string.Empty;
+                if (srcValue.IsEqualTo("null"))
+                {
+                    srcValue = null;
+                }
+
+                var nullableType = Nullable.GetUnderlyingType(parameterType);
+                if ((nullableType != null) && (string.IsNullOrWhiteSpace(srcValue)))
+                {
+                    return (null);
+                }
+
+                return (base.ConvertStringToValue(srcValue, (nullableType ?? parameterType)));
             }
         }
 
@@ -129,7 +137,6 @@ namespace Ducksoft.Soa.Common.RestClientConverters
         public override string ConvertValueToString(object parameter, Type parameterType)
         {
             //Hp --> Logic: If object value is null then return empty string.
-
             if (typeof(DynamicLinqFilter) == parameterType)
             {
                 //Hp --> Logic: If object value is null then return empty string.
@@ -144,11 +151,6 @@ namespace Ducksoft.Soa.Common.RestClientConverters
             {
                 //Hp --> Logic: If object value is null then return default value.
                 return ((null != parameter) ? parameter.ToString() : default(DateTime).ToString());
-            }
-            else if (typeof(DateTime?) == parameterType)
-            {
-                //Hp --> Logic: If object value is null then return empty string.
-                return ((null != parameter) ? parameter.ToString() : string.Empty);
             }
             else if (parameterType.IsArray)
             {
@@ -168,13 +170,19 @@ namespace Ducksoft.Soa.Common.RestClientConverters
                     return (description);
                 };
 
-
-                return ((null != parameter) ? GetEnumDescription(parameter as Enum, parameterType)
-                    : string.Empty);
+                return ((null != parameter) ?
+                    GetEnumDescription(parameter as Enum, parameterType) : string.Empty);
             }
             else
             {
-                return (base.ConvertValueToString(parameter, parameterType));
+                var nullableType = Nullable.GetUnderlyingType(parameterType);
+                if ((nullableType != null) && (parameter == null))
+                {
+                    //Hp --> Logic: If object value is null then return empty string.
+                    return (string.Empty);
+                }
+
+                return (base.ConvertValueToString(parameter, (nullableType ?? parameterType)));
             }
         }
     }

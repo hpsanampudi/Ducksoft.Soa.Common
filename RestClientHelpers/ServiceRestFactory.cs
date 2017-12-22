@@ -173,9 +173,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The operation contract path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract TResponse GetData<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
@@ -183,9 +186,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
@@ -193,9 +199,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract List<TResponse> GetDataList<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
@@ -203,34 +212,48 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract Task<List<TResponse>> GetDataListAsync<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
-        public abstract void PostData(string contractOrApiPath, bool isIgnoreError = false);
+        public abstract void PostData(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
-        public abstract Task PostDataAsync(string contractOrApiPath, bool isIgnoreError = false);
+        public abstract Task PostDataAsync(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract TResponse PostData<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
@@ -238,9 +261,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false);
 
         /// <summary>
@@ -251,10 +277,14 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract TResponse PostData<TRequest, TResponse>(string contractOrApiPath,
-            TRequest requestObject, string requestObjNamespace = "", bool isIgnoreError = false);
+            TRequest requestObject, string requestObjNamespace = "", string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
 
         /// <summary>
         /// Posts the data asynchronous.
@@ -264,10 +294,14 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         public abstract Task<TResponse> PostDataAsync<TRequest, TResponse>(string contractOrApiPath,
-            TRequest requestObject, string requestObjNamespace = "", bool isIgnoreError = false);
+            TRequest requestObject, string requestObjNamespace = "", string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
+            bool isIgnoreError = false);
 
         #region Interface: IDisposable implementation
         /// <summary>
@@ -305,10 +339,14 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <summary>
         /// Gets the OAuth2 token.
         /// </summary>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isDisplayError">if set to <c>true</c> [is display error].</param>
         /// <returns></returns>
-        /// <exception cref="ExceptionBase"></exception>
-        protected virtual OAuth2TokenResponse GetOAuth2Token(bool isDisplayError = true)
+        /// <exception cref="ExceptionBase">
+        /// </exception>
+        protected virtual OAuth2TokenResponse GetOAuth2Token(string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes), bool isDisplayError = true)
         {
             if (AuthType != ServiceAuthTypes.OAuth2)
             {
@@ -333,6 +371,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
             var client = new RestClient(tokenRequest.TokenUrl);
             var request = new RestRequest(Method.POST);
             request.RequestFormat = DataFormat.Json;
+
+            //Hp --> Logic: If request date format is empty then reset to null.
+            request.DateFormat = string.IsNullOrWhiteSpace(dateFormat) ? null : dateFormat;
+
+            //Hp --> Logic: Update request related serializer (Json/Xml) properties.
+            ConfigureRSharpSerializer(request, dateFormat, strategyType);
 
             if (!tokenRequest.Headers.ContainsKey("content-type"))
             {
@@ -360,7 +404,9 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                 throw (new ExceptionBase(errMessage, response.ErrorException));
             }
 
-            var tokenResponse = DeserializeFrom<OAuth2TokenResponse>(response);
+            var tokenResponse = DeserializeFrom<OAuth2TokenResponse>(
+                response, dateFormat, strategyType);
+
             tokenResponse.StatusCode = response.StatusCode;
             tokenResponse.Raw = response.Content;
             tokenResponse.TokenRequest = tokenRequest;
@@ -370,32 +416,23 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         }
 
         /// <summary>
-        /// Gets the json date.
-        /// </summary>
-        /// <param name="dateTime">The date time.</param>
-        /// <returns></returns>
-        protected long ToJsonDate(string dateTime)
-        {
-            ErrorBase.CheckArgIsNullOrDefault(dateTime, () => dateTime);
-
-            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            var currentDate = DateTime.Parse(dateTime);
-            return ((currentDate - unixEpoch).Ticks / TimeSpan.TicksPerMillisecond);
-        }
-
-        /// <summary>
         /// Deserializes from given json/xml string.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="jsonOrXmlStr">The json or XML string.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         protected virtual TResponse DeserializeFrom<TResponse>(string jsonOrXmlStr,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             CancellationToken cancelToken = default(CancellationToken))
         {
             ErrorBase.CheckArgIsNullOrDefault(jsonOrXmlStr, () => jsonOrXmlStr);
-            return (DeserializeFrom<TResponse>(
-                new RestResponse { Content = jsonOrXmlStr }, cancelToken));
+            return (DeserializeFrom<TResponse>(new RestResponse
+            {
+                Content = jsonOrXmlStr
+            }, dateFormat, strategyType, cancelToken));
         }
 
         /// <summary>
@@ -403,9 +440,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="response">The response.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         protected TResponse DeserializeFrom<TResponse>(IRestResponse response,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             CancellationToken cancelToken = default(CancellationToken))
         {
             ErrorBase.CheckArgIsNull(response, () => response);
@@ -430,6 +470,10 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                 }
             }
 
+            //Hp --> Logic: If request date format is empty then reset to null.
+            deserializer.DateFormat = string.IsNullOrWhiteSpace(dateFormat) ? null : dateFormat;
+            //TODO: Hp --> Needs to implement Json deserialize strategy type later.
+
             CheckForCancellationRequest(cancelToken);
             result = deserializer.Deserialize<TResponse>(response);
             return (result);
@@ -441,12 +485,15 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <typeparam name="TRequest">The type of the request.</typeparam>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase">
         /// </exception>
         protected string SerializeTo<TRequest>(TRequest requestObject,
-            string requestObjNamespace = "",
+            string requestObjNamespace = "", string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             CancellationToken cancelToken = default(CancellationToken))
         {
             ErrorBase.CheckArgIsNull(requestObject, () => requestObject);
@@ -466,6 +513,8 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     {
                         serializer = new JsonSerializer();
                         serializer.ContentType = "application/json; charset=utf-8";
+                        SimpleJson.CurrentJsonSerializerStrategy =
+                            new CustomJsonSerializerStrategy(strategyType);
                     }
                     break;
 
@@ -478,7 +527,8 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
 
             //Hp --> Note: For serialization we need to set date format explicity.
-            serializer.DateFormat = "yyyy-MM-ddTHH:mm:ssZ";
+            //Hp --> Logic: If request date format is empty then reset to null.
+            serializer.DateFormat = string.IsNullOrWhiteSpace(dateFormat) ? null : dateFormat;
             serializer.Namespace = (requestObjNamespace ?? string.Empty).Trim();
 
             CheckForCancellationRequest(cancelToken);
@@ -492,6 +542,51 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
             }
 
             return (rawData);
+        }
+
+        /// <summary>
+        /// Gets the RestSharp serializer.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
+        /// <returns></returns>
+        /// <exception cref="ExceptionBase"></exception>
+        protected virtual ISerializer ConfigureRSharpSerializer(IRestRequest request,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes))
+        {
+            ErrorBase.CheckArgIsNull(request, () => request);
+            var serializer = default(ISerializer);
+
+            switch (request.RequestFormat)
+            {
+                case DataFormat.Json:
+                    {
+                        serializer = request.JsonSerializer;
+                        serializer.ContentType = "application/json; charset=utf-8";
+                        SimpleJson.CurrentJsonSerializerStrategy =
+                            new CustomJsonSerializerStrategy(strategyType);
+                    }
+                    break;
+
+                case DataFormat.Xml:
+                    {
+                        serializer = request.XmlSerializer;
+                        serializer.ContentType = "application/xml; charset=utf-8";
+                    }
+                    break;
+
+                default:
+                    {
+                        var errMessage = $"Request format {request.RequestFormat} is not handled!";
+                        throw (new ExceptionBase(errMessage));
+                    }
+            }
+
+            //Hp --> Note: For serialization we need to set date format explicity.
+            //Hp --> Logic: If request date format is empty then reset to null.
+            serializer.DateFormat = string.IsNullOrWhiteSpace(dateFormat) ? null : dateFormat;
+            return (serializer);
         }
 
         /// <summary>

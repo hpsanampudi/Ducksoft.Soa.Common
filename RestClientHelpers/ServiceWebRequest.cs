@@ -47,9 +47,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="webMethod">The web method.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        protected WebRequest InitializeClient(string contractOrApiPath, string webMethod = "GET")
+        protected WebRequest InitializeClient(string contractOrApiPath, string webMethod = "GET",
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes))
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             ErrorBase.CheckArgIsNullOrDefault(webMethod, () => webMethod);
@@ -84,7 +87,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             if (AuthType == ServiceAuthTypes.OAuth2)
             {
-                var tokenResponse = GetOAuth2Token();
+                var tokenResponse = GetOAuth2Token(dateFormat, strategyType);
                 if (!tokenResponse?.IsError ?? false)
                 {
                     client.Headers.Add(HttpRequestHeader.Authorization,
@@ -100,10 +103,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The operation contract path.</param>
+        /// <param name="dateFormat">The date format.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override TResponse GetData<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
@@ -111,7 +116,9 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             try
             {
-                var client = InitializeClient(contractOrApiPath);
+                var client = InitializeClient(contractOrApiPath, dateFormat: dateFormat,
+                    strategyType: strategyType);
+
                 var response = client.GetResponse() as HttpWebResponse;
                 if (!isIgnoreError)
                 {
@@ -132,7 +139,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     rawData = reader.ReadToEnd();
                 }
 
-                result = DeserializeFrom<TResponse>(rawData);
+                result = DeserializeFrom<TResponse>(rawData, dateFormat, strategyType);
             }
             catch (Exception ex)
             {
@@ -148,10 +155,13 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override async Task<TResponse> GetDataAsync<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
@@ -160,8 +170,10 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             try
             {
-                var client = InitializeClient(contractOrApiPath);
-                var response = await GetResponseAsync(client, cancelToken);
+                var client = InitializeClient(contractOrApiPath, dateFormat: dateFormat,
+                    strategyType: strategyType);
+
+                var response = await GetResponseAsync(client, dateFormat, strategyType, cancelToken);
                 if (!isIgnoreError)
                 {
                     EnsureValidResponse(response, cancelToken);
@@ -181,7 +193,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     rawData = reader.ReadToEnd();
                 }
 
-                result = DeserializeFrom<TResponse>(rawData, cancelToken);
+                result = DeserializeFrom<TResponse>(rawData, dateFormat, strategyType, cancelToken);
             }
             catch (Exception ex)
             {
@@ -197,10 +209,13 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override List<TResponse> GetDataList<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
@@ -208,7 +223,9 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             try
             {
-                var client = InitializeClient(contractOrApiPath);
+                var client = InitializeClient(contractOrApiPath, dateFormat: dateFormat,
+                    strategyType: strategyType);
+
                 var response = client.GetResponse() as HttpWebResponse;
                 if (!isIgnoreError)
                 {
@@ -229,7 +246,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     rawData = reader.ReadToEnd();
                 }
 
-                result = DeserializeFrom<List<TResponse>>(rawData);
+                result = DeserializeFrom<List<TResponse>>(rawData, dateFormat, strategyType);
             }
             catch (Exception ex)
             {
@@ -245,11 +262,14 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override async Task<List<TResponse>> GetDataListAsync<TResponse>(
-            string contractOrApiPath, bool isIgnoreError = false)
+            string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes), bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             var result = new List<TResponse>();
@@ -257,8 +277,10 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             try
             {
-                var client = InitializeClient(contractOrApiPath);
-                var response = await GetResponseAsync(client, cancelToken);
+                var client = InitializeClient(contractOrApiPath, dateFormat: dateFormat,
+                    strategyType: strategyType);
+
+                var response = await GetResponseAsync(client, dateFormat, strategyType, cancelToken);
                 if (!isIgnoreError)
                 {
                     EnsureValidResponse(response, cancelToken);
@@ -278,7 +300,8 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     rawData = reader.ReadToEnd();
                 }
 
-                result = DeserializeFrom<List<TResponse>>(rawData, cancelToken);
+                result = DeserializeFrom<List<TResponse>>(
+                    rawData, dateFormat, strategyType, cancelToken);
             }
             catch (Exception ex)
             {
@@ -293,15 +316,18 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// Posts the data.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <exception cref="ExceptionBase"></exception>
-        public override void PostData(string contractOrApiPath, bool isIgnoreError = false)
+        public override void PostData(string contractOrApiPath, string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes), bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
 
             try
             {
-                var client = InitializeClient(contractOrApiPath, "POST");
+                var client = InitializeClient(contractOrApiPath, "POST", dateFormat, strategyType);
 
                 //Hp --> Note: As we are not passing request object set content length as zero.
                 client.ContentLength = 0;
@@ -323,10 +349,13 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// Posts the data asynchronous.
         /// </summary>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override async Task PostDataAsync(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
@@ -334,12 +363,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             try
             {
-                var client = InitializeClient(contractOrApiPath, "POST");
+                var client = InitializeClient(contractOrApiPath, "POST", dateFormat, strategyType);
 
                 //Hp --> Note: As we are not passing request object set content length as zero.
                 client.ContentLength = 0;
 
-                var response = await GetResponseAsync(client, cancelToken);
+                var response = await GetResponseAsync(client, dateFormat, strategyType, cancelToken);
                 if (!isIgnoreError)
                 {
                     EnsureValidResponse(response, cancelToken);
@@ -359,10 +388,13 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override TResponse PostData<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
@@ -370,7 +402,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             try
             {
-                var client = InitializeClient(contractOrApiPath, "POST");
+                var client = InitializeClient(contractOrApiPath, "POST", dateFormat, strategyType);
 
                 //Hp --> Note: As we are not passing request object set content length as zero.
                 client.ContentLength = 0;
@@ -395,7 +427,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     rawData = reader.ReadToEnd();
                 }
 
-                result = DeserializeFrom<TResponse>(rawData);
+                result = DeserializeFrom<TResponse>(rawData, dateFormat, strategyType);
             }
             catch (Exception ex)
             {
@@ -411,10 +443,13 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
         /// <param name="contractOrApiPath">The contract or API path.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override async Task<TResponse> PostDataAsync<TResponse>(string contractOrApiPath,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
@@ -423,12 +458,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             try
             {
-                var client = InitializeClient(contractOrApiPath, "POST");
+                var client = InitializeClient(contractOrApiPath, "POST", dateFormat, strategyType);
 
                 //Hp --> Note: As we are not passing request object set content length as zero.
                 client.ContentLength = 0;
 
-                var response = await GetResponseAsync(client, cancelToken);
+                var response = await GetResponseAsync(client, dateFormat, strategyType, cancelToken);
                 if (!isIgnoreError)
                 {
                     EnsureValidResponse(response, cancelToken);
@@ -448,7 +483,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     rawData = reader.ReadToEnd();
                 }
 
-                result = DeserializeFrom<TResponse>(rawData, cancelToken);
+                result = DeserializeFrom<TResponse>(rawData, dateFormat, strategyType, cancelToken);
             }
             catch (Exception ex)
             {
@@ -467,11 +502,14 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override TResponse PostData<TRequest, TResponse>(string contractOrApiPath,
-            TRequest requestObject, string requestObjNamespace = "", bool isIgnoreError = false)
+            TRequest requestObject, string requestObjNamespace = "", string dateFormat = null,
+            JsonStrategyTypes strategyType = default(JsonStrategyTypes), bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
             ErrorBase.CheckArgIsNull(requestObject, () => requestObject);
@@ -479,13 +517,15 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             try
             {
-                var client = InitializeClient(contractOrApiPath, "POST");
+                var client = InitializeClient(contractOrApiPath, "POST", dateFormat, strategyType);
                 requestObjNamespace =
                     ((requestObjNamespace ?? DefaultNamespace) ?? string.Empty).Trim();
 
                 //Hp --> Note: HttpWebRequest is not serializing the request properly.
                 //So, instead of using HttpWebRequest serializing mechanism use rest sharp serializer.
-                var rawRequestData = SerializeTo(requestObject, requestObjNamespace);
+                var rawRequestData = SerializeTo(requestObject, requestObjNamespace, dateFormat,
+                    strategyType);
+
                 var requestInBytes = Encoding.UTF8.GetBytes(rawRequestData);
 
                 client.ContentLength = Encoding.UTF8.GetByteCount(rawRequestData);
@@ -514,7 +554,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     rawData = reader.ReadToEnd();
                 }
 
-                result = DeserializeFrom<TResponse>(rawData);
+                result = DeserializeFrom<TResponse>(rawData, dateFormat, strategyType);
             }
             catch (Exception ex)
             {
@@ -533,11 +573,14 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// <param name="contractOrApiPath">The contract or API path.</param>
         /// <param name="requestObject">The request object.</param>
         /// <param name="requestObjNamespace">The request object namespace.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="isIgnoreError">if set to <c>true</c> [is ignore error].</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
         public override async Task<TResponse> PostDataAsync<TRequest, TResponse>(
             string contractOrApiPath, TRequest requestObject, string requestObjNamespace = "",
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             bool isIgnoreError = false)
         {
             ErrorBase.CheckArgIsNullOrDefault(contractOrApiPath, () => contractOrApiPath);
@@ -547,13 +590,15 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
 
             try
             {
-                var client = InitializeClient(contractOrApiPath, "POST");
+                var client = InitializeClient(contractOrApiPath, "POST", dateFormat, strategyType);
                 requestObjNamespace =
                     ((requestObjNamespace ?? DefaultNamespace) ?? string.Empty).Trim();
 
                 //Hp --> Note: HttpWebRequest is not serializing the request properly.
                 //So, instead of using HttpWebRequest serializing mechanism use rest sharp serializer.
-                var rawRequestData = SerializeTo(requestObject, requestObjNamespace, cancelToken);
+                var rawRequestData = SerializeTo(requestObject, requestObjNamespace, dateFormat,
+                    strategyType, cancelToken);
+
                 var requestInBytes = Encoding.UTF8.GetBytes(rawRequestData);
 
                 client.ContentLength = Encoding.UTF8.GetByteCount(rawRequestData);
@@ -562,7 +607,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     stream.Write(requestInBytes, 0, (int)client.ContentLength);
                 }
 
-                var response = await GetResponseAsync(client, cancelToken);
+                var response = await GetResponseAsync(client, dateFormat, strategyType, cancelToken);
                 if (!isIgnoreError)
                 {
                     EnsureValidResponse(response, cancelToken);
@@ -582,7 +627,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     rawData = reader.ReadToEnd();
                 }
 
-                result = DeserializeFrom<TResponse>(rawData, cancelToken);
+                result = DeserializeFrom<TResponse>(rawData, dateFormat, strategyType, cancelToken);
             }
             catch (Exception ex)
             {
@@ -597,9 +642,12 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// Gets the serializer.
         /// </summary>
         /// <typeparam name="TResponse">The type of the response.</typeparam>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        protected virtual XmlObjectSerializer GetSerializer<TResponse>()
+        protected virtual XmlObjectSerializer GetXmlSerializer<TResponse>(
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes))
         {
             var serializer = default(XmlObjectSerializer);
 
@@ -631,10 +679,14 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
         /// Downloads the data task asynchronous.
         /// </summary>
         /// <param name="client">The client.</param>
+        /// <param name="dateFormat">The date format.</param>
+        /// <param name="strategyType">Type of the strategy.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
+        /// <exception cref="System.NullReferenceException"></exception>
         /// <exception cref="NullReferenceException"></exception>
         protected async Task<HttpWebResponse> GetResponseAsync(WebRequest client,
+            string dateFormat = null, JsonStrategyTypes strategyType = default(JsonStrategyTypes),
             CancellationToken cancelToken = default(CancellationToken))
         {
             CheckForCancellationRequest(cancelToken);
