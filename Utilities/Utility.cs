@@ -1462,7 +1462,7 @@ namespace Ducksoft.Soa.Common.Utilities
                 result = (T)serializer.Deserialize(reader);
             }
 
-            return result;
+            return (result);
         }
 
         /// <summary>
@@ -1480,6 +1480,12 @@ namespace Ducksoft.Soa.Common.Utilities
             ErrorBase.CheckArgIsNullOrDefault(xmlFilePath, () => xmlFilePath);
             T result;
 
+            if (!IsFileExists(xmlFilePath))
+            {
+                var errMessage = $"The given xml \"{xmlFilePath}\" file path doesn't exists!";
+                throw (new FileNotFoundException(errMessage));
+            }
+
             // Create an XML reader for this file.
             using (var reader = XmlReader.Create(xmlFilePath, xmlRdrSettings))
             {
@@ -1487,7 +1493,47 @@ namespace Ducksoft.Soa.Common.Utilities
                 result = (T)serializer.Deserialize(reader);
             }
 
-            return result;
+            return (result);
+        }
+
+        /// <summary>
+        /// Deserializes from XML.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xmlFilePath">The XML file path.</param>
+        /// <param name="xsdFilePath">The XSD file path.</param>
+        /// <returns></returns>
+        public static T DeserializeFromXml<T>(string xmlFilePath, string xsdFilePath)
+            where T : class
+        {
+            var xmlRdrSettings = GetXmlReaderSettings(xsdFilePath);
+            return (DeserializeFromXml<T>(xmlFilePath, xmlRdrSettings));
+        }
+
+        /// <summary>
+        /// Gets the XML reader settings.
+        /// </summary>
+        /// <param name="xsdFilePath">The XSD file path.</param>
+        /// <returns></returns>
+        /// <exception cref="FileNotFoundException"></exception>
+        public static XmlReaderSettings GetXmlReaderSettings(string xsdFilePath)
+        {
+            if (!IsFileExists(xsdFilePath))
+            {
+                var errMessage = $"The given xsd \"{xsdFilePath}\" file path doesn't exists!";
+                throw (new FileNotFoundException(errMessage));
+            }
+
+            //Hp --> Logic: Validate the given xml file against its corresponsding schema.
+            var xmlRdrSettings = new XmlReaderSettings();
+            xmlRdrSettings.Schemas.Add(null, xsdFilePath);
+            xmlRdrSettings.ValidationType = ValidationType.Schema;
+            xmlRdrSettings.ValidationEventHandler += (sender, e) =>
+            {
+                throw (new ExceptionBase(e.Message, e.Exception));
+            };
+
+            return (xmlRdrSettings);
         }
 
         /// <summary>
