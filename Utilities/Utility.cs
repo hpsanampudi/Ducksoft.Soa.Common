@@ -60,104 +60,110 @@ namespace Ducksoft.Soa.Common.Utilities
         private static CultureInfo mainThreadUICulture = Thread.CurrentThread.CurrentUICulture;
 
         /// <summary>
-        /// Gets the templates path.
+        /// Gets the folder path.
         /// </summary>
+        /// <param name="folderName">Name of the folder.</param>
         /// <returns></returns>
-        public static string GetTemplatesPath()
+        public static string GetFolderPath(string folderName)
         {
-            return (GetCombinedPath(GetApplicationDirPath(), "Templates"));
+            ErrorBase.CheckArgIsNullOrDefault(folderName, nameof(folderName));
+            return (GetCombinedPath(AppDirPath, folderName));
         }
 
         /// <summary>
         /// Gets the application log file path.
         /// </summary>
+        /// <param name="appSettingsKey">The application settings key.</param>
         /// <returns></returns>
-        public static string GetAppLogFilePath()
+        public static string GetAppLogFilePath(string appSettingsKey)
         {
-            string logFilePath = GetValueFromAppSettings("App_LogFilePath");
+            string logFilePath = GetValueFromAppSettings(appSettingsKey);
             return (GetExpandedEnvVarPath(logFilePath));
         }
 
         /// <summary>
         /// Gets the name of the application.
         /// </summary>
-        /// <returns></returns>
-        public static string GetApplicationName()
+        /// <value>
+        /// The name of the application.
+        /// </value>
+        public static string AppName
         {
-            return (GetFileNameWithoutExtension(GetApplicationFullPath()));
+            get
+            {
+                return (GetFileNameWithoutExtension(AppFullPath));
+            }
         }
 
         /// <summary>
         /// Gets the name of the application product.
         /// </summary>
-        /// <returns></returns>
-        public static string GetAppProductName()
+        /// <value>
+        /// The name of the application product.
+        /// </value>
+        public static string AppProductName
         {
-            return (Application.ProductName);
+            get
+            {
+                return (Application.ProductName);
+            }
         }
 
         /// <summary>
         /// Gets the application product version.
         /// </summary>
-        /// <returns></returns>
-        public static string GetAppProductVersion()
+        /// <value>
+        /// The application product version.
+        /// </value>
+        public static string AppProductVersion
         {
-            return (Application.ProductVersion);
+            get
+            {
+                return (Application.ProductVersion);
+            }
         }
 
         /// <summary>
-        /// Gets the application full path.
+        /// Gets the application build number.
         /// </summary>
-        /// <returns></returns>
-        public static string GetAppBuildNumber()
+        /// <value>
+        /// The application build number.
+        /// </value>
+        public static string AppBuildNumber
         {
-            return (Assembly.GetEntryAssembly().GetName().Version.Build
-                .ToString(CultureInfo.CurrentUICulture));
+            get
+            {
+                return (Assembly.GetEntryAssembly().GetName().Version.Build
+                    .ToString(CultureInfo.CurrentUICulture));
+            }
         }
 
         /// <summary>
         /// Gets the application main form.
         /// </summary>
-        /// <returns></returns>
-        public static Form GetApplicationMainForm()
+        /// <value>
+        /// The application main form.
+        /// </value>
+        public static Form AppMainForm
         {
-            return ((0 != Application.OpenForms.Count) ? Application.OpenForms[0] : null);
-        }
-
-        /// <summary>
-        /// Gets the application full path.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetApplicationFullPath()
-        {
-            return (Application.ExecutablePath);
-        }
-
-        /// <summary>
-        /// Gets the application directory path.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetApplicationDirPath()
-        {
-            return (GetDirectoryPath(GetApplicationFullPath()));
+            get
+            {
+                return ((0 != Application.OpenForms.Count) ? Application.OpenForms[0] : null);
+            }
         }
 
         /// <summary>
         /// Gets the application root directory path.
         /// </summary>
-        /// <returns></returns>
-        public static string GetAppRootDirectory()
+        /// <value>
+        /// The application root directory path.
+        /// </value>
+        public static string AppRootDirectoryPath
         {
-            return (Path.GetPathRoot(GetApplicationFullPath()));
-        }
-
-        /// <summary>
-        /// Gets the system application data path.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetSystemAppDataPath()
-        {
-            return (Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            get
+            {
+                return (Path.GetPathRoot(AppFullPath));
+            }
         }
 
         /// <summary>
@@ -182,7 +188,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <param name="parent">The parent.</param>
         public static DialogResult DisplayMessage(string message, IWin32Window parent)
         {
-            return (DisplayMessage(message, GetApplicationName(), parent));
+            return (DisplayMessage(message, AppName, parent));
         }
 
         /// <summary>
@@ -198,7 +204,9 @@ namespace Ducksoft.Soa.Common.Utilities
             //ErrorBase.Require(null != parent); //Can be null
             ErrorBase.CheckArgIsNullOrDefault(message, () => message);
             DialogResult dlgResult = DialogResult.None;
-            dlgResult = MessageBox.Show(parent, message, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            dlgResult = MessageBox.Show(parent, message, caption, MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+
             return (dlgResult);
         }
 
@@ -210,8 +218,8 @@ namespace Ducksoft.Soa.Common.Utilities
         public static DialogResult AskAbortRetryIgnoreConfirmation(string message)
         {
             DialogResult dlgResult = DialogResult.None;
-            dlgResult = MessageBox.Show(message, GetApplicationName(),
-                MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning);
+            dlgResult = MessageBox.Show(message, AppName, MessageBoxButtons.AbortRetryIgnore,
+                MessageBoxIcon.Warning);
 
             return (dlgResult);
         }
@@ -224,7 +232,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <returns></returns>
         public static DialogResult AskOkCancelConfirmation(string message, IWin32Window parent)
         {
-            return (AskOkCancelConfirmation(message, GetApplicationName(), parent));
+            return (AskOkCancelConfirmation(message, AppName, parent));
         }
 
         /// <summary>
@@ -254,7 +262,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <returns></returns>
         public static DialogResult AskYesNoConfirmation(string message, IWin32Window parent)
         {
-            return (AskYesNoConfirmation(message, GetApplicationName(), parent));
+            return (AskYesNoConfirmation(message, AppName, parent));
         }
 
         /// <summary>
@@ -289,7 +297,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <returns></returns>
         public static DialogResult ShowErrorDialog(string message, IWin32Window parent)
         {
-            return (ShowErrorDialog(message, GetApplicationName(), parent));
+            return (ShowErrorDialog(message, AppName, parent));
         }
 
         /// <summary>
@@ -321,8 +329,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <returns></returns>
         public static DialogResult ShowFatalErrorDialog(string message, IWin32Window parent)
         {
-            return (ShowFatalErrorDialog(message, (GetApplicationName() + " : Fatal Error"),
-                parent));
+            return (ShowFatalErrorDialog(message, (AppName + " : Fatal Error"), parent));
         }
 
         /// <summary>

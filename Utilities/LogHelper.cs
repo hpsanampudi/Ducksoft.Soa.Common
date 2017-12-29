@@ -14,7 +14,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <summary>
         /// Stores the path of log file in the system %appdata% location.
         /// </summary>
-        public static readonly string LogFilePath = Utility.GetAppLogFilePath();
+        public static readonly string LogFilePath = Utility.GetAppLogFilePath("App_LogFilePath");
 
         /// <summary>
         /// Writes the message as information into log file.
@@ -119,7 +119,7 @@ namespace Ducksoft.Soa.Common.Utilities
             try
             {
                 // Write to Windows Event Log
-                EventLog.WriteEntry(Utility.GetApplicationName(), message, EventLogEntryType.Error);
+                EventLog.WriteEntry(Utility.AppName, message, EventLogEntryType.Error);
             }
             catch (Exception ex)
             {

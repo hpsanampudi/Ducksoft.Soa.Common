@@ -1,4 +1,5 @@
 ﻿using Ducksoft.Soa.Common.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -59,22 +60,75 @@ namespace Ducksoft.Soa.Common.DataContracts
         /// <param name="clientSecret">The client secret.</param>
         /// <param name="grantType">Type of the grant.</param>
         /// <param name="scope">The scope.</param>
+        /// <param name="redirectUrls">The redirect urls.</param>
+        /// <param name="authCode">The  authorization code.</param>
+        /// <param name="userName">The username.</param>
+        /// <param name="password">The password.</param>
         public OAuth2TokenRequest(string tokenUrl, string clientId, string clientSecret,
             OAuth2TokenGrantTypes grantType = OAuth2TokenGrantTypes.ClientCredentials,
-            string scope = "") : this()
+            string scope = "", List<string> redirectUrls = null, string authCode = "",
+            string userName = "", string password = "") : this()
         {
-            TokenUrl = tokenUrl;
+            Func<string, string> GetValidStr =
+                (source) => string.IsNullOrWhiteSpace(source) ? string.Empty : source.Trim();
+
+            TokenUrl = GetValidStr(tokenUrl);
+            clientId = GetValidStr(clientId);
+            clientSecret = GetValidStr(clientSecret);
+            scope = GetValidStr(scope);
+            redirectUrls = redirectUrls ?? new List<string>();
+            authCode = GetValidStr(authCode);
+            userName = GetValidStr(userName);
+            password = GetValidStr(password);
+
             BodyParameters.Add("client_id", clientId);
             BodyParameters.Add("client_secret", clientSecret);
-
             if (grantType != OAuth2TokenGrantTypes.None)
             {
                 BodyParameters.Add("grant_type", grantType.GetEnumDescription());
             }
 
-            if (!string.IsNullOrWhiteSpace(scope))
+            var errMessage = string.Empty;
+            switch (grantType)
             {
-                BodyParameters.Add("scope", scope);
+                case OAuth2TokenGrantTypes.AuthorizationCode:
+                    {
+                        BodyParameters.Add("code", authCode);
+                        BodyParameters.Add("redirect_uri", string.Join(",", redirectUrls));
+                        BodyParameters.Add("scope", scope);
+                    }
+                    break;
+
+                case OAuth2TokenGrantTypes.ClientCredentials:
+                    {
+                        if (!string.IsNullOrWhiteSpace(scope))
+                        {
+                            BodyParameters.Add("scope", scope);
+                        }
+                    }
+                    break;
+
+                case OAuth2TokenGrantTypes.Password:
+                    {
+                        BodyParameters.Add("username", userName);
+                        BodyParameters.Add("password", password);
+                        BodyParameters.Add("scope", scope);
+                    }
+                    break;
+
+                case OAuth2TokenGrantTypes.None:
+                case OAuth2TokenGrantTypes.RefreshToken:
+                case OAuth2TokenGrantTypes.Custom:
+                default:
+                    {
+                        errMessage = $"The given grant type {grantType} is not handled!";
+                    }
+                    break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(errMessage))
+            {
+                throw (new ExceptionBase(errMessage));
             }
         }
 

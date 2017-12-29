@@ -255,7 +255,7 @@ namespace Ducksoft.Soa.Common.Utilities
 #else
             //Hp --> If we have implementation for catching unhandled exceptions at top level then 
             //we should just throw exception.                
-            throw (argException);                
+            throw (argException);
 #endif
         }
 
@@ -317,9 +317,8 @@ namespace Ducksoft.Soa.Common.Utilities
                     seriousError |= (exception is AccessViolationException);
                 }
 
-                string appName = Utility.GetApplicationName();
-
-                StringBuilder myErrMessage = new StringBuilder();
+                var appName = Utility.AppName;
+                var myErrMessage = new StringBuilder();
                 myErrMessage.Append(defaultMessage);
                 myErrMessage.Append(Environment.NewLine);
 
