@@ -1,17 +1,4 @@
-﻿#region Copyright © Churchill Knight 1998 - 2015
-//------------------------------------------------------------------------------------------------
-//<copyright file="CustMsgHeaderBuilder.cs" company="Churchill Knight & Associates Ltd">
-//  Copyright © Churchill Knight 1998 - 2015.  All rights reserved.
-//</copyright>
-//<author>Hanuman Prasad Sanampudi</author>
-//<date>21/07/2015</date>
-//<description>
-//  Singleton class, which is used to used to build custom message header.
-//</description>
-//------------------------------------------------------------------------------------------------ 
-#endregion
-
-using Ducksoft.Soa.Common.DataContracts;
+﻿using Ducksoft.Soa.Common.DataContracts;
 using Ducksoft.Soa.Common.Utilities;
 using System;
 using System.Collections.Generic;
