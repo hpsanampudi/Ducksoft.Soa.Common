@@ -3,7 +3,7 @@
     /// <summary>
     /// Base class to parse xml with given renderer
     /// </summary>
-    public abstract class XmlRenderBase
+    public abstract class XmlRendererBase
     {
         /// <summary>
         /// Gets the XML file path.
@@ -12,10 +12,10 @@
         public string XmlFilePath { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="XmlRenderBase"/> class.
+        /// Initializes a new instance of the <see cref="XmlRendererBase"/> class.
         /// </summary>
         /// <param name="xmlfilePath">The xmlfile path.</param>
-        public XmlRenderBase(string xmlfilePath)
+        public XmlRendererBase(string xmlfilePath)
         {
             XmlFilePath = xmlfilePath;
         }

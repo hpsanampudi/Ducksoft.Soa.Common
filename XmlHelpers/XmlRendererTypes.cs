@@ -3,7 +3,7 @@
     /// <summary>
     /// Enum which stores xml renderer types
     /// </summary>
-    public enum XmlRenderTypes
+    public enum XmlRendererTypes
     {
         /// <summary>
         /// The none

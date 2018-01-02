@@ -274,9 +274,9 @@
     <Compile Include="WcfClientHelpers\ServiceClientFactory.cs" />
     <Compile Include="WcfClientHelpers\ServiceClientWrapper.cs" />
     <Compile Include="WcfClients\LoggingServiceClient.cs" />
-    <Compile Include="XmlHelpers\XmlRenderBase.cs" />
-    <Compile Include="XmlHelpers\XmlRenderTypes.cs" />
-    <Compile Include="XmlHelpers\XmlSchemaRender.cs" />
+    <Compile Include="XmlHelpers\XmlRendererBase.cs" />
+    <Compile Include="XmlHelpers\XmlRendererTypes.cs" />
+    <Compile Include="XmlHelpers\XmlSchemaRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Ducksoft.Soa.Common.pfx" />

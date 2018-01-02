@@ -8,7 +8,7 @@ namespace Ducksoft.Soa.Common.XmlHelpers
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="Ducksoft.Soa.Bl.JobSponsorRender.Xml.XmlRenderBase" />
-    public abstract class XmlSchemaRender<T> : XmlRenderBase where T : class
+    public abstract class XmlSchemaRenderer<T> : XmlRendererBase where T : class
     {
         /// <summary>
         /// Gets the XSD file path.
@@ -23,11 +23,11 @@ namespace Ducksoft.Soa.Common.XmlHelpers
         public T XmlRawData { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="XmlSchemaRender{T}"/> class.
+        /// Initializes a new instance of the <see cref="XmlSchemaRenderer{T}"/> class.
         /// </summary>
         /// <param name="xmlfilePath">The xmlfile path.</param>
         /// <param name="xsdFilePath">The XSD file path.</param>
-        public XmlSchemaRender(string xmlfilePath, string xsdFilePath) : base(xmlfilePath)
+        public XmlSchemaRenderer(string xmlfilePath, string xsdFilePath) : base(xmlfilePath)
         {
             XsdFilePath = xsdFilePath;
         }
