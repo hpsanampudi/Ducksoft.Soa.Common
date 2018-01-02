@@ -2114,7 +2114,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// </summary>
         /// <param name="paths">The list of paths to combine.</param>
         /// <returns>System.String.</returns>
-        public static string GetCombinedPath(string[] paths)
+        public static string GetCombinedPath(params string[] paths)
         {
             ErrorBase.CheckArgIsNullOrDefault(paths, () => paths);
             return (Path.Combine(paths));
