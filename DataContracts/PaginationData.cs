@@ -27,6 +27,6 @@ namespace Ducksoft.Soa.Common.DataContracts
         /// The page data.
         /// </value>
         [DataMember]
-        public IEnumerable<TEntity> PageData { get; set; }
+        public List<TEntity> PageData { get; set; }
     }
 }

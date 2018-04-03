@@ -52,6 +52,31 @@ namespace Ducksoft.Soa.Common.Filters
         }
 
         /// <summary>
+        /// Gets the filter expression.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="group">The group.</param>
+        /// <returns></returns>
+        /// <exception cref="System.NullReferenceException">body</exception>
+        public Expression<Func<T, bool>> GetFilterExpression<T>() where T : class
+        {
+            var srcType = typeof(T);
+
+            //Hp --> Logic: Create E => portion of lambda expression
+            var parameter = Expression.Parameter(srcType, "E");
+            var body = CreateLinqExpression<T>(parameter);
+            if (body == null)
+            {
+                throw (new NullReferenceException($"Object \"{nameof(body)}\" reference is null" +
+                    $" in method {nameof(GetFilterExpression)}"));
+            }
+
+            // finally create entire expression - E => E.Id == 'id'
+            var expression = Expression.Lambda<Func<T, bool>>(body, new[] { parameter });
+            return (expression);
+        }
+
+        /// <summary>
         /// Creates the linq expression.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -162,6 +187,49 @@ namespace Ducksoft.Soa.Common.Filters
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            var oDataExp = string.Empty;
+            var leftExp = string.Empty;
+            var rightExp = string.Empty;
+
+            Func<string, string, string> Combine = (E1, E2) =>
+            $"{E1} {OperatorType.GetEnumDescription()} {E2}";
+
+            var filterExpList = Filters.Select(item => item.ToString());
+            if (filterExpList.Any())
+            {
+                leftExp = $"({filterExpList.Aggregate((E1, E2) => Combine(E1, E2))})";
+            }
+
+            var subGrpExpList = SubGroups.Select(item => item.ToString());
+            if (subGrpExpList.Any())
+            {
+                rightExp = $"({subGrpExpList.Aggregate((E1, E2) => Combine(E1, E2))})";
+            }
+
+            if ((!string.IsNullOrWhiteSpace(leftExp)) && (!string.IsNullOrWhiteSpace(rightExp)))
+            {
+                oDataExp = $"({Combine(leftExp, rightExp)})";
+            }
+            else if (!string.IsNullOrWhiteSpace(leftExp))
+            {
+                oDataExp = leftExp;
+            }
+            else if (!string.IsNullOrWhiteSpace(rightExp))
+            {
+                oDataExp = rightExp;
+            }
+
+            return (oDataExp);
         }
     }
 }

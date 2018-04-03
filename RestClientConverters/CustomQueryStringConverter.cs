@@ -22,7 +22,7 @@ namespace Ducksoft.Soa.Common.RestClientConverters
         {
             var nullableType = Nullable.GetUnderlyingType(type);
             return ((typeof(DynamicLinqFilter) == type) ||
-                (typeof(IList<QueryOption>) == type) ||
+                (typeof(List<QueryOption>) == type) ||
                 (typeof(int[]) == type) ||
                 (typeof(double[]) == type) ||
                 (typeof(float[]) == type) ||
@@ -47,7 +47,7 @@ namespace Ducksoft.Soa.Common.RestClientConverters
                     string.Equals(parameter.ToLower().Trim(), "null")) ? null :
                     Utility.DeserializeFromJson<DynamicLinqFilter>(parameter));
             }
-            else if (typeof(IList<QueryOption>) == parameterType)
+            else if (typeof(List<QueryOption>) == parameterType)
             {
                 #region Hp --> Example: Json string format to be passed in URL
                 //[
@@ -72,7 +72,7 @@ namespace Ducksoft.Soa.Common.RestClientConverters
                 // Hp --> Logic: Check whether null value is passed or not?
                 return ((string.IsNullOrEmpty(parameter) ||
                     string.Equals(parameter.ToLower().Trim(), "null")) ? null :
-                    Utility.DeserializeFromJson<IList<QueryOption>>(parameter));
+                    Utility.DeserializeFromJson<List<QueryOption>>(parameter));
             }
             else if (typeof(DateTime) == parameterType)
             {
@@ -142,7 +142,7 @@ namespace Ducksoft.Soa.Common.RestClientConverters
                 //Hp --> Logic: If object value is null then return empty string.
                 return ((null != parameter) ? Utility.SerializeToJson(parameter) : string.Empty);
             }
-            else if (typeof(IList<QueryOption>) == parameterType)
+            else if (typeof(List<QueryOption>) == parameterType)
             {
                 //Hp --> Logic: If object value is null then return empty string.
                 return ((null != parameter) ? Utility.SerializeToJson(parameter) : string.Empty);

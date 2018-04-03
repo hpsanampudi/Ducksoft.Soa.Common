@@ -627,7 +627,7 @@ namespace Ducksoft.Soa.Common.VirtualList
                 else
                 {
                     //Hp --> Using Linq, remove items from original data source.
-                    var deleteExpression = DataSource?.AsQueryable().ConvertTo(filter);
+                    var deleteExpression = filter.GetFilterExpression<T>();
                     itemsToDelete = DataSource?.AsQueryable().FilterBy(deleteExpression).ToList();
                     DataSource?.RemoveAll(deleteExpression);
                 }

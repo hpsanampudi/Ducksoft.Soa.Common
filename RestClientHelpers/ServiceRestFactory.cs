@@ -513,7 +513,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     {
                         serializer = new JsonSerializer();
                         serializer.ContentType = "application/json; charset=utf-8";
-                        SimpleJson.CurrentJsonSerializerStrategy =
+                        SimpleJson.SimpleJson.CurrentJsonSerializerStrategy =
                             new CustomJsonSerializerStrategy(strategyType);
                     }
                     break;
@@ -564,7 +564,7 @@ namespace Ducksoft.Soa.Common.RestClientHelpers
                     {
                         serializer = request.JsonSerializer;
                         serializer.ContentType = "application/json; charset=utf-8";
-                        SimpleJson.CurrentJsonSerializerStrategy =
+                        SimpleJson.SimpleJson.CurrentJsonSerializerStrategy =
                             new CustomJsonSerializerStrategy(strategyType);
                     }
                     break;

@@ -1,5 +1,5 @@
 ﻿using Ducksoft.Soa.Common.Utilities;
-using RestSharp;
+using SimpleJson;
 
 namespace Ducksoft.Soa.Common.RestClientHelpers
 {

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Ducksoft.Soa.Common.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
@@ -47,6 +50,15 @@ namespace Ducksoft.Soa.Common.DataContracts
         /// </value>
         [DataMember]
         public string AppName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of the layer.
+        /// </summary>
+        /// <value>
+        /// The type of the layer.
+        /// </value>
+        [DataMember]
+        public AppLayerTypes LayerType { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is notify user.
@@ -141,22 +153,65 @@ namespace Ducksoft.Soa.Common.DataContracts
              [CallerFilePath] string srcFilePath = "", [CallerLineNumber] int srcLineNumber = 0)
         {
             var callerAssembly = Assembly.GetCallingAssembly();
-            var errMessage = (null != exception) ? exception.Message : string.Empty;
+            var errMessage = string.Join(Environment.NewLine,
+                exception?.Messages() ?? new List<string>());
 
-            TicketNumber = Guid.Empty;
-            Reason = string.IsNullOrEmpty(customMessage) ? errMessage : customMessage;
+            var errorInfo = string.IsNullOrWhiteSpace(customMessage) ? errMessage :
+                string.Join(Environment.NewLine, customMessage, errMessage);
+
+            TicketNumber = Guid.NewGuid();
+            Reason = errorInfo;
             UserName = string.Empty;
             AppName = callerAssembly.GetName().Name;
+            LayerType = GetAppLayerType(callerAssembly);
             IsNotifyUser = isNotifyUser;
             SourceMethodName = srcMethodName;
             SourceFilePath = srcFilePath;
             SourceLineNumber = srcLineNumber;
-            Message = string.IsNullOrEmpty(customMessage) ?
-                errMessage : $"{customMessage}{Environment.NewLine}{errMessage}";
-
+            Message = errorInfo;
             HelpLink = string.Empty;
-            CallStack = (exception == null) ?
-                string.Empty : $"{Environment.NewLine}{exception.StackTrace}";
+            CallStack = (null == exception) ? string.Empty :
+                $"{Environment.NewLine}{exception.StackTrace}";
+        }
+
+        /// <summary>
+        /// Gets the type of the application layer.
+        /// </summary>
+        /// <param name="assembly">The assembly.</param>
+        /// <returns></returns>
+        public static AppLayerTypes GetAppLayerType(Assembly assembly)
+        {
+            var layerType = AppLayerTypes.None;
+            var delimeter = new[] { "." };
+            var result = assembly.GetName().Name.Split(delimeter,
+                StringSplitOptions.RemoveEmptyEntries);
+
+            Func<AppLayerTypes, bool> IsAppLayer = (appLayerType) =>
+            result.Any(name => Utility.GetEnumDescription(appLayerType).IsEqualTo(name));
+
+            if (IsAppLayer(AppLayerTypes.UI))
+            {
+                layerType = AppLayerTypes.UI;
+            }
+            else if (IsAppLayer(AppLayerTypes.Adaptor))
+            {
+                layerType = AppLayerTypes.Adaptor;
+            }
+            else if (IsAppLayer(AppLayerTypes.BL))
+            {
+                layerType = AppLayerTypes.BL;
+            }
+            else if (IsAppLayer(AppLayerTypes.DAL))
+            {
+                layerType = AppLayerTypes.DAL;
+            }
+            else if (IsAppLayer(AppLayerTypes.Common))
+            {
+                //TODO: Hp -->  Needs to handle if each layer has common component apart from genric?
+                layerType = AppLayerTypes.Common;
+            }
+
+            return (layerType);
         }
     }
 }

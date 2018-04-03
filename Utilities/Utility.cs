@@ -1150,6 +1150,20 @@ namespace Ducksoft.Soa.Common.Utilities
         }
 
         /// <summary>
+        /// Gets the class attribute.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <param name="srcType">Type of the source.</param>
+        /// <param name="isInherit">if set to <c>true</c> [is inherit].</param>
+        /// <returns></returns>
+        public static TAttribute GetClassAttribute<TAttribute>(this Type srcType,
+            bool isInherit = false) where TAttribute : Attribute
+        {
+            ErrorBase.CheckArgIsNull(srcType, () => srcType);
+            return (srcType.GetCustomAttributes(isInherit).OfType<TAttribute>().FirstOrDefault());
+        }
+
+        /// <summary>
         /// Gets the method attribute.
         /// </summary>
         /// <typeparam name="T">The type of the class in which this method present.</typeparam>
@@ -2529,6 +2543,42 @@ namespace Ducksoft.Soa.Common.Utilities
         }
 
         /// <summary>
+        /// Determines whether [is simple type].
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>
+        ///   <c>true</c> if [is simple type] [the specified type]; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsSimpleType(this Type type)
+        {
+            var myTypes = new Type[]
+            {
+                typeof(Enum),
+                typeof(string),
+                typeof(decimal),
+                typeof(DateTime),
+                typeof(DateTimeOffset),
+                typeof(TimeSpan),
+                typeof(Guid)
+            };
+
+            return ((type.IsPrimitive) || (myTypes.Contains(type)) ||
+                (Convert.GetTypeCode(type) != TypeCode.Object) ||
+                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) &&
+                IsSimpleType(type.GetGenericArguments()[0])));
+        }
+
+        /// <summary>
+        /// Gets all complex (or) navigation properties.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static IEnumerable<PropertyInfo> GetAllComplexProperties<T>()
+        {
+            return (GetAllProperties(typeof(T)).Where(P => !P.PropertyType.IsSimpleType()));
+        }
+
+        /// <summary>
         /// Convert dictionary data to given object type.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -3017,34 +3067,6 @@ namespace Ducksoft.Soa.Common.Utilities
         }
 
         /// <summary>
-        /// Converts given filter group to expression.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source">The source.</param>
-        /// <param name="group">The group.</param>
-        /// <returns></returns>
-        /// <exception cref="NullReferenceException">body</exception>
-        public static Expression<Func<T, bool>> ConvertTo<T>(this IQueryable<T> source,
-            FilterGroup group) where T : class
-        {
-            ErrorBase.CheckArgIsNull(group, () => group);
-
-            var srcType = typeof(T);
-
-            //Hp --> Logic: Create E => portion of lambda expression
-            var parameter = Expression.Parameter(srcType, "E");
-            var body = group.CreateLinqExpression<T>(parameter);
-            if (null == body)
-            {
-                throw (new NullReferenceException($"Object \"{nameof(body)}\" reference is null" +
-                    $" in method {nameof(ConvertTo)}"));
-            }
-
-            // finally create entire expression - E => E.Id == 'id'
-            return (Expression.Lambda<Func<T, bool>>(body, new[] { parameter }));
-        }
-
-        /// <summary>
         /// Filters the by.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -3057,7 +3079,7 @@ namespace Ducksoft.Soa.Common.Utilities
             ErrorBase.CheckArgIsNull(group, () => group);
 
             // Hp --> Logic: Convert given filter group to expreesion
-            var expression = source.ConvertTo(group);
+            var expression = group.GetFilterExpression<T>();
             return (source.Where(expression));
         }
 
@@ -3089,8 +3111,8 @@ namespace Ducksoft.Soa.Common.Utilities
             ErrorBase.CheckArgIsNull(group, () => group);
 
             // Hp --> Logic: Convert given filter group to expreesion
-            var expression = source.AsQueryable().ConvertTo(group);
-            var predicate = expression.ConvertTo();
+            var expression = group.GetFilterExpression<T>();
+            var predicate = expression.GetPredicate();
             return (source.RemoveAll(predicate));
         }
 
@@ -3107,7 +3129,7 @@ namespace Ducksoft.Soa.Common.Utilities
             ErrorBase.CheckArgIsNull(expression, () => expression);
 
             // Hp --> Logic: Convert given filter group to expreesion
-            return (source.RemoveAll(expression.ConvertTo()));
+            return (source.RemoveAll(expression.GetPredicate()));
         }
 
         /// <summary>
@@ -3126,17 +3148,6 @@ namespace Ducksoft.Soa.Common.Utilities
         }
 
         /// <summary>
-        /// Converts given expression to predicate.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="expression">The expression.</param>
-        /// <returns></returns>
-        public static Predicate<T> ConvertTo<T>(this Expression<Func<T, bool>> expression)
-        {
-            return (new Predicate<T>(expression?.Compile() ?? null));
-        }
-
-        /// <summary>
         /// Properties the descriptor.
         /// </summary>
         /// <param name="propertyInfo">The property information.</param>
@@ -3144,6 +3155,47 @@ namespace Ducksoft.Soa.Common.Utilities
         public static PropertyDescriptor PropertyDescriptor(this PropertyInfo propertyInfo)
         {
             return TypeDescriptor.GetProperties(propertyInfo.DeclaringType)[propertyInfo.Name];
+        }
+
+        /// <summary>
+        /// Gets the expression.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propName">Name of the property.</param>
+        /// <returns></returns>
+        /// <exception cref="System.NullReferenceException"></exception>
+        public static Expression<Func<T, object>> GetExpression<T>(string propName)
+        {
+            var srcType = typeof(T);
+
+            //Hp --> Logic: Create E => portion of lambda expression
+            var parameter = Expression.Parameter(srcType, "E");
+            var propInfo = srcType.GetProperties()
+                .SingleOrDefault(P => P.Name.IsEqualTo(propName));
+
+            if (propInfo == null)
+            {
+                //Hp --> If given property name does not exists then throw exception.
+                throw (new NullReferenceException(string.Join(Environment.NewLine,
+                    $"{nameof(propInfo)} instance is null.",
+                    $"[Reason]: Cannot find property with name \"{propName}\".")));
+            }
+
+            //Hp --> Logic: Create E.Id portion of lambda expression (right)
+            var body = Expression.Property(parameter, propInfo.Name);
+            var expression = Expression.Lambda<Func<T, object>>(body, new[] { parameter });
+            return (expression);
+        }
+
+        /// <summary>
+        /// Converts given expression to predicate.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression">The expression.</param>
+        /// <returns></returns>
+        public static Predicate<T> GetPredicate<T>(this Expression<Func<T, bool>> expression)
+        {
+            return (new Predicate<T>(expression?.Compile() ?? null));
         }
 
         /// <summary>
@@ -3294,6 +3346,13 @@ namespace Ducksoft.Soa.Common.Utilities
         public static string ToODataDate(this DateTime date) => $"datetime'{date.ToString("s")}'";
 
         /// <summary>
+        /// To the OData string.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static string ToODataStr(this string source) => $"'{source}'";
+
+        /// <summary>
         /// Gets the json date.
         /// </summary>
         /// <param name="dateTime">The date time.</param>
@@ -3438,7 +3497,7 @@ namespace Ducksoft.Soa.Common.Utilities
             return (new PaginationData<T>
             {
                 TotalItems = filterData.Count(),
-                PageData = filterData.Skip(skip).Take(take)
+                PageData = filterData.Skip(skip).Take(take).ToList()
             });
         }
 

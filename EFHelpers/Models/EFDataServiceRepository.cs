@@ -203,7 +203,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             return (new PaginationData<TEntity>()
             {
                 TotalItems = RowsCount,
-                PageData = EntitySet.Skip((pageNumber - 1) * pageSize).Take(pageSize)
+                PageData = EntitySet.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList()
             });
         }
 
@@ -214,8 +214,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        public virtual PaginationData<TEntity> GetPaginationData(string expression,
-            int skip, int take)
+        public virtual PaginationData<TEntity> GetPaginationData(string expression, int skip, int take)
         {
             ErrorBase.CheckArgIsNullOrDefault(expression, () => expression);
             ErrorBase.CheckArgIsValid(skip, () => skip, index => (0 <= index));
@@ -226,7 +225,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             return (new PaginationData<TEntity>()
             {
                 TotalItems = result.Count(),
-                PageData = result.Skip(skip).Take(take)
+                PageData = result.Skip(skip).Take(take).ToList()
             });
         }
 

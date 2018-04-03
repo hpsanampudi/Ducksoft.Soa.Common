@@ -5,7 +5,7 @@ namespace Ducksoft.Soa.Common.Utilities
     /// <summary>
     /// Interface which holds datbase entity related audit information
     /// </summary>
-    public interface IAuditColumns<TUserType>
+    public interface IAuditColumns<TUserType> where TUserType : struct
     {
         /// <summary>
         /// Gets or sets the insert by.
@@ -29,7 +29,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <value>
         /// The update by.
         /// </value>
-        TUserType UpdateBy { get; set; }
+        TUserType? UpdateBy { get; set; }
 
         /// <summary>
         /// Gets or sets the update date.
@@ -45,7 +45,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <value>
         /// The delete by.
         /// </value>
-        TUserType DeleteBy { get; set; }
+        TUserType? DeleteBy { get; set; }
 
         /// <summary>
         /// Gets or sets the delete date.

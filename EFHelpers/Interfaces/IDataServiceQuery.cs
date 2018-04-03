@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Ducksoft.Soa.Common.ODataHelpers
+namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
 {
     /// <summary>
     /// Interface for data service query.

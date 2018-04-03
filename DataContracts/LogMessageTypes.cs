@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using Ducksoft.Soa.Common.Utilities;
+using System.Runtime.Serialization;
 
 namespace Ducksoft.Soa.Common.DataContracts
 {
@@ -39,5 +40,50 @@ namespace Ducksoft.Soa.Common.DataContracts
         /// </summary>
         [EnumMember(Value = "Information")]
         Information,
+    }
+
+    /// <summary>
+    /// Class which is used to store type of SOA layer from where log message is initally sent.
+    /// </summary>
+    [DataContract(Name = "AppLayerTypes",
+        Namespace = "http://ducksoftware.co.uk/SOA/WCF/DataContracts")]
+    public enum AppLayerTypes
+    {
+        /// <summary>
+        /// The none
+        /// </summary>
+        [EnumDescription("None")]
+        [EnumMember(Value = "None")]
+        None = -1,
+        /// <summary>
+        /// The presentation layer
+        /// </summary>
+        [EnumDescription("UI")]
+        [EnumMember(Value = "UI")]
+        UI,
+        /// <summary>
+        /// The adaptor
+        /// </summary>
+        [EnumDescription("Adaptors")]
+        [EnumMember(Value = "Adaptors")]
+        Adaptor,
+        /// <summary>
+        /// The business layer
+        /// </summary>
+        [EnumDescription("BL")]
+        [EnumMember(Value = "BL")]
+        BL,
+        /// <summary>
+        /// The data access layer
+        /// </summary>
+        [EnumDescription("DAL")]
+        [EnumMember(Value = "DAL")]
+        DAL,
+        /// <summary>
+        /// The common utilities layer
+        /// </summary>
+        [EnumDescription("Common")]
+        [EnumMember(Value = "Common")]
+        Common
     }
 }

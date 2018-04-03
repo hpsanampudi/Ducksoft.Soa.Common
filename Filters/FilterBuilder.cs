@@ -314,6 +314,136 @@ namespace Ducksoft.Soa.Common.Filters
         }
 
         /// <summary>
+        /// Gets the OData filter expression.
+        /// </summary>
+        /// <value>
+        /// The o data filter expression.
+        /// </value>
+        public string ODataFilterExpression
+        {
+            get
+            {
+                var result = string.Empty;
+                switch (OperatorType)
+                {
+                    case FilterCompareOperatorTypes.EqualTo:
+                        {
+                            result = $"{PropertyName} eq {ODataFilterValue}";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.NotEqualTo:
+                        {
+                            result = $"{PropertyName} ne {ODataFilterValue}";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.LessThan:
+                        {
+                            result = $"{PropertyName} lt {ODataFilterValue}";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.LessThanOrEqualTo:
+                        {
+                            result = $"{PropertyName} le {ODataFilterValue}";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.GreaterThan:
+                        {
+                            result = $"{PropertyName} gt {ODataFilterValue}";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.GreaterThanOrEqualTo:
+                        {
+                            result = $"{PropertyName} ge {ODataFilterValue}";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.StartsWith:
+                        {
+                            result = $"startswith({PropertyName}, {ODataFilterValue})";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.EndsWith:
+                        {
+                            result = $"endswith({PropertyName}, {ODataFilterValue})";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.Contains:
+                        {
+                            result = $"substringof({ODataFilterValue}, {PropertyName})";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.NotContains:
+                        {
+                            result = $"not(substringof({ODataFilterValue}, {PropertyName})";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.IsNull:
+                        {
+                            result = $"{PropertyName} eq null";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.IsNotNull:
+                        {
+                            result = $"not({PropertyName} eq null)";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.IsEmpty:
+                        {
+                            result = $"{PropertyName} eq '{string.Empty}'";
+                        }
+                        break;
+
+                    case FilterCompareOperatorTypes.IsNotEmpty:
+                        {
+                            result = $"not({PropertyName} eq '{string.Empty}')";
+                        }
+                        break;
+                }
+
+                return (result);
+            }
+        }
+
+        /// <summary>
+        /// To the OData filter value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
+        protected virtual string ODataFilterValue
+        {
+            get
+            {
+                var oDataStr = string.Empty;
+                if (typeof(string) == Value.GetType())
+                {
+                    oDataStr = Value.ToString().ToODataStr();
+                }
+                else if (typeof(DateTime) == Value.GetType())
+                {
+                    oDataStr = ((DateTime)Value).ToODataDate();
+                }
+                else
+                {
+                    oDataStr = $"{Value}";
+                }
+
+                return (oDataStr);
+            }
+        }
+
+        /// <summary>
         /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
@@ -342,6 +472,17 @@ namespace Ducksoft.Soa.Common.Filters
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return ($"({ODataFilterExpression})");
         }
     }
 }
