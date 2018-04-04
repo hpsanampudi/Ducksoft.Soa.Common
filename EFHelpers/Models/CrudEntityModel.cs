@@ -16,8 +16,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
     /// <summary>
     /// Singleton class which is used to map entity to DTO (or) vice versa while performing CRUD operations
     /// </summary>
-    /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IMapEntityModel" />
-    public class CRUDEntityModel : IMapEntityModel
+    /// <seealso cref="CKA.SOA.DAL.Common.Interfaces.IMapEntityModel" />
+    public class CrudEntityModel : IMapEntityModel
     {
         /// <summary>
         /// Initializes the instance of singleton object of this class.
@@ -25,16 +25,16 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// loaded for the first time.
         /// .NET guarantees thread safety through lazy initialization
         /// </summary>
-        private static readonly Lazy<CRUDEntityModel> instance =
-            new Lazy<CRUDEntityModel>(() => new CRUDEntityModel());
+        private static readonly Lazy<CrudEntityModel> instance =
+            new Lazy<CrudEntityModel>(() => new CrudEntityModel());
 
         /// <summary>
-        /// Gets the instance of the singleton object: MapEntityModel.
+        /// Gets the instance of the singleton object: CrudEntityModel.
         /// </summary>
         /// <value>
         /// The instance.
         /// </value>
-        public static CRUDEntityModel Instance
+        public static CrudEntityModel Instance
         {
             get { return (instance.Value); }
         }
@@ -49,9 +49,9 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         public ILoggingService Logger { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CRUDEntityModel" /> class.
+        /// Initializes a new instance of the <see cref="CrudEntityModel" /> class.
         /// </summary>
-        private CRUDEntityModel()
+        private CrudEntityModel()
         {
         }
 
@@ -61,20 +61,22 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// </summary>
         /// <typeparam name="TDTO">The type of the map.</typeparam>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <typeparam name="TAudit">The type of the audit.</typeparam>
         /// <param name="objectToCreate">The object to create.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        public int Create<TDTO, TEntity>(TDTO objectToCreate,
+        public int Create<TDTO, TEntity, TAudit>(TDTO objectToCreate,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
             where TDTO : class
+            where TEntity : class
+            where TAudit : struct
         {
             var result = -1;
             try
             {
-                if (typeof(TDTO).Implements<IAuditColumns<int>>())
+                if (typeof(TDTO).Implements<IAuditColumns<TAudit>>())
                 {
-                    var record = (IAuditColumns<int>)objectToCreate;
+                    var record = (IAuditColumns<TAudit>)objectToCreate;
                     record.InsertDate = DateTime.Now;
                 }
 
@@ -111,8 +113,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <returns></returns>
         public PaginationData<TDTO> GetAll<TDTO, TEntity>(IList<QueryOption> queryOptions = null,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
             where TDTO : class
+            where TEntity : class
         {
             var result = default(PaginationData<TDTO>);
             try
@@ -149,15 +151,15 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Gets the single or default.
         /// </summary>
-        /// <typeparam name="TDTO">The type of the dto.</typeparam>
+        /// <typeparam name="TDTO">The type of the map.</typeparam>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="odataFilterExpression">The odata filter expression.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public TDTO GetSingleOrDefault<TDTO, TEntity>(string odataFilterExpression,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
             where TDTO : class
+            where TEntity : class
         {
             var result = default(TDTO);
             try
@@ -190,21 +192,23 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// </summary>
         /// <typeparam name="TDTO">The type of the map.</typeparam>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <typeparam name="TAudit">The type of the audit.</typeparam>
         /// <param name="objectToUpdate">The object to update.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked entity].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        public int Update<TDTO, TEntity>(TDTO objectToUpdate, bool isTracked = false,
+        public int Update<TDTO, TEntity, TAudit>(TDTO objectToUpdate, bool isTracked = false,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
             where TDTO : class
+            where TEntity : class
+            where TAudit : struct
         {
             var result = -1;
             try
             {
-                if (typeof(TDTO).Implements<IAuditColumns<int>>())
+                if (typeof(TDTO).Implements<IAuditColumns<TAudit>>())
                 {
-                    var record = (IAuditColumns<int>)objectToUpdate;
+                    var record = (IAuditColumns<TAudit>)objectToUpdate;
                     record.UpdateDate = DateTime.Now;
                 }
 
@@ -236,22 +240,24 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// </summary>
         /// <typeparam name="TDTO">The type of the map.</typeparam>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <typeparam name="TAudit">The type of the audit.</typeparam>
         /// <param name="objectToDelete">The object to delete.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked entity].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        public int Delete<TDTO, TEntity>(TDTO objectToDelete, bool isTracked = false,
+        public int Delete<TDTO, TEntity, TAudit>(TDTO objectToDelete, bool isTracked = false,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
             where TDTO : class
+            where TEntity : class
+            where TAudit : struct
         {
             var result = -1;
             try
             {
                 //Hp --> Logic: Do not delete physical record, always update audit column DeleteDate            
-                if (typeof(TDTO).Implements<IAuditColumns<int>>())
+                if (typeof(TDTO).Implements<IAuditColumns<TAudit>>())
                 {
-                    var record = (IAuditColumns<int>)objectToDelete;
+                    var record = (IAuditColumns<TAudit>)objectToDelete;
                     record.DeleteDate = DateTime.Now;
                 }
 
@@ -283,12 +289,15 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// Deletes the database record by given OData filter expression.
         /// </summary>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <typeparam name="TAudit">The type of the audit.</typeparam>
         /// <param name="odataFilterExpression">The OData filter expression.</param>
         /// <param name="userId">The user identifier.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        public int Delete<TEntity>(string odataFilterExpression, int userId,
-            CancellationToken cancelToken = default(CancellationToken)) where TEntity : class
+        public int Delete<TEntity, TAudit>(string odataFilterExpression, TAudit userId,
+            CancellationToken cancelToken = default(CancellationToken))
+            where TEntity : class
+            where TAudit : struct
         {
             var result = -1;
             try
@@ -336,8 +345,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <returns></returns>
         public bool Purge<TDTO, TEntity>(TDTO objectToPurge, bool isTracked = false,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
             where TDTO : class
+            where TEntity : class
         {
             var isSuccess = false;
             try

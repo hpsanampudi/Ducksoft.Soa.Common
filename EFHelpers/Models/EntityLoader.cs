@@ -6,6 +6,9 @@ using Nelibur.ObjectMapper;
 using Nelibur.ObjectMapper.Bindings;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure.DependencyResolution;
+using System.Data.Entity.Infrastructure.Pluralization;
 using System.Data.Services.Client;
 using System.Data.Services.Common;
 using System.Linq;
@@ -534,7 +537,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         public virtual TPKey AddRecord<T, TPKey>(T record, Action<T> target,
             Func<T, TPKey> primaryKey = null, TPKey defaultValue = default(TPKey),
             CancellationToken cancelToken = default(CancellationToken))
-            where T : class where TPKey : struct
+            where T : class
+            where TPKey : struct
         {
             ErrorBase.CheckArgIsNull(record, () => record);
             ErrorBase.CheckArgIsNull(target, () => target);
@@ -607,7 +611,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         public virtual TPKey UpdateRecord<T, TPKey>(T record, Func<T, TPKey> primaryKey = null,
             TPKey defaultValue = default(TPKey), bool isTracked = false,
             CancellationToken cancelToken = default(CancellationToken))
-            where T : class where TPKey : struct
+            where T : class
+            where TPKey : struct
         {
             ErrorBase.CheckArgIsNull(record, () => record);
 
@@ -715,7 +720,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// </exception>
         public virtual bool PurgeRecord<T, TPKey>(T record, Func<T, TPKey> primaryKey = null,
             bool isTracked = false, CancellationToken cancelToken = default(CancellationToken))
-            where T : class where TPKey : struct
+            where T : class
+            where TPKey : struct
         {
             ErrorBase.CheckArgIsNull(record, () => record);
 
@@ -808,7 +814,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// </exception>
         public virtual bool PurgeRecord<T, TPKey>(string odataFilterExpression,
             CancellationToken cancelToken = default(CancellationToken))
-            where T : class where TPKey : struct
+            where T : class
+            where TPKey : struct
         {
             ErrorBase.CheckArgIsNullOrDefault(odataFilterExpression, () => odataFilterExpression);
 
@@ -857,7 +864,9 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <param name="defaultValue">The default value.</param>
         /// <returns></returns>
         protected KeyValuePair<string, TResult> GetPrimaryKeyInfo<T, TResult>(T srcEntity,
-            TResult defaultValue = default(TResult)) where T : class where TResult : struct
+            TResult defaultValue = default(TResult))
+            where T : class
+            where TResult : struct
         {
             // Find primary key names based on data service key attribute.
             var myDsKeyAttr = typeof(T).GetCustomAttributes(
@@ -1057,11 +1066,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             else
             {
                 //TODO: Hp --> Entity framework mismatch version error is comming need to check.
-                //Hp --> Logic: To get name of the entity set in pluralization format.
-                //var service =
-                //    DbConfiguration.DependencyResolver.GetService<IPluralizationService>();
+                //Hp-- > Logic: To get name of the entity set in pluralization format.
+                var service =
+                    DbConfiguration.DependencyResolver.GetService<IPluralizationService>();
 
-                //entitySetName = service.Pluralize(typeof(T).Name);
+                entitySetName = service.Pluralize(typeof(T).Name);
             }
 
             return (entitySetName);

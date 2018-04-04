@@ -229,6 +229,8 @@
     <Compile Include="Handler\GlobalWcfErrorHandlerAttribute.cs" />
     <Compile Include="Helpers\AjaxRequestAttribute.cs" />
     <Compile Include="Helpers\HtmlExtensions.cs" />
+    <Compile Include="Infrastructure\MapEntityModelHelper.cs" />
+    <Compile Include="Infrastructure\MapEntityModule.cs" />
     <Compile Include="Infrastructure\LoggingServiceHelper.cs" />
     <Compile Include="Infrastructure\LoggingModule.cs" />
     <Compile Include="MessageHeaders\CustMsgHeaderBehaviorAttribute.cs" />

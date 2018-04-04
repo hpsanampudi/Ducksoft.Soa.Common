@@ -1,26 +1,26 @@
-﻿using Ducksoft.Soa.Common.Contracts;
+﻿using Ducksoft.Soa.Common.EFHelpers.Interfaces;
 using Ninject.Modules;
 using System.Collections.Generic;
 
 namespace Ducksoft.Soa.Common.Infrastructure
 {
     /// <summary>
-    /// Static logging helper class which is used to load logging service in IOC container.
+    /// Static entity model mapper helper class which is used to map entity models in IOC container.
     /// </summary>
-    public static class LoggingServiceHelper
+    public static class MapEntityModelHelper
     {
         /// <summary>
-        /// Adds or get logging service to IOC container.
+        /// Adds or get entity model mapper to IOC container.
         /// </summary>
         /// <returns></returns>
-        public static ILoggingService AddOrGetLoggingService
+        public static IMapEntityModel AddOrGetMapEntityModel
         {
             get
             {
-                ILoggingService logger = null;
+                IMapEntityModel mapper = null;
                 try
                 {
-                    logger = NInjectHelper.Instance.GetInstance<ILoggingService>();
+                    mapper = NInjectHelper.Instance.GetInstance<IMapEntityModel>();
                 }
                 catch
                 {
@@ -28,13 +28,13 @@ namespace Ducksoft.Soa.Common.Infrastructure
                     //then load it here.
                     NInjectHelper.Instance.LoadModules(new List<INinjectModule>
                     {
-                        new LoggingModule(),
+                        new MapEntityModule(),
                     });
 
-                    logger = NInjectHelper.Instance.GetInstance<ILoggingService>();
+                    mapper = NInjectHelper.Instance.GetInstance<IMapEntityModel>();
                 }
 
-                return (logger);
+                return (mapper);
             }
         }
     }
