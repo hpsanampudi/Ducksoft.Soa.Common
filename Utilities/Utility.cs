@@ -586,52 +586,64 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <summary>
         /// Gets the decade date regular expression in yyyymmdd format based on current date.
         /// </summary>
+        /// <param name="delimeter">The delimeter.</param>
         /// <returns></returns>
-        public static string GetDecadeDateRegExpression()
+        public static string GetDecadeDateRegExpression(string delimeter = "")
         {
-            var startYear = DateTime.Now.AddYears(-100).Year;
-            var endYear = DateTime.Now.AddYears(100).Year;
+            int startYear = DateTime.Now.AddYears(-100).Year;
+            int endYear = DateTime.Now.AddYears(100).Year;
 
-            var subStartYear = ToInt(startYear.ToString().Substring(0, 2));
-            var subEndYear = ToInt(endYear.ToString().Substring(0, 2));
+            int subStartYear = Convert.ToInt16(startYear.ToString().Substring(0, 2));
+            int subEndYear = Convert.ToInt16(endYear.ToString().Substring(0, 2));
 
-            var decadeStartYear = ToInt(startYear.ToString().Substring(0, 2) + "00");
-            var decadeEndYear = ToInt((endYear + 100).ToString().Substring(0, 2) + "00");
+            int decadeStartYear = Convert.ToInt16(startYear.ToString().Substring(0, 2) + "00");
+            int decadeEndYear = Convert.ToInt16((endYear + 100).ToString().Substring(0, 2) + "00");
 
             var regxStartYear = string.Join("|",
                 Enumerable.Range(subStartYear, ((subEndYear - subStartYear) + 1)));
 
             //Hp --> Logic: Validation for date format in yyyymmdd
-            var regxDateBuilder = new StringBuilder();
+            StringBuilder regxDateBuilder = new StringBuilder();
 
             //Validation for 31 days a year (Jan,Mar,May,Jul,Oct,Dec)
-            regxDateBuilder.Append(
-                "((((" + regxStartYear + ")[0-9]{2})(0[13578]|1[02])(0[1-9]|[12][0-9]|3[01]))");
+            regxDateBuilder.Append(string.Join(delimeter,
+                $"(((({regxStartYear})[0-9]{{2}})",
+                "(0[13578]|1[02])",
+                $"(0[1-9]|[12][0-9]|3[01]))"));
+
             regxDateBuilder.Append("|");
 
             //Validation for 30 days a year (Apr,Jun,Sep,Nov)
-            regxDateBuilder.Append(
-                "(((" + regxStartYear + ")[0-9]{2})(0[469]|11)(0[1-9]|[12][0-9]|30))");
+            regxDateBuilder.Append(string.Join(delimeter,
+                $"((({regxStartYear})[0-9]{{2}})",
+                "(0[469]|11)",
+                "(0[1-9]|[12][0-9]|30))"));
+
             regxDateBuilder.Append("|");
 
             //Validation for 28 days a year (Feb)
-            regxDateBuilder.Append(
-                "(((" + regxStartYear + ")[0-9]{2})(02)(0[1-9]|1[0-9]|2[0-8]))");
+            regxDateBuilder.Append(string.Join(delimeter,
+                $"((({regxStartYear})[0-9]{{2}})",
+                "(02)",
+                "(0[1-9]|1[0-9]|2[0-8]))"));
+
             regxDateBuilder.Append("|");
 
             //Rules for validation of Leap year
             //1. Any year that can be evenly divided by 4 (such as 2012, 2016, etc)
             //2. If it can be evenly divided by 400, then it is (such as 2000, 2400)
             //3. If it can can be evenly divided by 100, then it isn't (such as 2100, 2200, 2300, 2500, 2600, etc)
-            var leapYears = string.Join("|",
+            var misLeapYears = string.Join("|",
                 Enumerable.Range(decadeStartYear, ((decadeEndYear - decadeStartYear) + 1))
-                .Where(y => ((DateTime.IsLeapYear(y)) && (0 == (y % 400)))));
+                .Where(Y => ((DateTime.IsLeapYear(Y)) && (0 == (Y % 400)))));
 
-            var regxLeapYears = string.IsNullOrEmpty(leapYears) ?
-                string.Empty : string.Concat("|", leapYears);
+            var regxMisLeapYears = string.IsNullOrEmpty(misLeapYears) ?
+                string.Empty : string.Concat("|", misLeapYears);
 
-            regxDateBuilder.Append("((((" + regxStartYear + ")(04|08|[2468][048]|[13579][26]))" +
-                regxLeapYears + ")(02)(29)))");
+            regxDateBuilder.Append(string.Join(delimeter,
+                $"(((({regxStartYear})(04|08|[2468][048]|[13579][26])){regxMisLeapYears})",
+                "(02)",
+                "(29)))"));
 
             return (regxDateBuilder.ToString());
         }
