@@ -1,14 +1,12 @@
 ﻿using Ducksoft.Soa.Common.DataContracts;
 using Ducksoft.Soa.Common.EFHelpers.Interfaces;
+using Ducksoft.Soa.Common.EFHelpers.ODataHelpers;
 using Ducksoft.Soa.Common.Filters;
 using Ducksoft.Soa.Common.Utilities;
 using Nelibur.ObjectMapper;
 using Nelibur.ObjectMapper.Bindings;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure.DependencyResolution;
-using System.Data.Entity.Infrastructure.Pluralization;
 using System.Data.Services.Client;
 using System.Data.Services.Common;
 using System.Linq;
@@ -22,9 +20,10 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
     /// <summary>
     /// Class which is used to load Entities with user provided connection string information.
     /// </summary>
-    /// <typeparam name="TEntity">The type of the entity.</typeparam>
-    /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IEntityLoader" />
-    public class EntityLoader<TEntity> : IEntityLoader where TEntity : DataServiceContext
+    /// <typeparam name="TEntities">The type of the entities.</typeparam>
+    /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IEntityLoader{TEntities}" />
+    public class EntityLoader<TEntities> : IEntityLoader<TEntities>
+        where TEntities : DataServiceContext
     {
         /// <summary>
         /// Gets the data service client.
@@ -32,7 +31,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <value>
         /// The client.
         /// </value>
-        protected virtual TEntity DataSvcClient { get; private set; }
+        public virtual TEntities DataSvcClient { get; private set; }
 
         /// <summary>
         /// Gets the data service URL.
@@ -51,14 +50,14 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         public DbConnectionInfo ConnectionInfo { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EntityLoader{TEntity}"/> class.
+        /// Initializes a new instance of the <see cref="EntityLoader{TEntities}"/> class.
         /// </summary>
         public EntityLoader()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EntityLoader{TEntity}"/> class.
+        /// Initializes a new instance of the <see cref="EntityLoader{TEntities}"/> class.
         /// </summary>
         /// <param name="dataServiceUrl">The data service URL.</param>
         public EntityLoader(Uri dataServiceUrl)
@@ -69,7 +68,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EntityLoader{TEntity}"/> class.
+        /// Initializes a new instance of the <see cref="EntityLoader{TEntities}" /> class.
         /// </summary>
         /// <param name="dataServiceUrl">The data service URL.</param>
         /// <param name="connectionInfo">The connection information.</param>
@@ -92,13 +91,13 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             //Hp --> BugFix: Failed to redirect to user provided db connection.
             //Note: Store the result in local variable and don't set it to DataSvcClient property
             //object because there is a chance it can overrriden at BL.
-            var client = new DataServiceContext(dataServiceUrl) as TEntity;
+            var client = new DataServiceContext(dataServiceUrl) as TEntities;
 
-            //Hp --> Logic: If TEntity is derived from DataServiceContext then we need to use 
+            //Hp --> Logic: If TEntities is derived from DataServiceContext then we need to use 
             //reflection to initialize the client object.
             if (null == client)
             {
-                DataSvcClient = (TEntity)Activator.CreateInstance(typeof(TEntity),
+                DataSvcClient = (TEntities)Activator.CreateInstance(typeof(TEntities),
                     new object[]
                     {
                         dataServiceUrl
@@ -131,24 +130,24 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Gets all.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="query">The query.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="FaultException{CustomFault}">
         /// </exception>
-        public virtual IEnumerable<QueryOperationResponse<T>> GetAll<T>(
-            DataServiceQuery<T> query, CancellationToken cancelToken = default(CancellationToken))
-            where T : class
+        protected virtual IEnumerable<QueryOperationResponse<TEntity>> GetAll<TEntity>(
+            IDataServiceQuery<TEntity> query,
+            CancellationToken cancelToken = default(CancellationToken))
+            where TEntity : class
         {
             var errMessage = string.Empty;
             var fault = default(CustomFault);
-            var response = default(QueryOperationResponse<T>);
+            var response = default(QueryOperationResponse<TEntity>);
 
             try
             {
-                response = query?.Execute() as QueryOperationResponse<T>;
-
+                response = query?.Execute() as QueryOperationResponse<TEntity>;
             }
             catch (Exception ex)
             {
@@ -158,7 +157,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
 
             // Hp --> Logic: In order to get all records we need to loop untill data service 
             //continuation token is null.
-            DataServiceQueryContinuation<T> token = null;
+            DataServiceQueryContinuation<TEntity> token = null;
             do
             {
                 try
@@ -178,15 +177,17 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 }
                 catch (OperationCanceledException ex)
                 {
-                    errMessage = $"User canceled while reading the {typeof(T).FullName} records.";
+                    errMessage = $"User canceled while reading the " +
+                        $"{typeof(TEntity).FullName} records.";
+
                     fault = new CustomFault(errMessage, ex);
                     break;
                 }
                 catch (Exception ex)
                 {
                     //Hp --> Logic: It can be DataServiceClientException (or) any error.
-                    errMessage =
-                        $"An error occurred while reading the {typeof(T).FullName} records.";
+                    errMessage = $"An error occurred while reading the " +
+                        $"{typeof(TEntity).FullName} records.";
 
                     fault = new CustomFault(errMessage, ex);
                     break;
@@ -208,20 +209,31 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         }
 
         /// <summary>
-        /// Gets all.
+        /// Gets all records.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <param name="query">The query.</param>
+        /// <param name="cancelToken">The cancel token.</param>
+        /// <returns></returns>
+        public virtual IEnumerable<TEntity> GetAllRecords<TEntity>(
+            IDataServiceQuery<TEntity> query,
+            CancellationToken cancelToken = default(CancellationToken))
+            where TEntity : class => GetAll(query, cancelToken).SelectMany(R => R);
+
+        /// <summary>
+        /// Gets all records while calling a store procedure returning complex data type
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="query">The query url calling store procedure.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        /// <exception cref="FaultException{CustomFault}">
-        /// </exception>
-        public virtual IQueryable<T> GetAll<T>(string query,
+        /// <exception cref="FaultException{CustomFault}"></exception>
+        public virtual IQueryable<TEntity> GetAll<TEntity>(string query,
             CancellationToken cancelToken = default(CancellationToken))
-            where T : class
+            where TEntity : class
         {
             ErrorBase.CheckArgIsNullOrDefault(query, () => query);
-            var response = default(IQueryable<T>);
+            var response = default(IQueryable<TEntity>);
 
             try
             {
@@ -236,19 +248,21 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 //without the type 'T' being a collection.
                 //Comments: When calling a store procedure returning complex data type then pass
                 //other parameters of Execute method as shown below:
-                response = DataSvcClient.Execute<T>(queryUri, "GET", false).AsQueryable();
+                response = DataSvcClient.Execute<TEntity>(queryUri, "GET", false).AsQueryable();
             }
             catch (OperationCanceledException ex)
             {
-                var errMessage = $"User canceled while reading the {typeof(T).FullName} records.";
+                var errMessage = $"User canceled while reading the " +
+                    $"{typeof(TEntity).FullName} records.";
+
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
             }
             catch (Exception ex)
             {
                 //Hp --> Logic: It can be DataServiceClientException (or) any error.
-                var errMessage =
-                    $"An error occurred while reading the {typeof(T).FullName} records.";
+                var errMessage = $"An error occurred while reading the " +
+                    $"{typeof(TEntity).FullName} records.";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -260,18 +274,18 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Gets the single or default.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="predicate">The predicate.</param>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <param name="query">The query.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        /// <exception cref="FaultException{CustomFault}">
-        /// </exception>
-        public virtual T GetSingleOrDefault<T>(DataServiceQuery<T> query,
-            CancellationToken cancelToken = default(CancellationToken)) where T : class
+        /// <exception cref="FaultException{CustomFault}"></exception>
+        public virtual TEntity GetSingleOrDefault<TEntity>(IDataServiceQuery<TEntity> query,
+            CancellationToken cancelToken = default(CancellationToken))
+            where TEntity : class
         {
             ErrorBase.CheckArgIsNullOrDefault(query, () => query);
 
-            var result = default(T);
+            var result = default(TEntity);
             try
             {
                 if ((cancelToken != default(CancellationToken)) &&
@@ -284,15 +298,17 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             }
             catch (OperationCanceledException ex)
             {
-                var errMessage = $"User canceled while reading the {typeof(T).FullName} record.";
+                var errMessage = $"User canceled while reading the " +
+                    $"{typeof(TEntity).FullName} record.";
+
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
             }
             catch (Exception ex)
             {
                 //Hp --> Logic: It can be DataServiceClientException (or) any error.
-                var errMessage =
-                    $"An error occurred while reading the {typeof(T).FullName} record.";
+                var errMessage = $"An error occurred while reading the " +
+                    $"{typeof(TEntity).FullName} record.";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -304,28 +320,30 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Executes the OData query.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
         /// <param name="queryOptions">The query options.</param>
+        /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        protected virtual IEnumerable<QueryOperationResponse<T>> ExecuteODataQuery<T>(
-            DataServiceQuery<T> baseQuery, IList<QueryOption> queryOptions = null,
-            CancellationToken cancelToken = default(CancellationToken)) where T : class
-        {
-            return (GetAll(LoadQueryOptions(baseQuery, queryOptions), cancelToken));
-        }
+        public virtual IEnumerable<TEntity> ExecuteODataQuery<TEntity>(
+            IDataServiceQuery<TEntity> baseQuery, IList<QueryOption> queryOptions = null,
+            CancellationToken cancelToken = default(CancellationToken))
+            where TEntity : class =>
+            GetAllRecords(LoadQueryOptions(baseQuery, queryOptions), cancelToken);
 
         /// <summary>
         /// Loads the query options.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
         /// <param name="queryOptions">The query options.</param>
         /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <returns></returns>
-        public virtual DataServiceQuery<T> LoadQueryOptions<T>(DataServiceQuery<T> baseQuery,
-            IList<QueryOption> queryOptions = null, bool isAddOrAppendDeleteFilter = true)
-            where T : class
+        /// <exception cref="ExceptionBase"></exception>
+        public virtual IDataServiceQuery<TEntity> LoadQueryOptions<TEntity>(
+            IDataServiceQuery<TEntity> baseQuery, IList<QueryOption> queryOptions = null,
+            bool isAddOrAppendDeleteFilter = true)
+            where TEntity : class
         {
             var query = baseQuery;
             var requestUrl = baseQuery.RequestUri;
@@ -336,7 +354,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             if (urlQueryOptions.Any(U => myQueryOptions.Any(Q => Q.Option.IsEqualTo(U))))
             {
                 var errorMessage =
-                    $"Base query url contains one (or) more user provided query option key!";
+                    $"Base query url already contains one (or) more user provided query option key!";
 
                 throw (new ExceptionBase(errorMessage));
             }
@@ -352,7 +370,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                     var strComparer = StringComparison.CurrentCultureIgnoreCase;
                     if (!urlFilterExpr.Contains(deleteExpression, strComparer))
                     {
-                        query = AddOrAppendDeleteFilter<T>(requestUrl);
+                        query = AddOrAppendDeleteFilter<TEntity>(requestUrl);
                     }
                 }
                 else
@@ -377,12 +395,13 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Loads the filter query option.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
         /// <param name="odataFilterExpression">The odata filter expression.</param>
         /// <returns></returns>
-        public virtual DataServiceQuery<T> LoadFilterQueryOption<T>(
-            DataServiceQuery<T> baseQuery, string odataFilterExpression = "") where T : class
+        public virtual IDataServiceQuery<TEntity> LoadFilterQueryOption<TEntity>(
+            IDataServiceQuery<TEntity> baseQuery, string odataFilterExpression = "")
+            where TEntity : class
         {
             var queryOptions = new List<QueryOption>
             {
@@ -399,15 +418,17 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Gets the pagination data.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
         /// <param name="pageIndex">Index of the page.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        public PaginationData<T> GetPaginationData<T>(DataServiceQuery<T> baseQuery,
+        public PaginationData<TEntity> GetPaginationData<TEntity>(
+            IDataServiceQuery<TEntity> baseQuery,
             int? pageIndex = default(int?), int? pageSize = default(int?),
-            CancellationToken cancelToken = default(CancellationToken)) where T : class
+            CancellationToken cancelToken = default(CancellationToken))
+            where TEntity : class
         {
             if (baseQuery == null)
             {
@@ -438,14 +459,16 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Gets the pagination data.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
         /// <param name="queryOptions">The query options.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        public PaginationData<T> GetPaginationData<T>(DataServiceQuery<T> baseQuery,
+        public PaginationData<TEntity> GetPaginationData<TEntity>(
+            IDataServiceQuery<TEntity> baseQuery,
             IList<QueryOption> queryOptions = null,
-            CancellationToken cancelToken = default(CancellationToken)) where T : class
+            CancellationToken cancelToken = default(CancellationToken))
+            where TEntity : class
         {
             if (baseQuery == null)
             {
@@ -453,25 +476,25 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             }
 
             var queryToExecute = LoadQueryOptions(baseQuery, queryOptions);
-            return (new PaginationData<T>
+            return (new PaginationData<TEntity>
             {
                 TotalItems = GetTotalRecordsCount(queryToExecute, cancelToken),
-                PageData = GetAll(queryToExecute, cancelToken).SelectMany(R => R).ToList()
+                PageData = GetAllRecords(queryToExecute, cancelToken).ToList()
             });
         }
 
         /// <summary>
         /// Gets the total records count.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="FaultException{CustomFault}">
         /// </exception>
-        public long GetTotalRecordsCount<T>(DataServiceQuery<T> baseQuery,
+        public long GetTotalRecordsCount<TEntity>(IDataServiceQuery<TEntity> baseQuery,
             CancellationToken cancelToken = default(CancellationToken))
-            where T : class
+            where TEntity : class
         {
             long totalRecords = -1;
 
@@ -497,13 +520,13 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                     cancelToken.ThrowIfCancellationRequested();
                 }
 
-                var response = baseQuery.Execute() as QueryOperationResponse<T>;
+                var response = baseQuery.Execute() as QueryOperationResponse<TEntity>;
                 totalRecords = response.TotalCount;
             }
             catch (OperationCanceledException ex)
             {
-                var errMessage =
-                    $"User canceled while reading the {typeof(T).FullName} total records.";
+                var errMessage = $"User canceled while reading the " +
+                    $"{typeof(TEntity).FullName} total records.";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -511,8 +534,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             catch (Exception ex)
             {
                 //Hp --> Logic: It can be DataServiceClientException (or) any error.
-                var errMessage =
-                    $"An error occurred while reading the {typeof(T).FullName} total records.";
+                var errMessage = $"An error occurred while reading the " +
+                    $"{typeof(TEntity).FullName} total records.";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -524,27 +547,25 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Adds the record.
         /// </summary>
-        /// <typeparam name="T">The type of entity record</typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="record">The record.</param>
-        /// <param name="target">The target.</param>
         /// <param name="primaryKey">The primary key.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        /// <exception cref="FaultException{CustomFault}">
-        /// </exception>
-        public virtual TPKey AddRecord<T, TPKey>(T record, Action<T> target,
-            Func<T, TPKey> primaryKey = null, TPKey defaultValue = default(TPKey),
+        /// <exception cref="FaultException{CustomFault}"></exception>
+        public virtual TPKey AddRecord<TEntity, TPKey>(TEntity record,
+            Func<TEntity, TPKey> primaryKey = null,
+            TPKey defaultValue = default(TPKey),
             CancellationToken cancelToken = default(CancellationToken))
-            where T : class
+            where TEntity : class
             where TPKey : struct
         {
             ErrorBase.CheckArgIsNull(record, () => record);
-            ErrorBase.CheckArgIsNull(target, () => target);
 
             var result = defaultValue;
-            Func<T, TPKey> GetPrimaryKeyValue = (R) =>
+            Func<TEntity, TPKey> GetPrimaryKeyValue = (R) =>
             primaryKey?.Invoke(R) ?? GetPrimaryKeyInfo(R, defaultValue).Value;
 
             try
@@ -555,7 +576,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                     cancelToken.ThrowIfCancellationRequested();
                 }
 
-                target.Invoke(record);
+                var entitySetName = GetEntitySetName<TEntity>();
+                DataSvcClient.AddObject(entitySetName, record);
                 var dbResponse = DataSvcClient.SaveChanges();
 
                 // Enumerate the returned responses. 
@@ -563,7 +585,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 {
                     // Get the descriptor for the entity.
                     EntityDescriptor descriptor = change.Descriptor as EntityDescriptor;
-                    var addedEntity = (T)descriptor?.Entity ?? null;
+                    var addedEntity = (TEntity)descriptor?.Entity ?? null;
                     if (addedEntity == null)
                     {
                         continue;
@@ -575,14 +597,18 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             }
             catch (OperationCanceledException ex)
             {
-                var errMessage = $"User canceled while adding the {typeof(T).FullName} record.";
+                var errMessage = $"User canceled while adding the " +
+                    $"{typeof(TEntity).FullName} record.";
+
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
             }
             catch (Exception ex)
             {
                 //Hp --> Logic: It can be DataServiceClientException (or) any error.
-                var errMessage = $"An error occurred while adding the {typeof(T).FullName} record.";
+                var errMessage = $"An error occurred while adding the " +
+                    $"{typeof(TEntity).FullName} record.";
+
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
             }
@@ -606,21 +632,21 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        /// <exception cref="FaultException{CustomFault}">
-        /// </exception>
-        public virtual TPKey UpdateRecord<T, TPKey>(T record, Func<T, TPKey> primaryKey = null,
+        /// <exception cref="FaultException{CustomFault}"></exception>
+        public virtual TPKey UpdateRecord<TEntity, TPKey>(TEntity record,
+            Func<TEntity, TPKey> primaryKey = null,
             TPKey defaultValue = default(TPKey), bool isTracked = false,
             CancellationToken cancelToken = default(CancellationToken))
-            where T : class
+            where TEntity : class
             where TPKey : struct
         {
             ErrorBase.CheckArgIsNull(record, () => record);
 
-            Func<T, TPKey> GetPrimaryKeyValue = (R) =>
+            Func<TEntity, TPKey> GetPrimaryKeyValue = (R) =>
             primaryKey?.Invoke(R) ?? GetPrimaryKeyInfo(R, defaultValue).Value;
 
             var result = defaultValue;
-            var dbRecord = default(T);
+            var dbRecord = default(TEntity);
 
             try
             {
@@ -629,17 +655,19 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 if (!isTracked)
                 {
                     var odataFilter = GetODataPKExpression(record);
-                    var baseQuery = CreateBaseQuery<T>();
+                    var baseQuery = CreateBaseQuery<TEntity>();
                     var query = LoadFilterQueryOption(baseQuery, odataFilter);
                     dbRecord = GetSingleOrDefault(query, cancelToken);
                     if (dbRecord == null)
                     {
-                        var errMessage = $"Failed to get database record with PK filter: {odataFilter}";
+                        var errMessage =
+                            $"Failed to get database record with PK filter: {odataFilter}";
+
                         throw (new ExceptionBase(errMessage));
                     }
 
                     //Hp --> Logic: Map the source record values into database record.
-                    TinyMapper.Bind(GetIgnoreConfig<T, T>());
+                    TinyMapper.Bind(GetIgnoreConfig<TEntity, TEntity>());
                     dbRecord = TinyMapper.Map(record, dbRecord);
                 }
                 else
@@ -665,7 +693,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 {
                     // Get the descriptor for the entity.
                     EntityDescriptor descriptor = change.Descriptor as EntityDescriptor;
-                    var updatedEntity = (T)descriptor?.Entity ?? null;
+                    var updatedEntity = (TEntity)descriptor?.Entity ?? null;
                     if (updatedEntity == null)
                     {
                         continue;
@@ -678,8 +706,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             catch (OperationCanceledException ex)
             {
                 var pKey = GetPrimaryKeyValue(record);
-                var errMessage =
-                    $"User canceled while updating the {typeof(T).FullName} record \"{pKey}\".";
+                var errMessage = $"User canceled while updating the {typeof(TEntity).FullName} " +
+                    $"record \"{pKey}\".";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -688,8 +716,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             {
                 //Hp --> Logic: It can be DataServiceClientException (or) any error.
                 var pKey = GetPrimaryKeyValue(record);
-                var errMessage =
-                    $"An error occurred while updating the {typeof(T).FullName} record \"{pKey}\".";
+                var errMessage = $"An error occurred while updating the " +
+                    $"{typeof(TEntity).FullName} record \"{pKey}\".";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -716,20 +744,20 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        /// <exception cref="FaultException{CustomFault}">
-        /// </exception>
-        public virtual bool PurgeRecord<T, TPKey>(T record, Func<T, TPKey> primaryKey = null,
+        /// <exception cref="FaultException{CustomFault}"></exception>
+        public virtual bool PurgeRecord<TEntity, TPKey>(TEntity record,
+            Func<TEntity, TPKey> primaryKey = null,
             bool isTracked = false, CancellationToken cancelToken = default(CancellationToken))
-            where T : class
+            where TEntity : class
             where TPKey : struct
         {
             ErrorBase.CheckArgIsNull(record, () => record);
 
-            Func<T, TPKey> GetPrimaryKeyValue = (R) =>
-            primaryKey?.Invoke(R) ?? GetPrimaryKeyInfo<T, TPKey>(R).Value;
+            Func<TEntity, TPKey> GetPrimaryKeyValue = (R) =>
+            primaryKey?.Invoke(R) ?? GetPrimaryKeyInfo<TEntity, TPKey>(R).Value;
 
             var isSuccess = false;
-            var dbRecord = default(T);
+            var dbRecord = default(TEntity);
 
             try
             {
@@ -738,7 +766,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 if (!isTracked)
                 {
                     var odataFilter = GetODataPKExpression(record);
-                    var baseQuery = CreateBaseQuery<T>();
+                    var baseQuery = CreateBaseQuery<TEntity>();
                     var query = LoadFilterQueryOption(baseQuery, odataFilter);
                     dbRecord = GetSingleOrDefault(query, cancelToken);
                     if (dbRecord == null)
@@ -750,7 +778,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                     }
 
                     //Hp --> Logic: Map the source record values into database record.
-                    TinyMapper.Bind(GetIgnoreConfig<T, T>());
+                    TinyMapper.Bind(GetIgnoreConfig<TEntity, TEntity>());
                     dbRecord = TinyMapper.Map(record, dbRecord);
                 }
                 else
@@ -775,8 +803,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             catch (OperationCanceledException ex)
             {
                 var pKey = GetPrimaryKeyValue(record);
-                var errMessage =
-                    $"User canceled while purging the {typeof(T).FullName} record \"{pKey}\".";
+                var errMessage = $"User canceled while purging the " +
+                    $"{typeof(TEntity).FullName} record \"{pKey}\".";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -785,8 +813,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             {
                 //Hp --> Logic: It can be DataServiceClientException (or) any error.
                 var pKey = GetPrimaryKeyValue(record);
-                var errMessage =
-                    $"An error occurred while purging the {typeof(T).FullName} record \"{pKey}\".";
+                var errMessage = $"An error occurred while purging the " +
+                    $"{typeof(TEntity).FullName} record \"{pKey}\".";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -805,16 +833,15 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Purges (or) deletes the record permanently.
         /// </summary>
-        /// <typeparam name="T">The type of entity record</typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="odataFilterExpression">The OData filter expression.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        /// <exception cref="FaultException{CustomFault}">
-        /// </exception>
-        public virtual bool PurgeRecord<T, TPKey>(string odataFilterExpression,
+        /// <exception cref="FaultException{CustomFault}"></exception>
+        public virtual bool PurgeRecord<TEntity, TPKey>(string odataFilterExpression,
             CancellationToken cancelToken = default(CancellationToken))
-            where T : class
+            where TEntity : class
             where TPKey : struct
         {
             ErrorBase.CheckArgIsNullOrDefault(odataFilterExpression, () => odataFilterExpression);
@@ -822,7 +849,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             var result = false;
             try
             {
-                var baseQuery = CreateBaseQuery<T>();
+                var baseQuery = CreateBaseQuery<TEntity>();
                 var query = LoadFilterQueryOption(baseQuery, odataFilterExpression);
 
                 if ((cancelToken != default(CancellationToken)) &&
@@ -832,12 +859,12 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 }
 
                 var record = query.Execute().SingleOrDefault();
-                result = PurgeRecord<T, TPKey>(record, null, true, cancelToken);
+                result = PurgeRecord<TEntity, TPKey>(record, null, true, cancelToken);
             }
             catch (OperationCanceledException ex)
             {
-                var errMessage = $"User canceled while purging the {typeof(T).FullName} record" +
-                    $" with filter {odataFilterExpression}.";
+                var errMessage = $"User canceled while purging the {typeof(TEntity).FullName} " +
+                    $"record with filter {odataFilterExpression}.";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -845,8 +872,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             catch (Exception ex)
             {
                 //Hp --> Logic: It can be DataServiceClientException (or) any error.
-                var errMessage = $"An error occurred while purging the {typeof(T).FullName} " +
-                    $" record with filter {odataFilterExpression}.";
+                var errMessage = $"An error occurred while purging the " +
+                    $"{typeof(TEntity).FullName} record with filter {odataFilterExpression}.";
 
                 var fault = new CustomFault(errMessage, ex);
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
@@ -858,18 +885,18 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Gets the primary key information.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TValue">The type of the value.</typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="srcEntity">The source entity.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns></returns>
-        protected KeyValuePair<string, TResult> GetPrimaryKeyInfo<T, TResult>(T srcEntity,
-            TResult defaultValue = default(TResult))
-            where T : class
+        protected KeyValuePair<string, TResult> GetPrimaryKeyInfo<TEntity, TResult>(
+            TEntity srcEntity, TResult defaultValue = default(TResult))
+            where TEntity : class
             where TResult : struct
         {
             // Find primary key names based on data service key attribute.
-            var myDsKeyAttr = typeof(T).GetCustomAttributes(
+            var myDsKeyAttr = typeof(TEntity).GetCustomAttributes(
                 typeof(DataServiceKeyAttribute), true).FirstOrDefault(k =>
                     (((DataServiceKeyAttribute)k).KeyNames.Count != 0)) as DataServiceKeyAttribute;
 
@@ -884,13 +911,14 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Gets the OData primary key expression.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="srcEntity">The source entity.</param>
         /// <returns></returns>
-        public virtual string GetODataPKExpression<T>(T srcEntity) where T : class
+        public virtual string GetODataPKExpression<TEntity>(TEntity srcEntity)
+            where TEntity : class
         {
             //Hp --> Logic: Find primary key names based on data service key attribute.
-            var myDsKeyAttr = typeof(T).GetCustomAttributes(
+            var myDsKeyAttr = typeof(TEntity).GetCustomAttributes(
                 typeof(DataServiceKeyAttribute), true).FirstOrDefault(k =>
                     (0 != ((DataServiceKeyAttribute)k).KeyNames.Count)) as DataServiceKeyAttribute;
 
@@ -911,17 +939,20 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Gets the primary key based predicate expression dynamically.
         /// </summary>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="srcEntity">The source entity.</param>
         /// <returns></returns>
-        protected virtual Expression<Func<T, bool>> GetPKExpression<T>(T srcEntity) where T : class
+        protected virtual Expression<Func<TEntity, bool>> GetPKExpression<TEntity>(
+            TEntity srcEntity)
+            where TEntity : class
         {
             //Hp --> Logic: Find primary key names based on data service key attribute.
-            var myDsKeyAttr = typeof(T).GetCustomAttributes(
+            var myDsKeyAttr = typeof(TEntity).GetCustomAttributes(
                 typeof(DataServiceKeyAttribute), true).FirstOrDefault(k =>
                     (0 != ((DataServiceKeyAttribute)k).KeyNames.Count)) as DataServiceKeyAttribute;
 
             //Hp --> Logic: Create entity => portion of lambda expression
-            var parameter = Expression.Parameter(typeof(T), "entity");
+            var parameter = Expression.Parameter(typeof(TEntity), "entity");
             Expression body = null;
 
             foreach (var key in myDsKeyAttr.KeyNames)
@@ -941,7 +972,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             }
 
             //Hp --> Logic: Finally create entire expression: entity => entity.Id == 'id'
-            var result = Expression.Lambda<Func<T, bool>>(body, new[] { parameter });
+            var result = Expression.Lambda<Func<TEntity, bool>>(body, new[] { parameter });
             return (result);
         }
 
@@ -954,8 +985,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         {
             var myQueryOptions = queryOptions ?? new List<QueryOption>();
             var filterOption = "$filter";
-            var filter = myQueryOptions.SingleOrDefault(Q => Q.Option.IsEqualTo(filterOption));
             var deleteExpression = "DeleteDate eq null";
+            var filter = myQueryOptions.SingleOrDefault(Q => Q.Option.IsEqualTo(filterOption));
             if (filter == null)
             {
                 myQueryOptions.Add(new QueryOption
@@ -967,7 +998,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             else
             {
                 var comparer = StringComparison.CurrentCultureIgnoreCase;
-                if (!filter.Option.Contains(deleteExpression, comparer))
+                if (!filter.Query.Contains(deleteExpression, comparer))
                 {
                     myQueryOptions.Remove(filter);
                     filter.Query += $" and ({deleteExpression})";
@@ -981,12 +1012,13 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Adds the or append delete filter.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="requestUrl">The request URL.</param>
         /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <returns></returns>
-        protected DataServiceQuery<T> AddOrAppendDeleteFilter<T>(Uri requestUrl,
-            bool isAddOrAppendDeleteFilter = true) where T : class
+        protected IDataServiceQuery<TEntity> AddOrAppendDeleteFilter<TEntity>(Uri requestUrl,
+            bool isAddOrAppendDeleteFilter = true)
+            where TEntity : class
         {
             ErrorBase.CheckArgIsNull(requestUrl, nameof(requestUrl));
             var deleteExpression = (isAddOrAppendDeleteFilter) ?
@@ -997,7 +1029,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             var entitySegmentName = requestUrl.Segments.LastOrDefault();
             if (string.IsNullOrWhiteSpace(entitySegmentName))
             {
-                entitySetName = GetEntitySetName<T>();
+                entitySetName = GetEntitySetName<TEntity>();
             }
             else
             {
@@ -1007,7 +1039,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             //Hp --> Logic: As we can edit the request url filter query parameter,
             //create new base query and copy all odata query options from request url
             //by editing the filter expression.
-            var query = CreateBaseQuery<T>(entitySetName);
+            var query = CreateBaseQuery<TEntity>(entitySetName);
             Func<string, string, bool> IsAppend = (source, target) =>
             {
                 var isAppend = true;
@@ -1053,24 +1085,26 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Gets the name of the entity set.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <param name="isPluralize">if set to <c>true</c> [is pluralize].</param>
         /// <returns></returns>
-        protected string GetEntitySetName<T>(bool isPluralize = false) where T : class
+        protected string GetEntitySetName<TEntity>(bool isPluralize = false)
+            where TEntity : class
         {
             var entitySetName = string.Empty;
             if (!isPluralize)
             {
-                var entitySetAttr = typeof(T).GetClassAttribute<EntitySetAttribute>();
+                var entitySetAttr = typeof(TEntity).GetClassAttribute<EntitySetAttribute>();
                 entitySetName = entitySetAttr?.EntitySet ?? string.Empty;
             }
             else
             {
                 //TODO: Hp --> Entity framework mismatch version error is comming need to check.
-                //Hp-- > Logic: To get name of the entity set in pluralization format.
-                var service =
-                    DbConfiguration.DependencyResolver.GetService<IPluralizationService>();
+                //Hp --> Logic: To get name of the entity set in pluralization format.
+                //var service =
+                //    DbConfiguration.DependencyResolver.GetService<IPluralizationService>();
 
-                entitySetName = service.Pluralize(typeof(T).Name);
+                //entitySetName = service.Pluralize(typeof(T).Name);
             }
 
             return (entitySetName);
@@ -1079,18 +1113,29 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Creates the base query.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="entitySetName">Name of the entity set.</param>
         /// <returns></returns>
-        protected DataServiceQuery<T> CreateBaseQuery<T>(string entitySetName = "") where T : class
+        public IDataServiceQuery<TEntity> CreateBaseQuery<TEntity>(string entitySetName = "")
+            where TEntity : class
         {
             if (string.IsNullOrWhiteSpace(entitySetName))
             {
-                entitySetName = GetEntitySetName<T>();
+                entitySetName = GetEntitySetName<TEntity>();
             }
 
-            return (DataSvcClient.CreateQuery<T>(entitySetName));
+            IQueryable<TEntity> baseQuery = DataSvcClient.CreateQuery<TEntity>(entitySetName);
+            return (baseQuery.Wrap());
         }
+
+        /// <summary>
+        /// Wraps the data service query to support mocking.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <param name="query">The query.</param>
+        /// <returns></returns>
+        public IDataServiceQuery<TEntity> WrapQuery<TEntity>(IQueryable<TEntity> query)
+            where TEntity : class => query.Wrap();
 
         /// <summary>
         /// Gets the ignore configuration.
@@ -1101,18 +1146,18 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <returns></returns>
         protected Action<IBindingConfig<TSource, TTarget>> GetIgnoreConfig<TSource, TTarget>(
             IEnumerable<string> predefinedProperties = null) => (config) =>
-        {
-            predefinedProperties = predefinedProperties ?? new List<string>();
-            foreach (var propName in predefinedProperties)
             {
-                config.Ignore(Utility.GetExpression<TSource>(propName));
-            }
+                predefinedProperties = predefinedProperties ?? new List<string>();
+                foreach (var propName in predefinedProperties)
+                {
+                    config.Ignore(Utility.GetExpression<TSource>(propName));
+                }
 
-            var complexProperties = Utility.GetAllComplexProperties<TSource>().Select(P => P.Name);
-            foreach (var propName in complexProperties)
-            {
-                config.Ignore(Utility.GetExpression<TSource>(propName));
-            }
-        };
+                var complexProperties = Utility.GetAllComplexProperties<TSource>().Select(P => P.Name);
+                foreach (var propName in complexProperties)
+                {
+                    config.Ignore(Utility.GetExpression<TSource>(propName));
+                }
+            };
     }
 }

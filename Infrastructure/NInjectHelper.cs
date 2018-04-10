@@ -66,6 +66,16 @@ namespace Ducksoft.Soa.Common.Infrastructure
         }
 
         /// <summary>
+        /// Gets the instance.
+        /// </summary>
+        /// <param name="interfaceType">Type of the interface.</param>
+        /// <returns></returns>
+        public dynamic GetInstance(Type interfaceType)
+        {
+            return (kernelInstance.GetService(interfaceType));
+        }
+
+        /// <summary>
         /// Loads the modules.
         /// </summary>
         /// <param name="modules">The modules.</param>

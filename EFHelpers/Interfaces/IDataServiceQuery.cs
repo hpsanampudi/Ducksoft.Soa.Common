@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -34,5 +35,19 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         /// <param name="value">The value.</param>
         /// <returns>A new query that includes the requested query option appended to the URI of the supplied query</returns>
         IDataServiceQuery<TElement> AddQueryOption(string name, object value);
+
+        /// <summary>
+        /// Gets the request URI.
+        /// </summary>
+        /// <value>
+        /// The request URI.
+        /// </value>
+        Uri RequestUri { get; }
+
+        /// <summary>
+        /// Executes this instance.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<TElement> Execute();
     }
 }

@@ -40,6 +40,14 @@ namespace Ducksoft.Soa.Common.EFHelpers.ODataHelpers
         public IQueryProvider Provider => query.Provider;
 
         /// <summary>
+        /// Gets the request URI.
+        /// </summary>
+        /// <value>
+        /// The request URI.
+        /// </value>
+        public Uri RequestUri => new Uri(string.Empty, UriKind.RelativeOrAbsolute);
+
+        /// <summary>
         /// Adds the query option.
         /// </summary>
         /// <param name="name">The name.</param>
@@ -81,5 +89,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.ODataHelpers
         /// An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.
         /// </returns>
         IEnumerator IEnumerable.GetEnumerator() => query.GetEnumerator();
+
+        /// <summary>
+        /// Executes this instance.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<TElement> Execute() => this;
     }
 }

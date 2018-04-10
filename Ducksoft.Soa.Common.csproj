@@ -208,7 +208,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>xxxDBModel.IEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="EFHelpers\Interfaces\IDbRepository.cs" />
+    <Compile Include="EFHelpers\Interfaces\IRepository.cs" />
     <Compile Include="EFHelpers\Interfaces\IMapEntityModel.cs" />
     <Compile Include="EFHelpers\Models\CrudEntityModel.cs" />
     <Compile Include="EFHelpers\Models\DbOperationTypes.cs" />
@@ -217,6 +217,9 @@
     <Compile Include="EFHelpers\Models\EntityLoader.cs" />
     <Compile Include="EFHelpers\Interfaces\IEntityLoader.cs" />
     <Compile Include="EFHelpers\Interfaces\IQueryableRepository.cs" />
+    <Compile Include="EFHelpers\Models\Repository.cs" />
+    <Compile Include="EFHelpers\Models\RepositoryBase.cs" />
+    <Compile Include="EFHelpers\ODataHelpers\DataServiceQueryHelper.cs" />
     <Compile Include="EFHelpers\SqlHelper.cs" />
     <Compile Include="Filters\FilterBuilder.cs" />
     <Compile Include="Filters\FilterChangedEventArgs.cs" />
@@ -229,8 +232,6 @@
     <Compile Include="Handler\GlobalWcfErrorHandlerAttribute.cs" />
     <Compile Include="Helpers\AjaxRequestAttribute.cs" />
     <Compile Include="Helpers\HtmlExtensions.cs" />
-    <Compile Include="Infrastructure\MapEntityModelHelper.cs" />
-    <Compile Include="Infrastructure\MapEntityModule.cs" />
     <Compile Include="Infrastructure\LoggingServiceHelper.cs" />
     <Compile Include="Infrastructure\LoggingModule.cs" />
     <Compile Include="MessageHeaders\CustMsgHeaderBehaviorAttribute.cs" />
