@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
     <id>Ducksoft.Soa.Common</id>
-    <version>2.0.0.9</version>
+    <version>2.0.0.10</version>
     <title>Ducksoft.Soa.Common</title>
     <authors>hpsanampudi</authors>
     <owners>Duck Software Limited</owners>
