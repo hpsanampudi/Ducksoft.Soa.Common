@@ -75,7 +75,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
-            where TPKey : struct
         {
             var result = default(TPKey);
             try
@@ -259,7 +258,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
-            where TPKey : struct
         {
             var result = default(TPKey);
             try
@@ -310,7 +308,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
-            where TPKey : struct
         {
             var result = default(TPKey);
             try
@@ -361,7 +358,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
-            where TPKey : struct
         {
             var result = default(TPKey);
             try
@@ -415,7 +411,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
-            where TPKey : struct
         {
             var isSuccess = false;
             try
@@ -459,7 +454,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
-            where TPKey : struct
         {
             var isSuccess = false;
             try

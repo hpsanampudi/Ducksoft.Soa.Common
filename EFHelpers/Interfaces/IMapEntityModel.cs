@@ -11,8 +11,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
     /// <typeparam name="TEntities">The type of the entities.</typeparam>
     /// <typeparam name="TAudit">The type of the audit.</typeparam>
     public interface IMapEntityModel<TEntities, TAudit>
-    where TEntities : DataServiceContext
-    where TAudit : struct
+        where TEntities : DataServiceContext
+        where TAudit : struct
     {
         /// <summary>
         /// Creates the specified object.
@@ -26,8 +26,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         TPKey Create<TDTO, TEntity, TPKey>(TDTO objectToCreate,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
 
         /// <summary>
         /// Gets the page data.
@@ -91,8 +90,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
 
         /// <summary>
         /// Deletes the specified object.
@@ -109,8 +107,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
 
         /// <summary>
         /// Deletes the database record by given OData filter expression.
@@ -125,8 +122,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         TPKey Delete<TEntity, TPKey>(string odataFilterExpression, TAudit userId,
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
 
         /// <summary>
         /// Purges the specified object.
@@ -143,8 +139,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
 
         /// <summary>
         /// Purge the database record by given OData filter expression.
@@ -158,7 +153,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         bool Purge<TEntity, TPKey>(string odataFilterExpression,
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
     }
 }

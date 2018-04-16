@@ -562,22 +562,20 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="record">The record.</param>
         /// <param name="primaryKey">The primary key.</param>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        /// <exception cref="FaultException{CustomFault}"></exception>
+        /// <exception cref="FaultException{CustomFault}">
+        /// </exception>
         public virtual TPKey AddRecord<TEntity, TPKey>(TEntity record,
-            Func<TEntity, TPKey> primaryKey = null,
-            TPKey defaultValue = default(TPKey),
+            Func<TEntity, TPKey> primaryKey = null, TPKey defValue = default(TPKey),
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
-            where TPKey : struct
         {
             ErrorBase.CheckArgIsNull(record, () => record);
 
-            var result = defaultValue;
-            Func<TEntity, TPKey> GetPrimaryKeyValue = (R) =>
-            primaryKey?.Invoke(R) ?? GetPrimaryKeyInfo(R, defaultValue).Value;
+            var result = defValue;
+            Func<TEntity, TPKey> GetPKValue = (R) => GetPrimaryKeyValue(R, primaryKey, defValue);
 
             try
             {
@@ -602,7 +600,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                         continue;
                     }
 
-                    result = GetPrimaryKeyValue(addedEntity);
+                    result = GetPKValue(addedEntity);
                     break;
                 }
             }
@@ -638,7 +636,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="record">The record.</param>
         /// <param name="primaryKey">The primary key.</param>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked entity].</param>
         /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
@@ -647,19 +645,16 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <exception cref="FaultException{CustomFault}">
         /// </exception>
         public virtual TPKey UpdateRecord<TEntity, TPKey>(TEntity record,
-            Func<TEntity, TPKey> primaryKey = null, TPKey defaultValue = default(TPKey),
+            Func<TEntity, TPKey> primaryKey = null, TPKey defValue = default(TPKey),
             bool isTracked = false, bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
-            where TPKey : struct
         {
             ErrorBase.CheckArgIsNull(record, () => record);
 
-            Func<TEntity, TPKey> GetPrimaryKeyValue = (R) =>
-            primaryKey?.Invoke(R) ?? GetPrimaryKeyInfo(R, defaultValue).Value;
-
-            var result = defaultValue;
+            var result = defValue;
             var dbRecord = default(TEntity);
+            Func<TEntity, TPKey> GetPKValue = (R) => GetPrimaryKeyValue(R, primaryKey, defValue);
 
             try
             {
@@ -714,13 +709,13 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                         continue;
                     }
 
-                    result = GetPrimaryKeyValue(updatedEntity);
+                    result = GetPKValue(updatedEntity);
                     break;
                 }
             }
             catch (OperationCanceledException ex)
             {
-                var pKey = GetPrimaryKeyValue(record);
+                var pKey = GetPKValue(record);
                 var errMessage = $"User canceled while updating the {typeof(TEntity).FullName} " +
                     $"record \"{pKey}\".";
 
@@ -730,7 +725,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             catch (Exception ex)
             {
                 //Hp --> Logic: It can be DataServiceClientException (or) any error.
-                var pKey = GetPrimaryKeyValue(record);
+                var pKey = GetPKValue(record);
                 var errMessage = $"An error occurred while updating the " +
                     $"{typeof(TEntity).FullName} record \"{pKey}\".";
 
@@ -767,15 +762,12 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             bool isTracked = false, bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
-            where TPKey : struct
         {
             ErrorBase.CheckArgIsNull(record, () => record);
 
-            Func<TEntity, TPKey> GetPrimaryKeyValue = (R) =>
-            primaryKey?.Invoke(R) ?? GetPrimaryKeyInfo<TEntity, TPKey>(R).Value;
-
             var isSuccess = false;
             var dbRecord = default(TEntity);
+            Func<TEntity, TPKey> GetPKValue = (R) => GetPrimaryKeyValue(R, primaryKey);
 
             try
             {
@@ -822,7 +814,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             }
             catch (OperationCanceledException ex)
             {
-                var pKey = GetPrimaryKeyValue(record);
+                var pKey = GetPKValue(record);
                 var errMessage = $"User canceled while purging the " +
                     $"{typeof(TEntity).FullName} record \"{pKey}\".";
 
@@ -832,7 +824,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             catch (Exception ex)
             {
                 //Hp --> Logic: It can be DataServiceClientException (or) any error.
-                var pKey = GetPrimaryKeyValue(record);
+                var pKey = GetPKValue(record);
                 var errMessage = $"An error occurred while purging the " +
                     $"{typeof(TEntity).FullName} record \"{pKey}\".";
 
@@ -865,7 +857,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
-            where TPKey : struct
         {
             ErrorBase.CheckArgIsNullOrDefault(odataFilterExpression, () => odataFilterExpression);
 
@@ -908,17 +899,16 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         }
 
         /// <summary>
-        /// Gets the primary key information.
+        /// Gets the entity primary key information.
         /// </summary>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="srcEntity">The source entity.</param>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <returns></returns>
         protected KeyValuePair<string, TResult> GetPrimaryKeyInfo<TEntity, TResult>(
-            TEntity srcEntity, TResult defaultValue = default(TResult))
+            TEntity srcEntity, TResult defValue)
             where TEntity : class
-            where TResult : struct
         {
             // Find primary key names based on data service key attribute.
             var myDsKeyAttr = typeof(TEntity).GetCustomAttributes(
@@ -927,10 +917,46 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
 
             //TODO: Hp --> Needs to implement logic it entity is having multiple Pkeys.
             var pKey = myDsKeyAttr.KeyNames.FirstOrDefault();
-            var pKeyValue = (pKey != null) ?
-                (TResult)srcEntity.GetPropertyValue(pKey) : defaultValue;
+            var pKeyValue = (pKey != null) ? (TResult)srcEntity.GetPropertyValue(pKey) : defValue;
 
             return (new KeyValuePair<string, TResult>(pKey, pKeyValue));
+        }
+
+        /// <summary>
+        /// Gets the primary key value.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="record">The record.</param>
+        /// <param name="defValue">The default value.</param>
+        /// <param name="primaryKey">The primary key.</param>
+        /// <returns></returns>
+        protected TResult GetPrimaryKeyValue<TEntity, TResult>(TEntity record,
+            Func<TEntity, TResult> primaryKey = null, TResult defValue = default(TResult))
+            where TEntity : class
+        {
+            if (primaryKey != null)
+            {
+                return (primaryKey.Invoke(record));
+            }
+
+            var myDefValue = defValue;
+            if (typeof(TResult).IsValueType)
+            {
+                myDefValue = (defValue == null) ? default(TResult) : defValue;
+            }
+            else if (typeof(TResult) == typeof(string))
+            {
+                var strDefValue = defValue as string;
+                myDefValue = (strDefValue?.Trim() ?? string.Empty).ChangeType<TResult>();
+            }
+            else
+            {
+                var errMessage = $"Reference type {typeof(TResult).Name} is not allowed as PKey!";
+                throw (new NotSupportedException(errMessage));
+            }
+
+            return (GetPrimaryKeyInfo(record, myDefValue).Value);
         }
 
         /// <summary>

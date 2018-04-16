@@ -711,6 +711,43 @@ namespace Ducksoft.Soa.Common.Utilities
         }
 
         /// <summary>
+        /// Changes the type.
+        /// </summary>
+        /// <typeparam name="TTarget">The type of the target.</typeparam>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static TTarget ChangeType<TTarget>(this object source) =>
+            (TTarget)Convert.ChangeType(source, typeof(TTarget));
+
+        /// <summary>
+        /// Converts to.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the source.</typeparam>
+        /// <typeparam name="TTarget">The type of the target.</typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="defValue">The definition value.</param>
+        /// <returns></returns>
+        public static TTarget ConvertTo<TTarget>(this object source,
+            TTarget defValue = default(TTarget))
+        {
+            var result = defValue;
+            try
+            {
+                var converter = TypeDescriptor.GetConverter(typeof(TTarget));
+                if (converter.CanConvertFrom(source.GetType()))
+                {
+                    result = (TTarget)converter.ConvertFrom(source);
+                }
+            }
+            catch
+            {
+                Debug.WriteLine("Failed to convert given source to target value");
+            }
+
+            return (result);
+        }
+
+        /// <summary>
         /// To the decimal.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -759,11 +796,11 @@ namespace Ducksoft.Soa.Common.Utilities
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <returns></returns>
-        public static int ToInt<T>(this T value, int defaultValue = 0)
+        public static int ToInt<T>(this T value, int defValue = 0)
         {
-            var result = defaultValue;
+            var result = defValue;
             try
             {
                 //Hp --> Logic: To handle if string value having scientific exponential characters.
@@ -1247,11 +1284,11 @@ namespace Ducksoft.Soa.Common.Utilities
         /// </summary>
         /// <typeparam name="TEnum">The type of the enum.</typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <returns>enum value.</returns>
-        public static TEnum ConvertToEnum<TEnum>(string value, TEnum defaultValue)
+        public static TEnum ConvertToEnum<TEnum>(string value, TEnum defValue)
         {
-            var enumValue = defaultValue;
+            var enumValue = defValue;
             try
             {
                 enumValue = (TEnum)Enum.Parse(typeof(TEnum), value, true);
@@ -1268,13 +1305,13 @@ namespace Ducksoft.Soa.Common.Utilities
         /// </summary>
         /// <typeparam name="TEnum">The type of the enum.</typeparam>
         /// <param name="description">The description.</param>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <param name="IsDisplayError">if set to <c>true</c> [is display error].</param>
         /// <returns>enum value from its description.</returns>
         public static TEnum GetEnumFrom<TEnum>(this string description,
-            TEnum defaultValue = default(TEnum), bool IsDisplayError = true)
+            TEnum defValue = default(TEnum), bool IsDisplayError = true)
         {
-            var enumValue = defaultValue;
+            var enumValue = defValue;
             try
             {
                 enumValue = GetEnumValues<TEnum>().Single(item =>
@@ -1294,15 +1331,15 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <typeparam name="TEnum">The type of the enum.</typeparam>
         /// <typeparam name="TAttr">The type of the attribute.</typeparam>
         /// <param name="description">The description.</param>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <param name="IsDisplayError">if set to <c>true</c> [is display error].</param>
         /// <returns>
         /// enum value from its description.
         /// </returns>
         public static TEnum GetEnumFrom<TEnum, TAttr>(this string description,
-            TEnum defaultValue = default(TEnum), bool IsDisplayError = true) where TAttr : Attribute
+            TEnum defValue = default(TEnum), bool IsDisplayError = true) where TAttr : Attribute
         {
-            var enumValue = defaultValue;
+            var enumValue = defValue;
             try
             {
                 enumValue = GetEnumValues<TEnum>().Single(item =>

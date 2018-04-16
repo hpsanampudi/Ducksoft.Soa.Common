@@ -20,20 +20,20 @@ namespace Ducksoft.Soa.Common.Utilities
         /// Gets the property value.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <param name="propName">Name of the property.</param>
         /// <returns>T.</returns>
-        protected T GetPropertyValue<T>(T defaultValue = default(T),
+        protected T GetPropertyValue<T>(T defValue = default(T),
             [CallerMemberName]string propName = null)
         {
             ErrorBase.CheckArgIsNullOrDefault(propName, nameof(propName));
             object value = null;
             if (notifiedProperties.TryGetValue(propName, out value))
             {
-                return ((null == value) ? defaultValue : (T)value);
+                return ((null == value) ? defValue : (T)value);
             }
 
-            return (defaultValue);
+            return (defValue);
         }
 
         /// <summary>

@@ -160,15 +160,14 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="record">The record.</param>
         /// <param name="primaryKey">The primary key.</param>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="FaultException{CustomFault}"></exception>
         TPKey AddRecord<TEntity, TPKey>(TEntity record, Func<TEntity, TPKey> primaryKey = null,
-            TPKey defaultValue = default(TPKey),
+            TPKey defValue = default(TPKey),
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
 
         /// <summary>
         /// Updates the record.
@@ -177,7 +176,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="record">The record.</param>
         /// <param name="primaryKey">The primary key.</param>
-        /// <param name="defaultValue">The default value.</param>
+        /// <param name="defValue">The default value.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked entity].</param>
         /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
@@ -185,11 +184,10 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         /// <exception cref="ExceptionBase"></exception>
         /// <exception cref="FaultException{CustomFault}"></exception>
         TPKey UpdateRecord<TEntity, TPKey>(TEntity record, Func<TEntity, TPKey> primaryKey = null,
-            TPKey defaultValue = default(TPKey), bool isTracked = false,
+            TPKey defValue = default(TPKey), bool isTracked = false,
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
 
         /// <summary>
         /// Purges (or) deletes the record permanently.
@@ -207,8 +205,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         bool PurgeRecord<TEntity, TPKey>(TEntity record, Func<TEntity, TPKey> primaryKey = null,
             bool isTracked = false, bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
 
         /// <summary>
         /// Purges (or) deletes the record permanently.
@@ -223,8 +220,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         bool PurgeRecord<TEntity, TPKey>(string odataFilterExpression,
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
-            where TEntity : class
-            where TPKey : struct;
+            where TEntity : class;
 
         /// <summary>
         /// Creates the base query.

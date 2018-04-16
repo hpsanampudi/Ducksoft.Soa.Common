@@ -49,7 +49,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <returns></returns>
         public virtual TResult CreateRecord<TResult>(TEntity recordToCreate,
             CancellationToken cancelToken = default(CancellationToken))
-            where TResult : struct
         {
             return (Loader.AddRecord<TEntity, TResult>(recordToCreate, cancelToken: cancelToken));
         }
@@ -118,7 +117,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         public virtual TResult UpdateRecord<TResult>(TEntity recordToUpdate, bool isTracked = false,
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
-            where TResult : struct
         {
             return (Loader.UpdateRecord<TEntity, TResult>(recordToUpdate, isTracked: isTracked,
                 isAddOrAppendDeleteFilter: isAddOrAppendDeleteFilter, cancelToken: cancelToken));
@@ -136,7 +134,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         public virtual bool PurgeRecord<TPKey>(TEntity recordToPurge, bool isTracked = false,
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
-            where TPKey : struct
         {
             return (Loader.PurgeRecord<TEntity, TPKey>(recordToPurge, isTracked: isTracked,
                 isAddOrAppendDeleteFilter: isAddOrAppendDeleteFilter, cancelToken: cancelToken));
@@ -153,7 +150,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         public virtual bool PurgeRecord<TPKey>(string odataFilterExpression,
             bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
-            where TPKey : struct
         {
             return (Loader.PurgeRecord<TEntity, TPKey>(odataFilterExpression,
                 isAddOrAppendDeleteFilter, cancelToken));

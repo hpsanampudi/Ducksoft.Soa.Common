@@ -22,8 +22,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         TResult CreateRecord<TResult>(TEntity recordToCreate,
-            CancellationToken cancelToken = default(CancellationToken))
-            where TResult : struct;
+            CancellationToken cancelToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the pagination data.
@@ -71,8 +70,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         /// <returns></returns>
         TResult UpdateRecord<TResult>(TEntity recordToUpdate, bool isTracked = false,
             bool isAddOrAppendDeleteFilter = true,
-            CancellationToken cancelToken = default(CancellationToken))
-            where TResult : struct;
+            CancellationToken cancelToken = default(CancellationToken));
 
         /// <summary>
         /// Purges the record.
@@ -85,8 +83,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         /// <returns></returns>
         bool PurgeRecord<TPKey>(TEntity recordToPurge, bool isTracked = false,
             bool isAddOrAppendDeleteFilter = true,
-            CancellationToken cancelToken = default(CancellationToken))
-             where TPKey : struct;
+            CancellationToken cancelToken = default(CancellationToken));
 
         /// <summary>
         /// Purge the database record by given OData filter expression.
@@ -97,7 +94,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         bool PurgeRecord<TPKey>(string odataFilterExpression, bool isAddOrAppendDeleteFilter = true,
-            CancellationToken cancelToken = default(CancellationToken))
-            where TPKey : struct;
+            CancellationToken cancelToken = default(CancellationToken));
     }
 }
