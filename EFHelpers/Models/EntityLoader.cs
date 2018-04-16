@@ -323,13 +323,16 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
         /// <param name="queryOptions">The query options.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public virtual IEnumerable<TEntity> ExecuteODataQuery<TEntity>(
             IDataServiceQuery<TEntity> baseQuery, IList<QueryOption> queryOptions = null,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class =>
-            GetAllRecords(LoadQueryOptions(baseQuery, queryOptions), cancelToken);
+            GetAllRecords(LoadQueryOptions(baseQuery, queryOptions, isAddOrAppendDeleteFilter),
+                cancelToken);
 
         /// <summary>
         /// Loads the query options.
@@ -350,8 +353,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             var urlQuery = HttpUtility.ParseQueryString(requestUrl.Query);
 
             var urlQueryOptions = urlQuery.AllKeys.ToList();
-            var myQueryOptions = queryOptions?.ToList() ?? new List<QueryOption>();
-            if (urlQueryOptions.Any(U => myQueryOptions.Any(Q => Q.Option.IsEqualTo(U))))
+            queryOptions = queryOptions?.ToList() ?? new List<QueryOption>();
+            if (urlQueryOptions.Any(U => queryOptions.Any(Q => Q.Option.IsEqualTo(U))))
             {
                 var errorMessage =
                     $"Base query url already contains one (or) more user provided query option key!";
@@ -379,10 +382,6 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                     queryOptions = AddOrAppendDeleteFilter(queryOptions);
                 }
             }
-            else
-            {
-                queryOptions = queryOptions ?? new List<QueryOption>();
-            }
 
             queryOptions.ToList().ForEach(item =>
             {
@@ -398,9 +397,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
         /// <param name="odataFilterExpression">The odata filter expression.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <returns></returns>
         public virtual IDataServiceQuery<TEntity> LoadFilterQueryOption<TEntity>(
-            IDataServiceQuery<TEntity> baseQuery, string odataFilterExpression = "")
+            IDataServiceQuery<TEntity> baseQuery, string odataFilterExpression = "",
+            bool isAddOrAppendDeleteFilter = true)
             where TEntity : class
         {
             var queryOptions = new List<QueryOption>
@@ -412,7 +413,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 }
             };
 
-            return (LoadQueryOptions(baseQuery, queryOptions));
+            return (LoadQueryOptions(baseQuery, queryOptions, isAddOrAppendDeleteFilter));
         }
 
         /// <summary>
@@ -422,11 +423,13 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <param name="baseQuery">The base query.</param>
         /// <param name="pageIndex">Index of the page.</param>
         /// <param name="pageSize">Size of the page.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public PaginationData<TEntity> GetPaginationData<TEntity>(
             IDataServiceQuery<TEntity> baseQuery,
             int? pageIndex = default(int?), int? pageSize = default(int?),
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
         {
@@ -453,7 +456,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 });
             }
 
-            return (GetPaginationData(baseQuery, qryOptions, cancelToken));
+            return (GetPaginationData(baseQuery, qryOptions, isAddOrAppendDeleteFilter,
+                cancelToken));
         }
 
         /// <summary>
@@ -462,11 +466,12 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
         /// <param name="queryOptions">The query options.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public PaginationData<TEntity> GetPaginationData<TEntity>(
-            IDataServiceQuery<TEntity> baseQuery,
-            IList<QueryOption> queryOptions = null,
+            IDataServiceQuery<TEntity> baseQuery, IList<QueryOption> queryOptions = null,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
         {
@@ -475,10 +480,14 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 return (null);
             }
 
-            var queryToExecute = LoadQueryOptions(baseQuery, queryOptions);
+            var queryToExecute = LoadQueryOptions(
+                baseQuery, queryOptions, isAddOrAppendDeleteFilter);
+
             return (new PaginationData<TEntity>
             {
-                TotalItems = GetTotalRecordsCount(queryToExecute, cancelToken),
+                TotalItems = GetTotalRecordsCount(
+                    queryToExecute, isAddOrAppendDeleteFilter, cancelToken),
+
                 PageData = GetAllRecords(queryToExecute, cancelToken).ToList()
             });
         }
@@ -488,11 +497,13 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// </summary>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="baseQuery">The base query.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="FaultException{CustomFault}">
         /// </exception>
         public long GetTotalRecordsCount<TEntity>(IDataServiceQuery<TEntity> baseQuery,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
         {
@@ -511,7 +522,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                             Option = "$inlinecount",
                             Query = "allpages"
                         }
-                    });
+                    }, isAddOrAppendDeleteFilter);
                 }
 
                 if ((cancelToken != default(CancellationToken)) &&
@@ -623,19 +634,21 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Updates the record.
         /// </summary>
-        /// <typeparam name="T">The type of entity record</typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="record">The record.</param>
         /// <param name="primaryKey">The primary key.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked entity].</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        /// <exception cref="FaultException{CustomFault}"></exception>
+        /// <exception cref="FaultException{CustomFault}">
+        /// </exception>
         public virtual TPKey UpdateRecord<TEntity, TPKey>(TEntity record,
-            Func<TEntity, TPKey> primaryKey = null,
-            TPKey defaultValue = default(TPKey), bool isTracked = false,
+            Func<TEntity, TPKey> primaryKey = null, TPKey defaultValue = default(TPKey),
+            bool isTracked = false, bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
             where TPKey : struct
@@ -656,7 +669,9 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 {
                     var odataFilter = GetODataPKExpression(record);
                     var baseQuery = CreateBaseQuery<TEntity>();
-                    var query = LoadFilterQueryOption(baseQuery, odataFilter);
+                    var query = LoadFilterQueryOption(
+                        baseQuery, odataFilter, isAddOrAppendDeleteFilter);
+
                     dbRecord = GetSingleOrDefault(query, cancelToken);
                     if (dbRecord == null)
                     {
@@ -736,18 +751,21 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <summary>
         /// Purges (or) deletes the record permanently.
         /// </summary>
-        /// <typeparam name="T">The type of entity record</typeparam>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="record">The record.</param>
         /// <param name="primaryKey">The primary key.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked entity].</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="ExceptionBase"></exception>
-        /// <exception cref="FaultException{CustomFault}"></exception>
+        /// <exception cref="FaultException{CustomFault}">
+        /// </exception>
         public virtual bool PurgeRecord<TEntity, TPKey>(TEntity record,
             Func<TEntity, TPKey> primaryKey = null,
-            bool isTracked = false, CancellationToken cancelToken = default(CancellationToken))
+            bool isTracked = false, bool isAddOrAppendDeleteFilter = true,
+            CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
             where TPKey : struct
         {
@@ -767,7 +785,9 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 {
                     var odataFilter = GetODataPKExpression(record);
                     var baseQuery = CreateBaseQuery<TEntity>();
-                    var query = LoadFilterQueryOption(baseQuery, odataFilter);
+                    var query = LoadFilterQueryOption(
+                        baseQuery, odataFilter, isAddOrAppendDeleteFilter);
+
                     dbRecord = GetSingleOrDefault(query, cancelToken);
                     if (dbRecord == null)
                     {
@@ -836,10 +856,13 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="odataFilterExpression">The OData filter expression.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
-        /// <exception cref="FaultException{CustomFault}"></exception>
+        /// <exception cref="FaultException{CustomFault}">
+        /// </exception>
         public virtual bool PurgeRecord<TEntity, TPKey>(string odataFilterExpression,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
             where TPKey : struct
@@ -850,7 +873,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             try
             {
                 var baseQuery = CreateBaseQuery<TEntity>();
-                var query = LoadFilterQueryOption(baseQuery, odataFilterExpression);
+                var query = LoadFilterQueryOption(
+                    baseQuery, odataFilterExpression, isAddOrAppendDeleteFilter);
 
                 if ((cancelToken != default(CancellationToken)) &&
                     (cancelToken.IsCancellationRequested))
@@ -859,7 +883,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 }
 
                 var record = query.Execute().SingleOrDefault();
-                result = PurgeRecord<TEntity, TPKey>(record, null, true, cancelToken);
+                result = PurgeRecord<TEntity, TPKey>(record, null, true, isAddOrAppendDeleteFilter,
+                    cancelToken);
             }
             catch (OperationCanceledException ex)
             {

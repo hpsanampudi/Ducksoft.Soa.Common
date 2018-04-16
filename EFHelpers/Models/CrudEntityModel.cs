@@ -20,7 +20,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
     /// <typeparam name="TAudit">The type of the audit.</typeparam>
     /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IMapEntityModel{TEntities, TAudit}" />
     /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IMapEntityModel" />
-    public class CRUDEntityModel<TEntities, TAudit> : IMapEntityModel<TEntities, TAudit>
+    public class CrudEntityModel<TEntities, TAudit> : IMapEntityModel<TEntities, TAudit>
         where TEntities : DataServiceContext
         where TAudit : struct
     {
@@ -30,17 +30,17 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// loaded for the first time.
         /// .NET guarantees thread safety through lazy initialization
         /// </summary>
-        private static readonly Lazy<CRUDEntityModel<TEntities, TAudit>> instance =
-            new Lazy<CRUDEntityModel<TEntities, TAudit>>(() =>
-            new CRUDEntityModel<TEntities, TAudit>());
+        private static readonly Lazy<CrudEntityModel<TEntities, TAudit>> instance =
+            new Lazy<CrudEntityModel<TEntities, TAudit>>(() =>
+            new CrudEntityModel<TEntities, TAudit>());
 
         /// <summary>
-        /// Gets the instance of the singleton object: MapEntityModel.
+        /// Gets the instance of the singleton object: CrudEntityModel.
         /// </summary>
         /// <value>
         /// The instance.
         /// </value>
-        public static CRUDEntityModel<TEntities, TAudit> Instance
+        public static CrudEntityModel<TEntities, TAudit> Instance
         {
             get { return (instance.Value); }
         }
@@ -55,9 +55,9 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         public ILoggingService Logger { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CRUDEntityModel" /> class.
+        /// Initializes a new instance of the <see cref="CrudEntityModel" /> class.
         /// </summary>
-        private CRUDEntityModel()
+        private CrudEntityModel()
         {
         }
 
@@ -116,10 +116,12 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="queryOptions">The query options.</param>
         /// <param name="query">The query.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public PaginationData<TDTO> GetPageData<TDTO, TEntity>(
             IList<QueryOption> queryOptions = null, IDataServiceQuery<TEntity> query = null,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
@@ -128,7 +130,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             try
             {
                 var repository = Repository<TEntities, TEntity>.Instance;
-                var response = repository.GetPaginationData(queryOptions, query, cancelToken);
+                var response = repository.GetPaginationData(queryOptions, query,
+                    isAddOrAppendDeleteFilter, cancelToken);
 
                 result = new PaginationData<TDTO>
                 {
@@ -161,9 +164,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TDTO">The type of the map.</typeparam>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="query">The query.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public IEnumerable<TDTO> GetAll<TDTO, TEntity>(IDataServiceQuery<TEntity> query = null,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
@@ -172,7 +177,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             try
             {
                 var repository = Repository<TEntities, TEntity>.Instance;
-                var response = repository.GetAllRecords(query, cancelToken);
+                var response = repository.GetAllRecords(query, isAddOrAppendDeleteFilter,
+                    cancelToken);
 
                 result = response?.Select(I => TinyMapper.Map<TDTO>(I)).ToList() ?? result;
             }
@@ -201,10 +207,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="odataFilterExpression">The odata filter expression.</param>
         /// <param name="query">The query.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public TDTO GetSingleOrDefault<TDTO, TEntity>(string odataFilterExpression,
-            IDataServiceQuery<TEntity> query = null,
+            IDataServiceQuery<TEntity> query = null, bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
@@ -213,8 +220,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             try
             {
                 var repository = Repository<TEntities, TEntity>.Instance;
-                var record = repository.GetSingleOrDefault(
-                    odataFilterExpression, query, cancelToken);
+                var record = repository.GetSingleOrDefault(odataFilterExpression, query,
+                    isAddOrAppendDeleteFilter, cancelToken);
 
                 result = (record != null) ? TinyMapper.Map<TDTO>(record) : result;
             }
@@ -244,9 +251,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="objectToUpdate">The object to update.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked entity].</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public TPKey Update<TDTO, TEntity, TPKey>(TDTO objectToUpdate, bool isTracked = false,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
@@ -264,7 +273,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 var recordToUpdate = TinyMapper.Map<TEntity>(objectToUpdate);
                 var repository = Repository<TEntities, TEntity>.Instance;
 
-                result = repository.UpdateRecord<TPKey>(recordToUpdate, isTracked, cancelToken);
+                result = repository.UpdateRecord<TPKey>(recordToUpdate, isTracked,
+                    isAddOrAppendDeleteFilter, cancelToken);
             }
             catch (FaultException<CustomFault> ex)
             {
@@ -292,9 +302,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="objectToDelete">The object to delete.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked entity].</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public TPKey Delete<TDTO, TEntity, TPKey>(TDTO objectToDelete, bool isTracked = false,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
@@ -314,7 +326,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 var recordToDelete = TinyMapper.Map<TEntity>(objectToDelete);
                 var repository = Repository<TEntities, TEntity>.Instance;
 
-                result = repository.UpdateRecord<TPKey>(recordToDelete, isTracked, cancelToken);
+                result = repository.UpdateRecord<TPKey>(recordToDelete, isTracked,
+                    isAddOrAppendDeleteFilter, cancelToken);
             }
             catch (FaultException<CustomFault> ex)
             {
@@ -341,9 +354,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="odataFilterExpression">The OData filter expression.</param>
         /// <param name="userId">The user identifier.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public TPKey Delete<TEntity, TPKey>(string odataFilterExpression, TAudit userId,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
             where TPKey : struct
@@ -353,8 +368,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             {
                 //Hp --> Get the record to delete from database based on filter query.
                 var repository = Repository<TEntities, TEntity>.Instance;
-                var recordToDelete = repository.GetSingleOrDefault(
-                    odataFilterExpression, cancelToken: cancelToken);
+                var recordToDelete = repository.GetSingleOrDefault(odataFilterExpression,
+                    isAddOrAppendDeleteFilter: isAddOrAppendDeleteFilter, cancelToken: cancelToken);
 
                 //Hp --> Logic: Do not delete physical record, always update audit column DeleteDate                  
                 if (recordToDelete.IsHavingAuditColumns(AuditColumnTypes.Delete))
@@ -363,7 +378,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                     recordToDelete.SetPropertyValue("DeleteDate", DateTime.Now);
                 }
 
-                result = repository.UpdateRecord<TPKey>(recordToDelete, true, cancelToken);
+                result = repository.UpdateRecord<TPKey>(recordToDelete, true,
+                    isAddOrAppendDeleteFilter, cancelToken);
             }
             catch (FaultException<CustomFault> ex)
             {
@@ -391,9 +407,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="objectToPurge">The object to purge.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked entity].</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public bool Purge<TDTO, TEntity, TPKey>(TDTO objectToPurge, bool isTracked = false,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TDTO : class
             where TEntity : class
@@ -407,7 +425,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
                 var repository = Repository<TEntities, TEntity>.Instance;
 
                 //Hp --> Logic: Delete the physical record permanently 
-                isSuccess = repository.PurgeRecord<TPKey>(recordToPurge, isTracked, cancelToken);
+                isSuccess = repository.PurgeRecord<TPKey>(recordToPurge, isTracked,
+                    isAddOrAppendDeleteFilter, cancelToken);
             }
             catch (FaultException<CustomFault> ex)
             {
@@ -433,9 +452,11 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="odataFilterExpression">The OData filter expression.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public bool Purge<TEntity, TPKey>(string odataFilterExpression,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TEntity : class
             where TPKey : struct
@@ -445,7 +466,8 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
             {
                 //Hp --> Logic: Delete the physical record permanently 
                 var repository = Repository<TEntities, TEntity>.Instance;
-                isSuccess = repository.PurgeRecord<TPKey>(odataFilterExpression, cancelToken);
+                isSuccess = repository.PurgeRecord<TPKey>(odataFilterExpression,
+                    isAddOrAppendDeleteFilter, cancelToken);
             }
             catch (FaultException<CustomFault> ex)
             {

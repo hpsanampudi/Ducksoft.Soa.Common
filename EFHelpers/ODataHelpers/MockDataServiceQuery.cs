@@ -13,7 +13,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.ODataHelpers
     /// <typeparam name="TElement">The type of the element.</typeparam>
     public class MockDataServiceQuery<TElement> : IDataServiceQuery<TElement>
     {
-        IQueryable<TElement> query;
+        private IQueryable<TElement> query;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MockDataServiceQuery{TElement}"/> class.
@@ -45,7 +45,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.ODataHelpers
         /// <value>
         /// The request URI.
         /// </value>
-        public Uri RequestUri => new Uri(string.Empty, UriKind.RelativeOrAbsolute);
+        public Uri RequestUri => new Uri(ElementType.Name, UriKind.RelativeOrAbsolute);
 
         /// <summary>
         /// Adds the query option.
@@ -65,6 +65,15 @@ namespace Ducksoft.Soa.Common.EFHelpers.ODataHelpers
         /// A new query that includes the requested $expand query option appended to the URI of the supplied query.
         /// </returns>
         public IDataServiceQuery<TElement> Expand(string path) => this;
+
+        /// <summary>
+        /// Expands the specified navigation property accessor.
+        /// </summary>
+        /// <typeparam name="TTarget">The type of the target.</typeparam>
+        /// <param name="navigationPropertyAccessor">The navigation property accessor.</param>
+        /// <returns></returns>
+        public IDataServiceQuery<TElement> Expand<TTarget>(
+            Expression<Func<TElement, TTarget>> navigationPropertyAccessor) => this;
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.

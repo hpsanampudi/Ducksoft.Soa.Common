@@ -59,27 +59,32 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// </summary>
         /// <param name="queryOptions">The query options.</param>
         /// <param name="query">The query.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public virtual PaginationData<TEntity> GetPaginationData(IList<QueryOption> queryOptions,
-            IDataServiceQuery<TEntity> query = null,
+            IDataServiceQuery<TEntity> query = null, bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
         {
             var baseQuery = query ?? Loader.CreateBaseQuery<TEntity>();
-            return (Loader.GetPaginationData(baseQuery, queryOptions, cancelToken));
+            return (Loader.GetPaginationData(baseQuery, queryOptions, isAddOrAppendDeleteFilter,
+                cancelToken));
         }
 
         /// <summary>
         /// Gets all records.
         /// </summary>
         /// <param name="query">The query.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public IEnumerable<TEntity> GetAllRecords(IDataServiceQuery<TEntity> query = null,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
         {
             var baseQuery = query ?? Loader.CreateBaseQuery<TEntity>();
-            return (Loader.GetAllRecords(baseQuery, cancelToken));
+            return (Loader.ExecuteODataQuery(baseQuery,
+                isAddOrAppendDeleteFilter: isAddOrAppendDeleteFilter, cancelToken: cancelToken));
         }
 
         /// <summary>
@@ -87,14 +92,17 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// </summary>
         /// <param name="odataFilterExpression">The odata filter expression.</param>
         /// <param name="query">The query.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public virtual TEntity GetSingleOrDefault(string odataFilterExpression,
-            IDataServiceQuery<TEntity> query = null,
+            IDataServiceQuery<TEntity> query = null, bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
         {
             var baseQuery = query ?? Loader.CreateBaseQuery<TEntity>();
-            var filterQuery = Loader.LoadFilterQueryOption(baseQuery, odataFilterExpression);
+            var filterQuery = Loader.LoadFilterQueryOption(baseQuery, odataFilterExpression,
+                isAddOrAppendDeleteFilter);
+
             return (Loader.GetSingleOrDefault(filterQuery, cancelToken));
         }
 
@@ -104,14 +112,16 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="recordToUpdate">The record to update.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked].</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public virtual TResult UpdateRecord<TResult>(TEntity recordToUpdate, bool isTracked = false,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TResult : struct
         {
             return (Loader.UpdateRecord<TEntity, TResult>(recordToUpdate, isTracked: isTracked,
-                cancelToken: cancelToken));
+                isAddOrAppendDeleteFilter: isAddOrAppendDeleteFilter, cancelToken: cancelToken));
         }
 
         /// <summary>
@@ -120,14 +130,16 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="recordToPurge">The record to purge.</param>
         /// <param name="isTracked">if set to <c>true</c> [is tracked].</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public virtual bool PurgeRecord<TPKey>(TEntity recordToPurge, bool isTracked = false,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TPKey : struct
         {
             return (Loader.PurgeRecord<TEntity, TPKey>(recordToPurge, isTracked: isTracked,
-                cancelToken: cancelToken));
+                isAddOrAppendDeleteFilter: isAddOrAppendDeleteFilter, cancelToken: cancelToken));
         }
 
         /// <summary>
@@ -135,13 +147,16 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
         /// </summary>
         /// <typeparam name="TPKey">The type of the primary key.</typeparam>
         /// <param name="odataFilterExpression">The odata filter expression.</param>
+        /// <param name="isAddOrAppendDeleteFilter">if set to <c>true</c> [is add or append delete filter].</param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         public virtual bool PurgeRecord<TPKey>(string odataFilterExpression,
+            bool isAddOrAppendDeleteFilter = true,
             CancellationToken cancelToken = default(CancellationToken))
             where TPKey : struct
         {
-            return (Loader.PurgeRecord<TEntity, TPKey>(odataFilterExpression, cancelToken));
+            return (Loader.PurgeRecord<TEntity, TPKey>(odataFilterExpression,
+                isAddOrAppendDeleteFilter, cancelToken));
         }
         #endregion
     }

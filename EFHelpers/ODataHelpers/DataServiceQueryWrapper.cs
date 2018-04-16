@@ -18,7 +18,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.ODataHelpers
         /// <summary>
         /// The query
         /// </summary>
-        DataServiceQuery<TElement> query;
+        private DataServiceQuery<TElement> query;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataServiceQueryWrapper{TElement}"/> class.
@@ -71,6 +71,16 @@ namespace Ducksoft.Soa.Common.EFHelpers.ODataHelpers
         /// </returns>
         public IDataServiceQuery<TElement> Expand(string path) =>
             new DataServiceQueryWrapper<TElement>(query.Expand(path));
+
+        /// <summary>
+        /// Expands the specified navigation property accessor.
+        /// </summary>
+        /// <typeparam name="TTarget">The type of the target.</typeparam>
+        /// <param name="navigationPropertyAccessor">The navigation property accessor.</param>
+        /// <returns></returns>
+        public IDataServiceQuery<TElement> Expand<TTarget>(
+            Expression<Func<TElement, TTarget>> navigationPropertyAccessor) =>
+            new DataServiceQueryWrapper<TElement>(query.Expand(navigationPropertyAccessor));
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.

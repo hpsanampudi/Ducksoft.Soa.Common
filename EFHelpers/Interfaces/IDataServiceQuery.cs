@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
 {
@@ -21,6 +22,15 @@ namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
         /// <param name="path">The path.</param>
         /// <returns>A new query that includes the requested $expand query option appended to the URI of the supplied query.</returns>
         IDataServiceQuery<TElement> Expand(string path);
+
+        /// <summary>
+        /// Expands the specified navigation property accessor.
+        /// </summary>
+        /// <typeparam name="TTarget">The type of the target.</typeparam>
+        /// <param name="navigationPropertyAccessor">The navigation property accessor.</param>
+        /// <returns></returns>
+        IDataServiceQuery<TElement> Expand<TTarget>(
+            Expression<Func<TElement, TTarget>> navigationPropertyAccessor);
 
         /// <summary>
         /// Includes the total count.
