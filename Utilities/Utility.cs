@@ -1165,15 +1165,8 @@ namespace Ducksoft.Soa.Common.Utilities
         public static TValue GetAttributeValue<TAttribute, TValue>(this Type type,
         Func<TAttribute, TValue> valueSelector) where TAttribute : Attribute
         {
-            var myAttr = type.GetCustomAttributes(typeof(TAttribute), true)
-                .SingleOrDefault() as TAttribute;
-
-            if (null != myAttr)
-            {
-                return (valueSelector(myAttr));
-            }
-
-            return (default(TValue));
+            var myAttr = type.GetCustomAttributes<TAttribute>(true).SingleOrDefault();
+            return ((myAttr != null) ? valueSelector(myAttr) : default(TValue));
         }
 
         /// <summary>
@@ -1187,16 +1180,20 @@ namespace Ducksoft.Soa.Common.Utilities
         public static TValue GetAttributeValue<TAttribute, TValue>(this PropertyInfo propInfo,
                 Func<TAttribute, TValue> valueSelector) where TAttribute : Attribute
         {
-            var myAttr = propInfo.GetCustomAttributes(typeof(TAttribute), true)
-                .SingleOrDefault() as TAttribute;
-
-            if (null != myAttr)
-            {
-                return (valueSelector(myAttr));
-            }
-
-            return (default(TValue));
+            var myAttr = propInfo.GetCustomAttributes<TAttribute>(true).SingleOrDefault();
+            return ((myAttr != null) ? valueSelector(myAttr) : default(TValue));
         }
+
+        /// <summary>
+        /// Gets the attribute.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <param name="propInfo">The property information.</param>
+        /// <param name="attributePropFilter">The attribute property filter.</param>
+        /// <returns></returns>
+        public static TAttribute GetAttribute<TAttribute>(this PropertyInfo propInfo,
+                Func<TAttribute, bool> attributePropFilter) where TAttribute : Attribute =>
+            propInfo.GetCustomAttributes<TAttribute>(true).SingleOrDefault(attributePropFilter);
 
         /// <summary>
         /// Gets the class attribute.
@@ -1209,7 +1206,7 @@ namespace Ducksoft.Soa.Common.Utilities
             bool isInherit = false) where TAttribute : Attribute
         {
             ErrorBase.CheckArgIsNull(srcType, () => srcType);
-            return (srcType.GetCustomAttributes(isInherit).OfType<TAttribute>().FirstOrDefault());
+            return (srcType.GetCustomAttributes<TAttribute>(isInherit).FirstOrDefault());
         }
 
         /// <summary>
@@ -1236,22 +1233,13 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <summary>
         /// Gets the method attribute.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
         /// <param name="methodInfo">The method information.</param>
         /// <param name="isInherit">if set to <c>true</c> [is inherit].</param>
         /// <returns></returns>
-        public static T GetMethodAttribute<T>(this MethodInfo methodInfo, bool isInherit = true)
-            where T : Attribute
-        {
-            var myAttrInfo = default(T);
-            if (null != methodInfo)
-            {
-                myAttrInfo = methodInfo.GetCustomAttributes(isInherit).Where(custAttr =>
-                    typeof(T) == custAttr.GetType()).Cast<T>().FirstOrDefault();
-            }
-
-            return (myAttrInfo);
-        }
+        public static TAttribute GetMethodAttribute<TAttribute>(this MethodInfo methodInfo,
+            bool isInherit = true) where TAttribute : Attribute =>
+            methodInfo?.GetCustomAttributes<TAttribute>(isInherit).FirstOrDefault();
 
         /// <summary>
         /// Gets the enum attribute.
@@ -1405,13 +1393,14 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <summary>
         /// Gets the description from a given enum value.
         /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
         /// <param name="value">The value.</param>
         /// <param name="IsDisplayError">if set to <c>true</c> [is display error].</param>
         /// <returns>
         /// System.String.
         /// </returns>
-        public static string GetEnumDescription<TAttr>(this Enum value, bool IsDisplayError = true)
-            where TAttr : Attribute
+        public static string GetEnumDescription<TAttribute>(this Enum value,
+            bool IsDisplayError = true) where TAttribute : Attribute
         {
             ErrorBase.CheckArgIsNull(value, () => value);
 
@@ -1420,12 +1409,12 @@ namespace Ducksoft.Soa.Common.Utilities
             var fi = type.GetField(value.ToString());
 
             //Hp --> Logic: Look for our 'TAttr' in the field's custom attributes
-            var myAttribute = fi.GetCustomAttributes(typeof(TAttr), false) as TAttr[];
+            var myAttributes = fi.GetCustomAttributes<TAttribute>(false);
 
             //Hp --> Logic: Only single instance of 'EnumDescriptionAttribute' is allowed.
-            if ((null != myAttribute) && (1 == myAttribute.Length))
+            var myEnumAttribute = myAttributes?.SingleOrDefault();
+            if (myEnumAttribute != null)
             {
-                var myEnumAttribute = myAttribute[0];
                 if (typeof(EnumDescriptionAttribute) == myEnumAttribute.GetType())
                 {
                     output = (myEnumAttribute as EnumDescriptionAttribute).Description;
@@ -2462,6 +2451,14 @@ namespace Ducksoft.Soa.Common.Utilities
         }
 
         /// <summary>
+        /// Gets the name of the property.
+        /// </summary>
+        /// <param name="propertyInfo">The property information.</param>
+        /// <returns></returns>
+        public static string GetPropertyName(this PropertyInfo propertyInfo) =>
+            propertyInfo?.Name?.Trim() ?? string.Empty;
+
+        /// <summary>
         /// Gets the property value.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -2699,10 +2696,7 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <returns></returns>
         public static IEnumerable<PropertyInfo> GetAllProperties(this object source,
             BindingFlags bindingAttr = BindingFlags.DeclaredOnly | BindingFlags.Public |
-            BindingFlags.Instance)
-        {
-            return (GetAllProperties(source.GetType(), bindingAttr));
-        }
+            BindingFlags.Instance) => GetAllProperties(source.GetType(), bindingAttr);
 
         /// <summary>
         /// Gets all properties.
@@ -2712,10 +2706,36 @@ namespace Ducksoft.Soa.Common.Utilities
         /// <returns></returns>
         public static IEnumerable<PropertyInfo> GetAllProperties(this Type sourceType,
             BindingFlags bindingAttr = BindingFlags.DeclaredOnly | BindingFlags.Public |
-            BindingFlags.Instance)
-        {
-            return (sourceType.GetProperties(bindingAttr).AsEnumerable());
-        }
+            BindingFlags.Instance) => sourceType.GetProperties(bindingAttr).AsEnumerable();
+
+        /// <summary>
+        /// Gets all properties.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="attributePropFilter">The attribute property filter.</param>
+        /// <param name="bindingAttr">The binding attribute.</param>
+        /// <returns></returns>
+        public static IEnumerable<PropertyInfo> GetAllProperties<TAttribute>(this object source,
+            Func<TAttribute, bool> attributePropFilter, BindingFlags bindingAttr =
+            BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
+            where TAttribute : Attribute =>
+            GetAllProperties(source.GetType(), attributePropFilter, bindingAttr);
+
+        /// <summary>
+        /// Gets all properties.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <param name="sourceType">Type of the source.</param>
+        /// <param name="attributePropFilter">The attribute property filter.</param>
+        /// <param name="bindingAttr">The binding attribute.</param>
+        /// <returns></returns>
+        public static IEnumerable<PropertyInfo> GetAllProperties<TAttribute>(this Type sourceType,
+            Func<TAttribute, bool> attributePropFilter, BindingFlags bindingAttr =
+            BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
+            where TAttribute : Attribute =>
+            sourceType.GetProperties(bindingAttr).Where(
+                P => P.GetAttribute(attributePropFilter) != null);
 
         /// <summary>
         /// Deserializes from json string.

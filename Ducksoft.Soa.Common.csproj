@@ -184,6 +184,7 @@
     <Compile Include="Caching\CacheItemInfoAttribute.cs" />
     <Compile Include="Caching\CacheManager.cs" />
     <Compile Include="Caching\CacheTypes.cs" />
+    <Compile Include="Configuration\ConfigElementCollectionBase.cs" />
     <Compile Include="Contracts\ILoggingService.cs" />
     <Compile Include="DataContracts\BatchTaskResult.cs" />
     <Compile Include="DataContracts\CustomMsgHeader.cs" />
