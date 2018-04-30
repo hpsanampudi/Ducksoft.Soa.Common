@@ -3136,6 +3136,48 @@ namespace Ducksoft.Soa.Common.Utilities
         }
 
         /// <summary>
+        /// Sorts the by.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="sortNestedProperty">The sort nested property.</param>
+        /// <param name="sortDirection">The sort direction.</param>
+        /// <returns></returns>
+        public static IQueryable<T> SortBy<T, TResult>(this IQueryable<T> source,
+            string sortNestedProperty,
+            ListSortDirection sortDirection = ListSortDirection.Ascending)
+        {
+            var type = typeof(T);
+            var parameter = Expression.Parameter(type, "p");
+            var sortKeys = sortNestedProperty.Split('.');
+
+            var expression = sortKeys.Aggregate<string, Expression>(parameter, Expression.Property);
+            var conversion = Expression.Convert(expression, typeof(object));
+
+            var tryExpression = Expression.TryCatch(Expression.Block(typeof(object), conversion),
+                Expression.Catch(typeof(object), Expression.Constant(null)));
+
+            var predicate = Expression.Lambda<Func<T, TResult>>(tryExpression, parameter);
+            return ((sortDirection == ListSortDirection.Ascending) ?
+                source.OrderBy(predicate) : source.OrderByDescending(predicate));
+        }
+
+        /// <summary>
+        /// Sorts the by.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="sortNestedProperty">The sort nested property.</param>
+        /// <param name="sortDirection">The sort direction.</param>
+        /// <returns></returns>
+        public static IQueryable<T> SortBy<T>(this IQueryable<T> source, string sortNestedProperty,
+            ListSortDirection sortDirection = ListSortDirection.Ascending)
+        {
+            return (source.SortBy<T, object>(sortNestedProperty, sortDirection));
+        }
+
+        /// <summary>
         /// Filters the by.
         /// </summary>
         /// <typeparam name="T"></typeparam>
