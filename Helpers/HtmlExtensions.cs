@@ -1,8 +1,11 @@
 ﻿using Ducksoft.Soa.Common.Utilities;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Web.Mvc.Html;
 using System.Web.Routing;
 
 namespace System.Web.Mvc
@@ -548,5 +551,68 @@ namespace System.Web.Mvc
 
             return (amount);
         }
+
+        /// <summary>
+        /// CheckBoxes for.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="htmlHelper">The HTML helper.</param>
+        /// <param name="expression">The expression.</param>
+        /// <returns></returns>
+        public static MvcHtmlString CheckBoxFor<T>(this HtmlHelper<T> htmlHelper,
+            Expression<Func<T, bool?>> expression) =>
+            htmlHelper.CheckBox(expression.GetCheckBoxName(),
+                expression.GetCheckBoxState(htmlHelper));
+
+        /// <summary>
+        /// CheckBoxes for.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="htmlHelper">The HTML helper.</param>
+        /// <param name="expression">The expression.</param>
+        /// <param name="htmlAttributes">The HTML attributes.</param>
+        /// <returns></returns>
+        public static MvcHtmlString CheckBoxFor<T>(this HtmlHelper<T> htmlHelper,
+            Expression<Func<T, bool?>> expression, object htmlAttributes) =>
+            htmlHelper.CheckBox(expression.GetCheckBoxName(),
+                expression.GetCheckBoxState(htmlHelper), htmlAttributes);
+
+        /// <summary>
+        /// CheckBoxes for.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="htmlHelper">The HTML helper.</param>
+        /// <param name="expression">The expression.</param>
+        /// <param name="htmlAttributes">The HTML attributes.</param>
+        /// <returns></returns>
+        public static MvcHtmlString CheckBoxFor<T>(this HtmlHelper<T> htmlHelper,
+            Expression<Func<T, bool?>> expression,
+            IDictionary<string, object> htmlAttributes) =>
+            htmlHelper.CheckBox(expression.GetCheckBoxName(),
+                expression.GetCheckBoxState(htmlHelper), htmlAttributes);
+
+        /// <summary>
+        /// Gets the state of the CheckBox.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression">The expression.</param>
+        /// <param name="htmlHelper">The HTML helper.</param>
+        /// <returns></returns>
+        private static bool GetCheckBoxState<T>(this Expression<Func<T, bool?>> expression,
+            HtmlHelper<T> htmlHelper)
+        {
+            var modelMeta = ModelMetadata.FromLambdaExpression(expression, htmlHelper.ViewData);
+            var value = modelMeta.Model as bool?;
+            return (value ?? false);
+        }
+
+        /// <summary>
+        /// Gets the name of the CheckBox.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression">The expression.</param>
+        /// <returns></returns>
+        private static string GetCheckBoxName<T>(this Expression<Func<T, bool?>> expression) =>
+            ExpressionHelper.GetExpressionText(expression);
     }
 }

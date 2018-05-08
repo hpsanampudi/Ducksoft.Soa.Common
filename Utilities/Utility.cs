@@ -3676,5 +3676,80 @@ namespace Ducksoft.Soa.Common.Utilities
         /// </remarks>
         public static Task CompletedTask { get; } = Task.FromResult(false);
 
+        /// <summary>
+        /// To the bool.
+        /// </summary>
+        /// <param name="sourceEnumType">Type of the source enum.</param>
+        /// <returns></returns>
+        public static bool? ToBool(this ThreeStateOptionTypes sourceEnumType)
+        {
+            var value = default(bool?);
+            switch (sourceEnumType)
+            {
+                case ThreeStateOptionTypes.None:
+                    {
+                        value = null;
+                    }
+                    break;
+
+                case ThreeStateOptionTypes.No:
+                    {
+                        value = false;
+                    }
+                    break;
+
+                case ThreeStateOptionTypes.Yes:
+                    {
+                        value = true;
+                    }
+                    break;
+
+                default:
+                    {
+                        //Hp --> Don nothing
+                    }
+                    break;
+            }
+
+            return (value);
+        }
+
+        /// <summary>
+        /// To the type of the three state option.
+        /// </summary>
+        /// <param name="sourceValue">The source value.</param>
+        /// <returns></returns>
+        public static ThreeStateOptionTypes ToThreeStateOptionType(this bool? sourceValue)
+        {
+            var optionType = ThreeStateOptionTypes.None;
+            switch (sourceValue)
+            {
+                case null:
+                    {
+                        optionType = ThreeStateOptionTypes.None;
+                    }
+                    break;
+
+                case false:
+                    {
+                        optionType = ThreeStateOptionTypes.No;
+                    }
+                    break;
+
+                case true:
+                    {
+                        optionType = ThreeStateOptionTypes.Yes;
+                    }
+                    break;
+
+                default:
+                    {
+                        //Hp --> Don nothing
+                    }
+                    break;
+            }
+
+            return (optionType);
+        }
     }
 }

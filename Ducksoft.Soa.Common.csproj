@@ -271,6 +271,7 @@
     <Compile Include="Utilities\LogHelper.cs" />
     <Compile Include="Utilities\ReadOnlyDictionaryWrapper.cs" />
     <Compile Include="Utilities\ReadOnlyListWrapper.cs" />
+    <Compile Include="Utilities\ThreeStateOptionType.cs" />
     <Compile Include="VirtualList\Model\IVirtualDataGridModel.cs" />
     <Compile Include="VirtualList\View\IVirtualDataGridView.cs" />
     <Compile Include="VirtualList\VirtualBindingList.cs" />
