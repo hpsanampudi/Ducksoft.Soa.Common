@@ -684,9 +684,12 @@ namespace Ducksoft.Soa.Common.Utilities
 
         /// <summary>
         /// Compares the date time.
+        /// IsPast: If source value is less than target value; 
+        /// IsFuture: If source value is greater than target value;
+        /// IsCurrent: If source value is equal to target value depending upon ignore milli secs;
         /// </summary>
-        /// <param name="srcValue">The SRC value.</param>
-        /// <param name="trgtValue">The TRGT value.</param>
+        /// <param name="source">The SRC value.</param>
+        /// <param name="target">The TRGT value.</param>
         /// <param name="isIgnoreMilliSeconds">if set to <c>true</c> [is ignore milli seconds].
         /// </param>
         /// <returns>
@@ -694,20 +697,54 @@ namespace Ducksoft.Soa.Common.Utilities
         /// IsFuture: If source value is greater than target value;
         /// IsCurrent: If source value is equal to target value depending upon ignore milli secs;
         /// </returns>
-        public static dynamic CompareDateTime(this DateTime srcValue, DateTime trgtValue,
+        public static dynamic CompareDateTime(this DateTime source, DateTime target,
             bool isIgnoreMilliSeconds = false)
         {
-            ErrorBase.CheckArgIsNull(srcValue, () => srcValue);
-            ErrorBase.CheckArgIsNull(trgtValue, () => trgtValue);
+            ErrorBase.CheckArgIsNull(source, () => source);
+            ErrorBase.CheckArgIsNull(target, () => target);
 
-            var result = srcValue.CompareTo(trgtValue);
+            var result = source.CompareTo(target);
             dynamic expando = new ExpandoObject();
             expando.IsPast = (0 > result);
             expando.IsFuture = (0 < result);
             expando.IsCurrent = (!isIgnoreMilliSeconds) ? (0 == result) :
-                (1 > Math.Abs((srcValue - trgtValue).TotalSeconds));
+                (1 > Math.Abs((source - target).TotalSeconds));
 
             return (expando);
+        }
+
+        /// <summary>
+        /// Extracts the date time in format yyyyMMddHHmmss from given string
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static DateTime? ExtractDateTime(this string source)
+        {
+            ErrorBase.CheckArgIsNullOrDefault(source, nameof(source));
+            var uploadDate = default(DateTime?);
+            var patternBuilder = new StringBuilder();
+            patternBuilder.Append("^(?:.*)?");
+            patternBuilder.Append($"(?<YearMonthDate>{GetDecadeDateRegExpression()})");
+            patternBuilder.Append("(?<Hours>[01][0-9]|2[0-3])");
+            patternBuilder.Append("(?<Minutes>[0-5][0-9])");
+            patternBuilder.Append(@"(?:\..*)?$");
+
+            var pattern = patternBuilder.ToString();
+            var result = Regex.Match(source, pattern);
+            if (result.Success)
+            {
+                var fileDateTimeStr = string.Join(string.Empty, result.Groups["YearMonthDate"],
+                    result.Groups["Hours"], result.Groups["Minutes"], "00");
+
+                DateTime fileDateTime;
+                if (DateTime.TryParseExact(fileDateTimeStr, "yyyyMMddHHmmss", null,
+                    DateTimeStyles.None, out fileDateTime))
+                {
+                    uploadDate = fileDateTime;
+                }
+            }
+
+            return (uploadDate);
         }
 
         /// <summary>
@@ -3706,9 +3743,9 @@ namespace Ducksoft.Soa.Common.Utilities
 
                 default:
                     {
-                        //Hp --> Don nothing
+                        var errMessage = $"The given {sourceEnumType} is not handled!";
+                        throw (new NotImplementedException(errMessage));
                     }
-                    break;
             }
 
             return (value);
@@ -3744,7 +3781,7 @@ namespace Ducksoft.Soa.Common.Utilities
 
                 default:
                     {
-                        //Hp --> Don nothing
+                        //Hp --> Do nothing
                     }
                     break;
             }

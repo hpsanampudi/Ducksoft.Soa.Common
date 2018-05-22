@@ -233,6 +233,8 @@
     <Compile Include="Handler\GlobalWcfErrorHandlerAttribute.cs" />
     <Compile Include="Helpers\AjaxRequestAttribute.cs" />
     <Compile Include="Helpers\HtmlExtensions.cs" />
+    <Compile Include="Helpers\MustAcceptAttribute.cs" />
+    <Compile Include="Helpers\MustSelectAttribute.cs" />
     <Compile Include="Infrastructure\LoggingServiceHelper.cs" />
     <Compile Include="Infrastructure\LoggingModule.cs" />
     <Compile Include="MessageHeaders\CustMsgHeaderBehaviorAttribute.cs" />
@@ -265,6 +267,16 @@
     <Compile Include="T4Helpers\OperationContract.cs" />
     <Compile Include="T4Helpers\SystemTypeAttribute.cs" />
     <Compile Include="T4Helpers\TypeSelector.cs" />
+    <Compile Include="Terms\ConsentControlViewModelBase.cs" />
+    <Compile Include="Terms\ConsentFileHelper.cs" />
+    <Compile Include="Terms\ConsentFileViewModel.cs" />
+    <Compile Include="Terms\ConsentTermTypes.cs" />
+    <Compile Include="Terms\ConsentUserViewModel.cs" />
+    <Compile Include="Terms\IConsentControlViewModel.cs" />
+    <Compile Include="Terms\ThreeStateCheckBoxViewModel.cs" />
+    <Compile Include="Terms\ThreeStateRadioButtonViewModel.cs" />
+    <Compile Include="Terms\TwoStateRadioButtonViewModel.cs" />
+    <Compile Include="Terms\SetupConsentTermsViewModel.cs" />
     <Compile Include="Utilities\CustomNavigationList.cs" />
     <Compile Include="Utilities\DictionaryComparer.cs" />
     <Compile Include="Utilities\ListComparer.cs" />

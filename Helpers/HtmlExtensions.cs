@@ -1,15 +1,39 @@
 ﻿using Ducksoft.Soa.Common.Utilities;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 
 namespace System.Web.Mvc
 {
+    /// <summary>
+    /// Enum which stores renderer types defined in partial view.
+    /// </summary>
+    public enum PartialViewRenderTypes
+    {
+        /// <summary>
+        /// The none
+        /// </summary>
+        [EnumDescription("None")]
+        None = -1,
+        /// <summary>
+        /// The javascript
+        /// </summary>
+        [EnumDescription("RenderPartialViewScript")]
+        Javascript,
+        /// <summary>
+        /// The style
+        /// </summary>
+        [EnumDescription("RenderPartialViewStyle")]
+        Style
+    }
+
     /// <summary>
     /// Static class which holds the html extension methods used in razor view.
     /// </summary>
@@ -558,61 +582,183 @@ namespace System.Web.Mvc
         /// <typeparam name="T"></typeparam>
         /// <param name="htmlHelper">The HTML helper.</param>
         /// <param name="expression">The expression.</param>
-        /// <returns></returns>
-        public static MvcHtmlString CheckBoxFor<T>(this HtmlHelper<T> htmlHelper,
-            Expression<Func<T, bool?>> expression) =>
-            htmlHelper.CheckBox(expression.GetCheckBoxName(),
-                expression.GetCheckBoxState(htmlHelper));
-
-        /// <summary>
-        /// CheckBoxes for.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="htmlHelper">The HTML helper.</param>
-        /// <param name="expression">The expression.</param>
+        /// <param name="isEnabled">if set to <c>true</c> [is enabled].</param>
         /// <param name="htmlAttributes">The HTML attributes.</param>
         /// <returns></returns>
         public static MvcHtmlString CheckBoxFor<T>(this HtmlHelper<T> htmlHelper,
-            Expression<Func<T, bool?>> expression, object htmlAttributes) =>
-            htmlHelper.CheckBox(expression.GetCheckBoxName(),
-                expression.GetCheckBoxState(htmlHelper), htmlAttributes);
-
-        /// <summary>
-        /// CheckBoxes for.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="htmlHelper">The HTML helper.</param>
-        /// <param name="expression">The expression.</param>
-        /// <param name="htmlAttributes">The HTML attributes.</param>
-        /// <returns></returns>
-        public static MvcHtmlString CheckBoxFor<T>(this HtmlHelper<T> htmlHelper,
-            Expression<Func<T, bool?>> expression,
-            IDictionary<string, object> htmlAttributes) =>
-            htmlHelper.CheckBox(expression.GetCheckBoxName(),
-                expression.GetCheckBoxState(htmlHelper), htmlAttributes);
-
-        /// <summary>
-        /// Gets the state of the CheckBox.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="expression">The expression.</param>
-        /// <param name="htmlHelper">The HTML helper.</param>
-        /// <returns></returns>
-        private static bool GetCheckBoxState<T>(this Expression<Func<T, bool?>> expression,
-            HtmlHelper<T> htmlHelper)
+            Expression<Func<T, bool?>> expression, bool isEnabled = true,
+            object htmlAttributes = null)
         {
+            var name = ExpressionHelper.GetExpressionText(expression);
             var modelMeta = ModelMetadata.FromLambdaExpression(expression, htmlHelper.ViewData);
             var value = modelMeta.Model as bool?;
-            return (value ?? false);
+            var isChecked = value ?? false;
+
+            var comparer = StringComparer.InvariantCultureIgnoreCase;
+            var customAttributes = new Dictionary<string, object>(comparer);
+            var userDefinedAttributes = htmlAttributes.GetUserDefinedHtmlAttributes();
+
+            //Hp --> Logic: Exclude checkbox enabled/disabled state
+            if (userDefinedAttributes.ContainsKey("disabled"))
+            {
+                userDefinedAttributes.Remove("disabled");
+            }
+
+            //Hp --> Logic: Override the checkbox enabled/disabled state based on user provided value.
+            if (!isEnabled)
+            {
+                customAttributes.Add("disabled", "disabled");
+            }
+
+            return (htmlHelper.CheckBox(name, isChecked, customAttributes));
         }
 
         /// <summary>
-        /// Gets the name of the CheckBox.
+        /// RadioButtons for.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TModel">The type of the model.</typeparam>
+        /// <typeparam name="TProperty">The type of the property.</typeparam>
+        /// <param name="htmlHelper">The HTML helper.</param>
         /// <param name="expression">The expression.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="isEnabled">if set to <c>true</c> [is enabled].</param>
+        /// <param name="htmlAttributes">The HTML attributes.</param>
         /// <returns></returns>
-        private static string GetCheckBoxName<T>(this Expression<Func<T, bool?>> expression) =>
-            ExpressionHelper.GetExpressionText(expression);
+        public static MvcHtmlString RadioButtonFor<TModel, TProperty>(
+            this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression,
+            TProperty value, bool isEnabled = true, object htmlAttributes = null)
+        {
+            var name = ExpressionHelper.GetExpressionText(expression);
+            var comparer = StringComparer.InvariantCultureIgnoreCase;
+            var customAttributes = new Dictionary<string, object>(comparer);
+            var userDefinedAttributes = htmlAttributes.GetUserDefinedHtmlAttributes();
+
+            //Hp --> Logic: Exclude checkbox enabled/disabled state
+            if (userDefinedAttributes.ContainsKey("disabled"))
+            {
+                userDefinedAttributes.Remove("disabled");
+            }
+
+            //Hp --> Logic: Override the checkbox enabled/disabled state based on user provided value.
+            if (!isEnabled)
+            {
+                customAttributes.Add("disabled", "disabled");
+            }
+
+            return (htmlHelper.RadioButton(name, value, customAttributes));
+        }
+
+        /// <summary>
+        /// Gets the user defined HTML attributes.
+        /// </summary>
+        /// <param name="htmlAttributes">The HTML attributes.</param>
+        /// <returns></returns>
+        private static Dictionary<string, object> GetUserDefinedHtmlAttributes(
+            this object htmlAttributes)
+        {
+            var comparer = StringComparer.InvariantCultureIgnoreCase;
+            var userDefinedAttributes = new Dictionary<string, object>(comparer);
+            if (htmlAttributes == null)
+            {
+                return (userDefinedAttributes);
+            }
+
+            var isDictionary = typeof(IDictionary).IsAssignableFrom(htmlAttributes.GetType());
+            if (isDictionary)
+            {
+                var linkedAttributes = htmlAttributes as IDictionary<string, object>;
+                userDefinedAttributes = new Dictionary<string, object>(linkedAttributes, comparer);
+            }
+            else
+            {
+                userDefinedAttributes = HtmlHelper
+                    .AnonymousObjectToHtmlAttributes(htmlAttributes)
+                    .ToDictionary(A => A.Key, A => A.Value, comparer);
+            }
+
+            return (userDefinedAttributes);
+        }
+
+        /// <summary>
+        /// Adds the script or style.
+        /// </summary>
+        /// <param name="htmlHelper">The HTML helper.</param>
+        /// <param name="url">The URL.</param>
+        /// <param name="renderType">Type of the render.</param>
+        public static void AddPartialViewScriptOrStyle(this HtmlHelper htmlHelper, string url,
+            PartialViewRenderTypes renderType = PartialViewRenderTypes.Javascript)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return;
+            }
+
+            var rendererName = renderType.GetEnumDescription();
+            var renderList = htmlHelper.ViewContext.HttpContext.Items[rendererName] as List<string>;
+            renderList = renderList ?? new List<string>();
+            if (renderList.Contains(url))
+            {
+                return;
+            }
+
+            renderList.Add(url);
+            htmlHelper.ViewContext.HttpContext.Items.Add(rendererName, renderList);
+        }
+
+        /// <summary>
+        /// Renders all script or styles.
+        /// </summary>
+        /// <param name="htmlHelper">The HTML helper.</param>
+        /// <param name="renderType">Type of the render.</param>
+        /// <returns></returns>
+        /// <exception cref="System.NotSupportedException"></exception>
+        public static MvcHtmlString RenderAllPartialViewScriptOrStyles(this HtmlHelper htmlHelper,
+            PartialViewRenderTypes renderType = PartialViewRenderTypes.Javascript)
+        {
+            var rendererName = renderType.GetEnumDescription();
+            var errMessage = string.Empty;
+            var renderUrlFormat = string.Empty;
+            switch (renderType)
+            {
+                case PartialViewRenderTypes.Javascript:
+                    {
+                        renderUrlFormat = "<script src=\"{0}\"></script>";
+                    }
+                    break;
+
+                case PartialViewRenderTypes.Style:
+                    {
+                        renderUrlFormat = "<link href=\"{0}\" rel=\"stylesheet\" />";
+                    }
+                    break;
+
+                case PartialViewRenderTypes.None:
+                default:
+                    {
+                        //Hp --> Logic: Throw exception
+                        errMessage = $"The given renderer Type {rendererName} is not handled!";
+                    }
+                    break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(errMessage))
+            {
+                throw (new NotSupportedException(errMessage));
+            }
+
+            var result = new StringBuilder();
+            var renderList = htmlHelper.ViewContext.HttpContext.Items[rendererName] as List<string>;
+            if (renderList == null)
+            {
+                return (MvcHtmlString.Create(result.ToString()));
+            }
+
+            foreach (var url in renderList)
+            {
+                result.AppendLine(string.Format(renderUrlFormat, url));
+            }
+
+            return (MvcHtmlString.Create(result.ToString()));
+        }
     }
 }
