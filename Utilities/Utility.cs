@@ -874,6 +874,30 @@ namespace Ducksoft.Soa.Common.Utilities
         }
 
         /// <summary>
+        /// To the nullable bool.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="defValue">The definition value.</param>
+        /// <returns></returns>
+        public static bool? ToNullableBool(this int value, bool? defValue = default(bool?))
+        {
+            var result = defValue;
+            try
+            {
+                if ((value == 0) || (value == 1))
+                {
+                    result = Convert.ToBoolean(value);
+                }
+            }
+            catch
+            {
+                Debug.WriteLine("Cannot convert given value to boolean: " + value);
+            }
+
+            return (result);
+        }
+
+        /// <summary>
         /// To the date time.
         /// </summary>
         /// <param name="value">The value.</param>
@@ -3487,18 +3511,33 @@ namespace Ducksoft.Soa.Common.Utilities
         public static string ToLongYear(this DateTime date) => date.ToString("yyyy");
 
         /// <summary>
-        /// Converts To the Odata date.
+        /// Converts To the Odata date in url.
         /// </summary>
         /// <param name="date">The date.</param>
         /// <returns></returns>
         public static string ToODataDate(this DateTime date) => $"datetime'{date.ToString("s")}'";
 
         /// <summary>
-        /// To the OData string.
+        /// To the OData string in url.
         /// </summary>
         /// <param name="source">The source.</param>
         /// <returns></returns>
         public static string ToODataStr(this string source) => $"'{source}'";
+
+        /// <summary>
+        /// To the OData boolean value in url.
+        /// </summary>
+        /// <param name="source">if set to <c>true</c> [source].</param>
+        /// <returns></returns>
+        public static string ToODataBool(this bool source) => $"{source.ToString().ToLower()}";
+
+        /// <summary>
+        /// To the OData boolean value in url.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static int ToODataBool(this bool? source) =>
+            (source == null) ? -1 : ToInt(source.Value);
 
         /// <summary>
         /// Gets the json date.
