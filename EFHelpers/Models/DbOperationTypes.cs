@@ -1,6 +1,6 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 
-namespace Ducksoft.Soa.Common.EFHelpers.Models
+namespace Ducksoft.SOA.Common.EFHelpers.Models
 {
     /// <summary>
     /// Enum which stores database CRUD operation types

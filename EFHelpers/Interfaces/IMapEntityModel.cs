@@ -1,9 +1,9 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
+﻿using Ducksoft.SOA.Common.DataContracts;
 using System.Collections.Generic;
 using System.Data.Services.Client;
 using System.Threading;
 
-namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
+namespace Ducksoft.SOA.Common.EFHelpers.Interfaces
 {
     /// <summary>
     /// Interface which is used to map entity to DTO (or) vice versa while performing CRUD operations

@@ -1,7 +1,7 @@
-﻿using Ducksoft.Soa.Common.Filters;
+﻿using Ducksoft.SOA.Common.Filters;
 using System.Runtime.Serialization;
 
-namespace Ducksoft.Soa.Common.DataContracts
+namespace Ducksoft.SOA.Common.DataContracts
 {
     /// <summary>
     /// Class which is used to store pagination query related information.

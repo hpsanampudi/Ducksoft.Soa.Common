@@ -1,10 +1,10 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 
-namespace Ducksoft.Soa.Common.WcfClientHelpers
+namespace Ducksoft.SOA.Common.WcfClientHelpers
 {
     /// <summary>
     /// Factory for creating WCF service clients.

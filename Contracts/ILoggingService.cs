@@ -1,8 +1,8 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
+﻿using Ducksoft.SOA.Common.DataContracts;
 using System;
 using System.ServiceModel;
 
-namespace Ducksoft.Soa.Common.Contracts
+namespace Ducksoft.SOA.Common.Contracts
 {
     /// <summary>
     /// Interface in which logging WCF service contracts exposed.

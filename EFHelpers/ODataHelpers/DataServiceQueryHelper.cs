@@ -1,9 +1,9 @@
-﻿using Ducksoft.Soa.Common.EFHelpers.Interfaces;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.EFHelpers.Interfaces;
+using Ducksoft.SOA.Common.Utilities;
 using System.Data.Services.Client;
 using System.Linq;
 
-namespace Ducksoft.Soa.Common.EFHelpers.ODataHelpers
+namespace Ducksoft.SOA.Common.EFHelpers.ODataHelpers
 {
     /// <summary>
     /// Static helper class for data service query to support mocking.

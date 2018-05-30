@@ -1,12 +1,13 @@
-﻿using Ducksoft.Soa.Common.Helpers;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Helpers;
+using Ducksoft.SOA.Common.Utilities;
 
-namespace Ducksoft.Soa.Common.Terms
+namespace Ducksoft.SOA.Common.Terms
 {
     /// <summary>
     /// 
     /// </summary>
-    /// <seealso cref="Ducksoft.Soa.Common.Terms.IConsentControlViewModel" />
+    /// <seealso cref="Ducksoft.SOA.Common.Terms.IConsentControlViewModel" />
     public class ThreeStateRadioButtonViewModel : ConsentControlViewModelBase
     {
         /// <summary>

@@ -1,7 +1,7 @@
-﻿using Ducksoft.Soa.Common.Contracts;
-using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Helpers;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Contracts;
+using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Helpers;
+using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.Data.Entity;
 using System.Data.Services;
@@ -12,7 +12,7 @@ using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 
-namespace Ducksoft.Soa.Common.EFHelpers.Models
+namespace Ducksoft.SOA.Common.EFHelpers.Models
 {
     /// <summary>
     /// Base class which is used to create entity framework model object through WCF data services.

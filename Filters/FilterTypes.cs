@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Ducksoft.Soa.Common.Filters
+namespace Ducksoft.SOA.Common.Filters
 {
     /// <summary>
     /// Enum which holds linq filter logical operator types.

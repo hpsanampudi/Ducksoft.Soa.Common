@@ -1,9 +1,9 @@
-﻿using Ducksoft.Soa.Common.Contracts;
-using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.WcfClientHelpers;
+﻿using Ducksoft.SOA.Common.Contracts;
+using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.WcfClientHelpers;
 using System;
 
-namespace Ducksoft.Soa.Common.WcfClients
+namespace Ducksoft.SOA.Common.WcfClients
 {
     /// <summary>
     /// Class which is used to create wcf logging service client.

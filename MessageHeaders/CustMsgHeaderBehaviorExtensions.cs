@@ -3,7 +3,7 @@ using System.Configuration;
 using System.Linq;
 using System.ServiceModel.Configuration;
 
-namespace Ducksoft.Soa.Common.MessageHeaders
+namespace Ducksoft.SOA.Common.MessageHeaders
 {
     /// <summary>
     /// Class which is used to configure custom message header behavior once under WCF client config file.

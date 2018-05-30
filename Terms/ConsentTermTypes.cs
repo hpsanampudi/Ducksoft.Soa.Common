@@ -1,4 +1,4 @@
-﻿namespace Ducksoft.Soa.Common.Terms
+﻿namespace Ducksoft.SOA.Common.Terms
 {
     /// <summary>
     /// Enum which stores the information related to consent terms type.

@@ -1,9 +1,9 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Ducksoft.Soa.Common.DataContracts
+namespace Ducksoft.SOA.Common.DataContracts
 {
     /// <summary>
     /// Class which stores custom header related information passed during WCF request.

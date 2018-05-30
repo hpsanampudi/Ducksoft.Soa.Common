@@ -1,4 +1,4 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Ducksoft.Soa.Common.DataContracts
+namespace Ducksoft.SOA.Common.DataContracts
 {
     /// <summary>
     /// Class which stores database connection string related information.
@@ -174,9 +174,9 @@ namespace Ducksoft.Soa.Common.DataContracts
         /// <summary>
         /// Gets the EF connection string.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntities">The type of the entities.</typeparam>
         /// <returns></returns>
-        public string GetEFConnectionStr<T>() where T : DbContext
+        public string GetEFConnectionStr<TEntities>() where TEntities : DbContext
         {
             var efConnection = string.Empty;
             var sqlConnection = GetSqlConnectionStr();
@@ -191,7 +191,7 @@ namespace Ducksoft.Soa.Common.DataContracts
             }
             else
             {
-                var entityType = typeof(T);
+                var entityType = typeof(TEntities);
                 var assemblyFullName = entityType.Assembly.GetName().FullName;
 
                 var metaDataStr = (string.IsNullOrWhiteSpace(EdmxModelName)) ?

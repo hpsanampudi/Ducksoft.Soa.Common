@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Ducksoft.Soa.Common.Utilities
+namespace Ducksoft.SOA.Common.Utilities
 {
     /// <summary>
     /// Base class which implements INotifyPropertyChanged interface.

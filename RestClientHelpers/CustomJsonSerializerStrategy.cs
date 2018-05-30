@@ -1,7 +1,7 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using SimpleJson;
 
-namespace Ducksoft.Soa.Common.RestClientHelpers
+namespace Ducksoft.SOA.Common.RestClientHelpers
 {
     /// <summary>
     /// Class which is used to configure given JSOn serialization strategy type

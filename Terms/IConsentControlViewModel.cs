@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ducksoft.Soa.Common.Terms
+namespace Ducksoft.SOA.Common.Terms
 {
     public interface IConsentControlViewModel
     {

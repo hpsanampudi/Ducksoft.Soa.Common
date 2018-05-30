@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Ducksoft.Soa.Common.ObjectComparer
+namespace Ducksoft.SOA.Common.ObjectComparer
 {
     /// <summary>
     /// Abstract class which is used to store object comparer model data.
     /// </summary>
     /// <typeparam name="TObjectType">The type of the object type.</typeparam>
     /// <typeparam name="TCompareObjType">The type of the compare object type.</typeparam>
-    /// <seealso cref="Ducksoft.Soa.Common.ObjectComparer.IObjectComparerModel{TObjectType, TCompareObjType}" />
+    /// <seealso cref="Ducksoft.SOA.Common.ObjectComparer.IObjectComparerModel{TObjectType, TCompareObjType}" />
     public abstract class ObjectComparerModel<TObjectType, TCompareObjType>
         : IObjectComparerModel<TObjectType, TCompareObjType>
     {

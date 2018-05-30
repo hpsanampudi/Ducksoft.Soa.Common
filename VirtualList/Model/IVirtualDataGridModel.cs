@@ -1,9 +1,9 @@
-﻿using Ducksoft.Soa.Common.VirtualList.View;
+﻿using Ducksoft.SOA.Common.VirtualList.View;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace Ducksoft.Soa.Common.VirtualList.Model
+namespace Ducksoft.SOA.Common.VirtualList.Model
 {
     /// <summary>
     /// 

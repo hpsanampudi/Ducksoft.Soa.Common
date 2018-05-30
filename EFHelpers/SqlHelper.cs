@@ -1,9 +1,9 @@
-﻿using Microsoft.SqlServer.Management.Common;
+﻿using Ducksoft.SOA.Common.Contracts;
+using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Infrastructure;
+using Ducksoft.SOA.Common.Utilities;
+using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
-using Ducksoft.Soa.Common.Contracts;
-using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Infrastructure;
-using Ducksoft.Soa.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -11,7 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Ducksoft.Soa.Logging.EFHelpers
+namespace Ducksoft.SOA.Common.EFHelpers
 {
     /// <summary>
     /// Static helper class whcih is used to perform SQl database operations.

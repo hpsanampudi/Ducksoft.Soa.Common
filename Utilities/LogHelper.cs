@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace Ducksoft.Soa.Common.Utilities
+namespace Ducksoft.SOA.Common.Utilities
 {
     /// <summary>
     /// Static class which is used to write error message to log file.

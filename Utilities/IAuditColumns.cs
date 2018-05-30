@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ducksoft.Soa.Common.Utilities
+namespace Ducksoft.SOA.Common.Utilities
 {
     /// <summary>
     /// Interface which holds datbase entity related audit information

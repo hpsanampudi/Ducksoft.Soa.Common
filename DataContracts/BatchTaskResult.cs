@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
-namespace Ducksoft.Soa.Common.DataContracts
+namespace Ducksoft.SOA.Common.DataContracts
 {
     /// <summary>
     /// Data class which is used to store async task result related information.

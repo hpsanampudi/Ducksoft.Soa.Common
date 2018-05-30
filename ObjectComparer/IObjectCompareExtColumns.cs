@@ -1,4 +1,4 @@
-﻿namespace Ducksoft.Soa.Common.ObjectComparer
+﻿namespace Ducksoft.SOA.Common.ObjectComparer
 {
     /// <summary>
     /// Interface which is used to provide comparer object extension columns.

@@ -1,10 +1,10 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Reflection;
 
-namespace Ducksoft.Soa.Common.Configuration
+namespace Ducksoft.SOA.Common.Configuration
 {
     /// <summary>
     /// Generic configuration file collection for storing multiple items.

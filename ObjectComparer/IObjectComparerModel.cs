@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Ducksoft.Soa.Common.ObjectComparer
+namespace Ducksoft.SOA.Common.ObjectComparer
 {
     /// <summary>
     /// Interface which is used to store object comparer model data.

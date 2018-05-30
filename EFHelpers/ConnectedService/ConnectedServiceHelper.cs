@@ -1,7 +1,7 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System.IO;
 
-namespace Ducksoft.Soa.Common.EFHelpers.ConnectedService
+namespace Ducksoft.SOA.Common.EFHelpers.ConnectedService
 {
     /// <summary>
     /// Class which stores connected Odata service related generic methods.

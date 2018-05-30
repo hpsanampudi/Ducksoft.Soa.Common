@@ -1,7 +1,7 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System.Runtime.Serialization;
 
-namespace Ducksoft.Soa.Common.DataContracts
+namespace Ducksoft.SOA.Common.DataContracts
 {
     /// <summary>
     /// Class which is used to store type of log message related information.

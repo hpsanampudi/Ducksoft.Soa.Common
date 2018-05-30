@@ -1,6 +1,6 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 
-namespace Ducksoft.Soa.Common.ObjectComparer
+namespace Ducksoft.SOA.Common.ObjectComparer
 {
     /// <summary>
     /// Enum which is used to show object compare status types.

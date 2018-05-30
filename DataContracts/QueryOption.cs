@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Ducksoft.Soa.Common.DataContracts
+namespace Ducksoft.SOA.Common.DataContracts
 {
     /// <summary>
     /// Data class which is used to store WCF data service query option related information.

@@ -1,11 +1,11 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.ServiceModel.Dispatcher;
 
-namespace Ducksoft.Soa.Common.RestClientConverters
+namespace Ducksoft.SOA.Common.RestClientConverters
 {
     /// <summary>
     /// Class which is used to convert WCF rest url parameters to string (or) vice versa.

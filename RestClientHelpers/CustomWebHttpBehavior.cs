@@ -1,8 +1,8 @@
-﻿using Ducksoft.Soa.Common.RestClientConverters;
+﻿using Ducksoft.SOA.Common.RestClientConverters;
 using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
 
-namespace Ducksoft.Soa.Common.RestClientHelpers
+namespace Ducksoft.SOA.Common.RestClientHelpers
 {
     /// <summary>
     /// Class which is used to configure custom web http behavior under WCF client config file.

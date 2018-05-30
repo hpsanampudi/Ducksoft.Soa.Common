@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
-namespace Ducksoft.Soa.Common.Infrastructure
+namespace Ducksoft.SOA.Common.Infrastructure
 {
     /// <summary>
     /// Singleton class, which is used to used to load ninject bindings.

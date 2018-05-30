@@ -1,6 +1,6 @@
-﻿using Ducksoft.Soa.Common.Contracts;
-using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Infrastructure;
+﻿using Ducksoft.SOA.Common.Contracts;
+using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Infrastructure;
 using System;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -8,7 +8,7 @@ using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
 
-namespace Ducksoft.Soa.Common.Handlers
+namespace Ducksoft.SOA.Common.Handlers
 {
     /// <summary>
     /// Class which is used to handle any unhandled exceptions occurs in WCF service.

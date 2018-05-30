@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ducksoft.Soa.Common.Caching
+namespace Ducksoft.SOA.Common.Caching
 {
     /// <summary>
     /// Attribute class for storing cache item related information.

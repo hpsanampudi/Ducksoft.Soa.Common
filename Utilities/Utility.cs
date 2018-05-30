@@ -1,5 +1,5 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Filters;
+﻿using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Filters;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -31,7 +31,7 @@ using System.Xml.Serialization;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
-namespace Ducksoft.Soa.Common.Utilities
+namespace Ducksoft.SOA.Common.Utilities
 {
     /// <summary>
     /// Static class which is used to perform common functionality across the application.

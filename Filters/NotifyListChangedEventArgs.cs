@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Ducksoft.Soa.Common.Filters
+namespace Ducksoft.SOA.Common.Filters
 {
     /// <summary>
     /// Class which is used to store binding list changed notification event arguments.

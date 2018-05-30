@@ -1,6 +1,6 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.EFHelpers.Interfaces;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.EFHelpers.Interfaces;
+using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.Linq;
 using System.Linq.Dynamic;
 using System.Linq.Expressions;
 
-namespace Ducksoft.Soa.Common.EFHelpers.Models
+namespace Ducksoft.SOA.Common.EFHelpers.Models
 {
     /// <summary>
     /// Class which is used to query entity set data through given WCF data service.

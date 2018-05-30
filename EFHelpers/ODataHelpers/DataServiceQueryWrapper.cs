@@ -1,4 +1,4 @@
-﻿using Ducksoft.Soa.Common.EFHelpers.Interfaces;
+﻿using Ducksoft.SOA.Common.EFHelpers.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,13 +6,13 @@ using System.Data.Services.Client;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Ducksoft.Soa.Common.EFHelpers.ODataHelpers
+namespace Ducksoft.SOA.Common.EFHelpers.ODataHelpers
 {
     /// <summary>
     /// Wrapper class for data service query
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
-    /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IDataServiceQuery{TEntity}" />
+    /// <seealso cref="Ducksoft.SOA.Common.EFHelpers.Interfaces.IDataServiceQuery{TEntity}" />
     public class DataServiceQueryWrapper<TEntity> : IDataServiceQuery<TEntity>
     {
         /// <summary>

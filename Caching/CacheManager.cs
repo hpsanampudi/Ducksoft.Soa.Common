@@ -1,11 +1,11 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Caching;
 
-namespace Ducksoft.Soa.Common.Caching
+namespace Ducksoft.SOA.Common.Caching
 {
     /// <summary>
     /// Singleton class, which is used to manage reading and writing of data to cache.

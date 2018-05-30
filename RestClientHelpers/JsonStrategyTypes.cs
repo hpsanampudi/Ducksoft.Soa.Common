@@ -1,6 +1,6 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 
-namespace Ducksoft.Soa.Common.RestClientHelpers
+namespace Ducksoft.SOA.Common.RestClientHelpers
 {
     /// <summary>
     /// Enum which stores the type of Json serialize/deserialize rest sharp strategy related information

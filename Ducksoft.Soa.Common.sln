@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ducksoft.Soa.Common", "Ducksoft.Soa.Common.csproj", "{2C7414D6-C082-4276-A974-2B15A0CD03D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ducksoft.SOA.Common", "Ducksoft.SOA.Common.csproj", "{2C7414D6-C082-4276-A974-2B15A0CD03D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

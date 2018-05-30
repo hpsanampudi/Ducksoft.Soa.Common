@@ -6,7 +6,7 @@ using System.Security;
 using System.Security.Permissions;
 using System.Security.Principal;
 
-namespace Ducksoft.Soa.Common.Utilities
+namespace Ducksoft.SOA.Common.Utilities
 {
     /// <summary>
     /// Reference: http://stackoverflow.com/questions/125341/how-do-you-do-impersonation-in-net

@@ -3,7 +3,7 @@ using System.Configuration;
 using System.ServiceModel.Configuration;
 using System.ServiceModel.Web;
 
-namespace Ducksoft.Soa.Common.RestClientHelpers
+namespace Ducksoft.SOA.Common.RestClientHelpers
 {
     /// <summary>
     /// Class which is used to enable CustomWebHttpBehavior for an endpoint through configuration.

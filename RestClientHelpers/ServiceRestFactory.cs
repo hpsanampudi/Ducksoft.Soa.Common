@@ -1,5 +1,5 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Utilities;
 using RestSharp;
 using RestSharp.Deserializers;
 using RestSharp.Serializers;
@@ -13,13 +13,13 @@ using System.ServiceModel.Web;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ducksoft.Soa.Common.RestClientHelpers
+namespace Ducksoft.SOA.Common.RestClientHelpers
 {
     /// <summary>
     /// Abstract class which is used to create WCF rest service factory instance.
     /// </summary>
     /// <typeparam name="TClient">The type of the client.</typeparam>
-    /// <seealso cref="Ducksoft.Soa.Common.RestClientHelpers.IServiceRestFactory" />
+    /// <seealso cref="Ducksoft.SOA.Common.RestClientHelpers.IServiceRestFactory" />
     public abstract class ServiceRestFactory<TClient> : IServiceRestFactory where TClient : class
     {
         /// <summary>

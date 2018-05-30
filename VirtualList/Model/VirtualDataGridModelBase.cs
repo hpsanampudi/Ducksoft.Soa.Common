@@ -1,19 +1,19 @@
-﻿using Ducksoft.Soa.Common.Filters;
-using Ducksoft.Soa.Common.Utilities;
-using Ducksoft.Soa.Common.VirtualList.View;
+﻿using Ducksoft.SOA.Common.Filters;
+using Ducksoft.SOA.Common.Utilities;
+using Ducksoft.SOA.Common.VirtualList.View;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Ducksoft.Soa.Common.VirtualList.Model
+namespace Ducksoft.SOA.Common.VirtualList.Model
 {
     /// <summary>
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <seealso cref="Ducksoft.Soa.Common.VirtualList.Model.IVirtualDataGridModel{T}" />
+    /// <seealso cref="Ducksoft.SOA.Common.VirtualList.Model.IVirtualDataGridModel{T}" />
     /// <seealso cref="FA.CSAS.Common.Utilities.NotifyPropertyBase" />
     public abstract class VirtualDataGridModelBase<T> : NotifyPropertyBase, IVirtualDataGridModel<T>
         where T : class

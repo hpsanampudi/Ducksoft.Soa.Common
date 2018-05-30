@@ -1,7 +1,7 @@
-﻿using Ducksoft.Soa.Common.Contracts;
-using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.EFHelpers.Interfaces;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Contracts;
+using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.EFHelpers.Interfaces;
+using Ducksoft.SOA.Common.Utilities;
 using Nelibur.ObjectMapper;
 using Ninject;
 using System;
@@ -11,15 +11,15 @@ using System.Linq;
 using System.ServiceModel;
 using System.Threading;
 
-namespace Ducksoft.Soa.Common.EFHelpers.Models
+namespace Ducksoft.SOA.Common.EFHelpers.Models
 {
     /// <summary>
     /// Singleton class which is used to map entity to DTO (or) vice versa while performing CRUD operations
     /// </summary>
     /// <typeparam name="TEntities">The type of the entities.</typeparam>
     /// <typeparam name="TAudit">The type of the audit.</typeparam>
-    /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IMapEntityModel{TEntities, TAudit}" />
-    /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IMapEntityModel" />
+    /// <seealso cref="Ducksoft.SOA.Common.EFHelpers.Interfaces.IMapEntityModel{TEntities, TAudit}" />
+    /// <seealso cref="Ducksoft.SOA.Common.EFHelpers.Interfaces.IMapEntityModel" />
     public sealed class CrudEntityModel<TEntities, TAudit> : IMapEntityModel<TEntities, TAudit>
         where TEntities : DataServiceContext
         where TAudit : struct

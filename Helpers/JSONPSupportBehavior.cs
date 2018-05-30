@@ -6,7 +6,7 @@ using System.ServiceModel.Dispatcher;
 using System.Text;
 using System.Xml;
 
-namespace Ducksoft.Soa.Common.Helpers
+namespace Ducksoft.SOA.Common.Helpers
 {
     /// <summary>
     /// Simply apply this attribute to a DataService-derived class to get JSONP support in that service

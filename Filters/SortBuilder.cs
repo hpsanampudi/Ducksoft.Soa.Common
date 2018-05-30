@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace Ducksoft.Soa.Common.Filters
+namespace Ducksoft.SOA.Common.Filters
 {
     /// <summary>
     /// Class which is used to build Linq sort expression. 

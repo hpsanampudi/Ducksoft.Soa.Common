@@ -1,10 +1,10 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
+﻿using Ducksoft.SOA.Common.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
 
-namespace Ducksoft.Soa.Common.RestClientHelpers
+namespace Ducksoft.SOA.Common.RestClientHelpers
 {
     /// <summary>
     /// Interface which is used to create WCF rest factory instance.

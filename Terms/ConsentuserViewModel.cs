@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Ducksoft.Soa.Common.Terms
+namespace Ducksoft.SOA.Common.Terms
 {
     /// <summary>
     /// 

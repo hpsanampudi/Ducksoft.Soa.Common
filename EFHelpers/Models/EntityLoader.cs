@@ -1,8 +1,8 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.EFHelpers.Interfaces;
-using Ducksoft.Soa.Common.EFHelpers.ODataHelpers;
-using Ducksoft.Soa.Common.Filters;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.EFHelpers.Interfaces;
+using Ducksoft.SOA.Common.EFHelpers.ODataHelpers;
+using Ducksoft.SOA.Common.Filters;
+using Ducksoft.SOA.Common.Utilities;
 using Nelibur.ObjectMapper;
 using Nelibur.ObjectMapper.Bindings;
 using System;
@@ -15,13 +15,13 @@ using System.ServiceModel;
 using System.Threading;
 using System.Web;
 
-namespace Ducksoft.Soa.Common.EFHelpers.Models
+namespace Ducksoft.SOA.Common.EFHelpers.Models
 {
     /// <summary>
     /// Class which is used to load Entities with user provided connection string information.
     /// </summary>
     /// <typeparam name="TEntities">The type of the entities.</typeparam>
-    /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IEntityLoader{TEntities}" />
+    /// <seealso cref="Ducksoft.SOA.Common.EFHelpers.Interfaces.IEntityLoader{TEntities}" />
     public class EntityLoader<TEntities> : IEntityLoader<TEntities>
         where TEntities : DataServiceContext
     {

@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 
-namespace Ducksoft.Soa.Common.Utilities
+namespace Ducksoft.SOA.Common.Utilities
 {
     /// <summary>
     /// Base class for all the data which we will read/write to XML using xpath queries

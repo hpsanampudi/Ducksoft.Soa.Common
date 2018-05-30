@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Ducksoft.Soa.Common.Terms
+namespace Ducksoft.SOA.Common.Terms
 {
     /// <summary>
     /// 
     /// </summary>
-    /// <seealso cref="Ducksoft.Soa.Common.Terms.IConsentControlViewModel" />
+    /// <seealso cref="Ducksoft.SOA.Common.Terms.IConsentControlViewModel" />
     public abstract class ConsentControlViewModelBase : IConsentControlViewModel
     {
         /// <summary>

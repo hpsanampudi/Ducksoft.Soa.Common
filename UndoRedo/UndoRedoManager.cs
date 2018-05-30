@@ -1,8 +1,8 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.Collections.Generic;
 
-namespace Ducksoft.Soa.Common.UndoRedo
+namespace Ducksoft.SOA.Common.UndoRedo
 {
     /// <summary>
     /// Class which is used to provide undo/redo functionality.

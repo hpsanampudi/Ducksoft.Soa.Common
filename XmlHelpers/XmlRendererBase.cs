@@ -1,4 +1,4 @@
-﻿namespace Ducksoft.Soa.Common.XmlHelpers
+﻿namespace Ducksoft.SOA.Common.XmlHelpers
 {
     /// <summary>
     /// Base class to parse xml with given renderer

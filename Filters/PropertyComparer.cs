@@ -1,4 +1,4 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml.Linq;
 
-namespace Ducksoft.Soa.Common.Filters
+namespace Ducksoft.SOA.Common.Filters
 {
     /// <summary>
     ///  Class for comparing object's properties.    

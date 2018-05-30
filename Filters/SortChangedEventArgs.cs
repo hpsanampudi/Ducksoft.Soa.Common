@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ducksoft.Soa.Common.Filters
+namespace Ducksoft.SOA.Common.Filters
 {
     /// <summary>
     /// Class which is used to store filter changed event arguments. 

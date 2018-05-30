@@ -1,11 +1,11 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 
-namespace Ducksoft.Soa.Common.MessageHeaders
+namespace Ducksoft.SOA.Common.MessageHeaders
 {
     /// <summary>
     /// Singleton class, which is used to used to build custom message header.

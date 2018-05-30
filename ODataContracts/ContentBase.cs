@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Ducksoft.Soa.Common.ODataContracts
+namespace Ducksoft.SOA.Common.ODataContracts
 {
     /// <summary>
     /// Data class which stores the WCF data service JSON content related information.

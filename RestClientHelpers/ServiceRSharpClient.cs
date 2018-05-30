@@ -1,5 +1,5 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Utilities;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -8,12 +8,12 @@ using System.ServiceModel.Web;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ducksoft.Soa.Common.RestClientHelpers
+namespace Ducksoft.SOA.Common.RestClientHelpers
 {
     /// <summary>
     /// Class which is used to create WCF rest service client using Rest sharp.
     /// </summary>
-    /// <seealso cref="Ducksoft.Soa.Common.RestClientHelpers.ServiceRestFactory{TClient}" />
+    /// <seealso cref="Ducksoft.SOA.Common.RestClientHelpers.ServiceRestFactory{TClient}" />
     public class ServiceRSharpClient : ServiceRestFactory<RestClient>
     {
         /// <summary>

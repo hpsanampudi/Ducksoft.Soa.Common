@@ -3,7 +3,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 
-namespace Ducksoft.Soa.Common.WcfClientHelpers
+namespace Ducksoft.SOA.Common.WcfClientHelpers
 {
     /// <summary>
     /// Provides a wrapper around a WCF service client.

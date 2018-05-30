@@ -1,19 +1,19 @@
-﻿using Ducksoft.Soa.Common.Contracts;
-using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.EFHelpers.Interfaces;
-using Ducksoft.Soa.Common.Infrastructure;
+﻿using Ducksoft.SOA.Common.Contracts;
+using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.EFHelpers.Interfaces;
+using Ducksoft.SOA.Common.Infrastructure;
 using System.Collections.Generic;
 using System.Data.Services.Client;
 using System.Threading;
 
-namespace Ducksoft.Soa.Common.EFHelpers.Models
+namespace Ducksoft.SOA.Common.EFHelpers.Models
 {
     /// <summary>
     /// Abstract class which is used to query CRUD operations of given entity set data.
     /// </summary>
     /// <typeparam name="TEntities">The type of the entities.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
-    /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IRepository{TEntities, TEntity}" />
+    /// <seealso cref="Ducksoft.SOA.Common.EFHelpers.Interfaces.IRepository{TEntities, TEntity}" />
     public abstract class RepositoryBase<TEntities, TEntity> : IRepository<TEntities, TEntity>
         where TEntities : DataServiceContext
         where TEntity : class

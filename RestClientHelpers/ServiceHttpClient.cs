@@ -1,5 +1,5 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +10,12 @@ using System.ServiceModel.Web;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ducksoft.Soa.Common.RestClientHelpers
+namespace Ducksoft.SOA.Common.RestClientHelpers
 {
     /// <summary>
     /// Class which is used to create WCF rest service client using HttpClient.
     /// </summary>
-    /// <seealso cref="Ducksoft.Soa.Common.RestClientHelpers.ServiceRestFactory{TClient}" />
+    /// <seealso cref="Ducksoft.SOA.Common.RestClientHelpers.ServiceRestFactory{TClient}" />
     public class ServiceHttpClient : ServiceRestFactory<HttpClient>
     {
         /// <summary>

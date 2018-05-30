@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 
-namespace Ducksoft.Soa.Common.Helpers
+namespace Ducksoft.SOA.Common.Helpers
 {
     /// <summary>
     /// The custom data annotation classs which is used to validate html checkbox must be checked.

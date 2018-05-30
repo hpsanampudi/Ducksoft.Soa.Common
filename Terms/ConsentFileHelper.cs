@@ -1,10 +1,10 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.IO;
 using System.Linq;
 using System.Web.Hosting;
 
-namespace Ducksoft.Soa.Common.Terms
+namespace Ducksoft.SOA.Common.Terms
 {
     /// <summary>
     /// 

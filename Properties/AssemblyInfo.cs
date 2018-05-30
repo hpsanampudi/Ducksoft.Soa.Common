@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Ducksoft.Soa.Common")]
+[assembly: AssemblyTitle("Ducksoft.SOA.Common")]
 [assembly: AssemblyDescription("Common utilities used across SOA application.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Duck Software Limited")]
-[assembly: AssemblyProduct("Ducksoft.Soa.Common")]
+[assembly: AssemblyProduct("Ducksoft.SOA.Common")]
 [assembly: AssemblyCopyright("Copyright © Duck Software Limited 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.0.16")]
-[assembly: AssemblyFileVersion("2.0.0.16")]
+[assembly: AssemblyVersion("3.0.0.*")]
+[assembly: AssemblyFileVersion("3.0.0.0")]

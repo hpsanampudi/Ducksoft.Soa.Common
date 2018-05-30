@@ -1,4 +1,4 @@
-﻿namespace Ducksoft.Soa.Common.EFHelpers.ConnectedService
+﻿namespace Ducksoft.SOA.Common.EFHelpers.ConnectedService
 {
     /// <summary>
     /// Class which deserializes connected Odata service json file.

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Ducksoft.Soa.Common.DataContracts
+namespace Ducksoft.SOA.Common.DataContracts
 {
     /// <summary>
     /// Class which is used store dynamic linq query related information.

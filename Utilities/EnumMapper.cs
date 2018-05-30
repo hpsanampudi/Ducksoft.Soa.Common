@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ducksoft.Soa.Common.Utilities
+namespace Ducksoft.SOA.Common.Utilities
 {
     /// <summary>
     /// Maps the given enum value to class object which is usefull in binding data to UI controls.

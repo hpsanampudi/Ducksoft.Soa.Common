@@ -1,4 +1,4 @@
-﻿namespace Ducksoft.Soa.Common.XmlHelpers
+﻿namespace Ducksoft.SOA.Common.XmlHelpers
 {
     /// <summary>
     /// Enum which stores xml renderer types

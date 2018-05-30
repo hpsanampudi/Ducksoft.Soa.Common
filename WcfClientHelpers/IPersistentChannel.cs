@@ -1,4 +1,4 @@
-﻿namespace Ducksoft.Soa.Common.WcfClientHelpers
+﻿namespace Ducksoft.SOA.Common.WcfClientHelpers
 {
     /// <summary>
     /// Represents an object that can open and close persistent channels.

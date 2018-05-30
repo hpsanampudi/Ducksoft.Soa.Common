@@ -1,8 +1,8 @@
-﻿using Ducksoft.Soa.Common.Contracts;
+﻿using Ducksoft.SOA.Common.Contracts;
 using Ninject.Modules;
 using System.Collections.Generic;
 
-namespace Ducksoft.Soa.Common.Infrastructure
+namespace Ducksoft.SOA.Common.Infrastructure
 {
     /// <summary>
     /// Static logging helper class which is used to load logging service in IOC container.

@@ -1,8 +1,8 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
+﻿using Ducksoft.SOA.Common.DataContracts;
 using System;
 using System.ServiceModel.Web;
 
-namespace Ducksoft.Soa.Common.RestClientHelpers
+namespace Ducksoft.SOA.Common.RestClientHelpers
 {
     /// <summary>
     /// Class which is used to create WCF rest service client.

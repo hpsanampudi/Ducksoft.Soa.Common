@@ -1,4 +1,4 @@
-﻿namespace Ducksoft.Soa.Common.UndoRedo
+﻿namespace Ducksoft.SOA.Common.UndoRedo
 {
     /// <summary>
     /// Class which holds the state of undo/redo functionality.

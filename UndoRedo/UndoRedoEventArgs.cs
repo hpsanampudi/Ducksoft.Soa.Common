@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ducksoft.Soa.Common.UndoRedo
+namespace Ducksoft.SOA.Common.UndoRedo
 {
     /// <summary>
     /// Class which holds the events arguments related to undo/redo functionality.

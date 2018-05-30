@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Data.Services.Client;
 
-namespace Ducksoft.Soa.Common.EFHelpers.Models
+namespace Ducksoft.SOA.Common.EFHelpers.Models
 {
     /// <summary>
     /// Singleton Class which is used to query given entity set data through WCF data service.
     /// </summary>
     /// <typeparam name="TEntities">The type of the entities.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
-    /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Models.RepositoryBase{TEntities, TEntity}" />
+    /// <seealso cref="Ducksoft.SOA.Common.EFHelpers.Models.RepositoryBase{TEntities, TEntity}" />
     public sealed class Repository<TEntities, TEntity> : RepositoryBase<TEntities, TEntity>
         where TEntities : DataServiceContext
         where TEntity : class

@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Ducksoft.Soa.Common.Utilities
+namespace Ducksoft.SOA.Common.Utilities
 {
     /// <summary>
     /// Static class which is used to validate a method arguments are valid (or) not.

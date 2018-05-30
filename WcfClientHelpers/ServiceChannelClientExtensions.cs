@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive.Disposables;
 
-namespace Ducksoft.Soa.Common.WcfClientHelpers
+namespace Ducksoft.SOA.Common.WcfClientHelpers
 {
     /// <summary>
     /// Static class which provides WCF service client related extension methods.

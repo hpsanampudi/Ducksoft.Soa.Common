@@ -1,11 +1,11 @@
-﻿using Ducksoft.Soa.Common.DataContracts;
+﻿using Ducksoft.SOA.Common.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.Data.Services.Client;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Ducksoft.Soa.Common.EFHelpers.Interfaces
+namespace Ducksoft.SOA.Common.EFHelpers.Interfaces
 {
     /// <summary>
     /// Interface which is used to query entity set data through given WCF data service.

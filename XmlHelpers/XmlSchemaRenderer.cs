@@ -1,13 +1,13 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 using System.Xml;
 
-namespace Ducksoft.Soa.Common.XmlHelpers
+namespace Ducksoft.SOA.Common.XmlHelpers
 {
     /// <summary>
     /// Abstract class for xml schema renderer
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <seealso cref="Ducksoft.Soa.Bl.JobSponsorRender.Xml.XmlRenderBase" />
+    /// <seealso cref="Ducksoft.SOA.Bl.JobSponsorRender.Xml.XmlRenderBase" />
     public abstract class XmlSchemaRenderer<T> : XmlRendererBase where T : class
     {
         /// <summary>

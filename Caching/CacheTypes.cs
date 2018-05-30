@@ -1,6 +1,6 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Utilities;
 
-namespace Ducksoft.Soa.Common.Caching
+namespace Ducksoft.SOA.Common.Caching
 {
     /// <summary>
     /// Stores the type of cache expirations types

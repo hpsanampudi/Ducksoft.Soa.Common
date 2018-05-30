@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Ducksoft.Soa.Common.WcfClientHelpers
+namespace Ducksoft.SOA.Common.WcfClientHelpers
 {
     /// <summary>
     /// Provides abstract base class for wrapping WCF channels.

@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata minClientVersion="2.8">
-    <id>Ducksoft.Soa.Common</id>
-    <version>2.0.0.16</version>
-    <title>Ducksoft.Soa.Common</title>
+    <id>Ducksoft.SOA.Common</id>
+    <version>3.0.0.0</version>
+    <title>Ducksoft.SOA.Common</title>
     <authors>hpsanampudi</authors>
     <owners>Duck Software Limited</owners>
-    <licenseUrl>https://github.com/hpsanampudi/Ducksoft.Soa.Common/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/hpsanampudi/Ducksoft.Soa.Common</projectUrl>
+    <licenseUrl>https://github.com/hpsanampudi/Ducksoft.SOA.Common/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/hpsanampudi/Ducksoft.SOA.Common</projectUrl>
     <iconUrl>https://www.gravatar.com/avatar/c66699de02a373b3835f8fe83d294328</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Common utilities used across SOA application.</description>

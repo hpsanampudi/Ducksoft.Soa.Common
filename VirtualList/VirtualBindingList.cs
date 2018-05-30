@@ -1,11 +1,11 @@
-﻿using Ducksoft.Soa.Common.Filters;
-using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.Filters;
+using Ducksoft.SOA.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Ducksoft.Soa.Common.VirtualList
+namespace Ducksoft.SOA.Common.VirtualList
 {
     /// <summary>
     /// Class which inherits binding list and supports sorting and filtering of its items.

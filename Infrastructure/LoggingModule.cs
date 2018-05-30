@@ -1,8 +1,8 @@
-﻿using Ninject.Modules;
-using Ducksoft.Soa.Common.Contracts;
-using Ducksoft.Soa.Common.WcfClients;
+﻿using Ducksoft.SOA.Common.Contracts;
+using Ducksoft.SOA.Common.WcfClients;
+using Ninject.Modules;
 
-namespace Ducksoft.Soa.Common.Infrastructure
+namespace Ducksoft.SOA.Common.Infrastructure
 {
     /// <summary>
     /// Class which is used to configure bindings related to dependency injection through NInject.

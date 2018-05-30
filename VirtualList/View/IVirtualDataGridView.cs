@@ -1,6 +1,6 @@
-﻿using Ducksoft.Soa.Common.VirtualList.Model;
+﻿using Ducksoft.SOA.Common.VirtualList.Model;
 
-namespace Ducksoft.Soa.Common.VirtualList.View
+namespace Ducksoft.SOA.Common.VirtualList.View
 {
     public interface IVirtualDataGridView<T> where T : class
     {

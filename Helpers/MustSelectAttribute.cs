@@ -1,9 +1,9 @@
-﻿using Ducksoft.Soa.Common.Utilities;
+﻿using Ducksoft.SOA.Common.DataContracts;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 
-namespace Ducksoft.Soa.Common.Helpers
+namespace Ducksoft.SOA.Common.Helpers
 {
     /// <summary>
     /// The custom data annotation classs which is used to validate html radio button must selected anyone option.
