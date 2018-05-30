@@ -20,7 +20,7 @@ namespace Ducksoft.Soa.Common.EFHelpers.Models
     /// <typeparam name="TAudit">The type of the audit.</typeparam>
     /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IMapEntityModel{TEntities, TAudit}" />
     /// <seealso cref="Ducksoft.Soa.Common.EFHelpers.Interfaces.IMapEntityModel" />
-    public class CrudEntityModel<TEntities, TAudit> : IMapEntityModel<TEntities, TAudit>
+    public sealed class CrudEntityModel<TEntities, TAudit> : IMapEntityModel<TEntities, TAudit>
         where TEntities : DataServiceContext
         where TAudit : struct
     {
