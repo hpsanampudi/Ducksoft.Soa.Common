@@ -320,7 +320,7 @@
     <None Include="Ducksoft.SOA.Common.pfx" />
     <None Include="LICENSE" />
     <None Include="packages.config" />
-    <None Include="Readme" />
+    <None Include="README.md" />
     <None Include="_CreateNewNuGetPackage\Config.ps1" />
     <None Include="_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1" />
     <None Include="_CreateNewNuGetPackage\DoNotModify\New-NuGetPackage.ps1" />
