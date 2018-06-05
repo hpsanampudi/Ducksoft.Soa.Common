@@ -10,11 +10,14 @@ namespace Ducksoft.SOA.Common.EFHelpers.Interfaces
     /// Interface for data service query.
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    /// <seealso cref="System.Linq.IOrderedQueryable{TEntity}" />
+    /// <seealso cref="System.Linq.IOrderedQueryable" />
     /// <seealso cref="System.Linq.IQueryable{TEntity}" />
     /// <seealso cref="System.Collections.Generic.IEnumerable{TEntity}" />
     /// <seealso cref="System.Linq.IQueryable" />
     /// <seealso cref="System.Collections.IEnumerable" />
-    public interface IDataServiceQuery<TEntity> : IQueryable<TEntity>, IEnumerable<TEntity>, IQueryable, IEnumerable
+    public interface IDataServiceQuery<TEntity> : IQueryable<TEntity>, IEnumerable<TEntity>,
+        IOrderedQueryable<TEntity>, IQueryable, IEnumerable, IOrderedQueryable
     {
         /// <summary>
         /// Expands the specified path.
