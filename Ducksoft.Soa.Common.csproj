@@ -346,14 +346,14 @@
   <ItemGroup>
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
-    <None Include="Properties\AssemblyInfo.tt">
+    <Content Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
-    </None>
-    <None Include="Properties\Ducksoft.SOA.Common.nuspec.tt">
+    </Content>
+    <Content Include="Properties\Ducksoft.SOA.Common.nuspec.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Ducksoft.SOA.Common.nuspec.nuspec</LastGenOutput>
-    </None>
+    </Content>
     <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
   </ItemGroup>
   <ItemGroup />
