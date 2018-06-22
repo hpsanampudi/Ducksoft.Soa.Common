@@ -727,24 +727,157 @@ namespace Ducksoft.SOA.Common.Utilities
             patternBuilder.Append($"(?<YearMonthDate>{GetDecadeDateRegExpression()})");
             patternBuilder.Append("(?<Hours>[01][0-9]|2[0-3])");
             patternBuilder.Append("(?<Minutes>[0-5][0-9])");
+            patternBuilder.Append("(?<Seconds>[0-5][0-9])?");
             patternBuilder.Append(@"(?:\..*)?$");
 
             var pattern = patternBuilder.ToString();
-            var result = Regex.Match(source, pattern);
+            var result = Regex.Match(source, pattern, RegexOptions.IgnoreCase);
             if (result.Success)
             {
-                var fileDateTimeStr = string.Join(string.Empty, result.Groups["YearMonthDate"],
-                    result.Groups["Hours"], result.Groups["Minutes"], "00");
+                var secsValue = result.Groups["Seconds"].Value;
+                var seconds = string.IsNullOrWhiteSpace(secsValue) ? "00" : secsValue;
 
-                DateTime fileDateTime;
-                if (DateTime.TryParseExact(fileDateTimeStr, "yyyyMMddHHmmss", null,
-                    DateTimeStyles.None, out fileDateTime))
-                {
-                    uploadDate = fileDateTime;
-                }
+                var dateTimeStr = string.Join(string.Empty, result.Groups["YearMonthDate"],
+                    result.Groups["Hours"], result.Groups["Minutes"], seconds);
+
+                uploadDate = ConvertToDateTime(dateTimeStr, dateTimeFormats: "yyyyMMddHHmmss");
             }
 
             return (uploadDate);
+        }
+
+        /// <summary>
+        /// Extracts the enu date time (i.e., dd MMM yyyy (or) dd MMMM yyyy).
+        /// </summary>
+        /// <param name="source">The source string.</param>
+        /// <returns></returns>
+        public static DateTime? ExtractEnuDateTime(this string source, string delimeter = " ")
+        {
+            ErrorBase.CheckArgIsNullOrDefault(source, nameof(source));
+            var uploadDate = default(DateTime?);
+            var patternBuilder = new StringBuilder();
+            patternBuilder.Append(@"(?<Date>\d+)");
+            patternBuilder.Append($"(?:{delimeter})");
+            patternBuilder.Append(@"(?<Month>Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?" +
+                "|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?" +
+                "|Nov(?:ember)?|Dec(?:ember)?)");
+
+            patternBuilder.Append($"(?:{delimeter})");
+            patternBuilder.Append(@"(?<Year>\d+)");
+            patternBuilder.Append(@"(?: )");
+            patternBuilder.Append("((?<Hours>[01][0-9]|2[0-3])");
+            patternBuilder.Append(":(?<Minutes>[0-5][0-9])");
+            patternBuilder.Append("(:(?<Seconds>[0-5][0-9]))?");
+            patternBuilder.Append("( (?<AMPM>AM|PM) )?)?");
+
+            var pattern = patternBuilder.ToString();
+            var result = Regex.Match(source, pattern, RegexOptions.IgnoreCase);
+            if (result.Success)
+            {
+                var dateStr = string.Join(delimeter, result.Groups["Date"],
+                    result.Groups["Month"], result.Groups["Year"]);
+
+                var timeStr = string.Empty;
+                var hrsValue = result.Groups["Hours"].Value;
+                var minValue = result.Groups["Minutes"].Value;
+                if ((!string.IsNullOrWhiteSpace(hrsValue)) && (!string.IsNullOrWhiteSpace(minValue)))
+                {
+                    var secsValue = result.Groups["Seconds"].Value;
+                    var seconds = string.IsNullOrWhiteSpace(secsValue) ? "00" : secsValue;
+
+                    var amOrpmValue = result.Groups["AMPM"].Value;
+                    var amOrpm = string.IsNullOrWhiteSpace(amOrpmValue) ? string.Empty : secsValue;
+
+                    timeStr = string.Join(":", hrsValue, minValue, seconds, amOrpm).TrimEnd(':');
+                }
+
+                uploadDate = ConvertToDateTime($"{dateStr} {timeStr}".Trim(), delimeter);
+            }
+
+            return (uploadDate);
+        }
+
+        /// <summary>
+        /// Converts to date time.
+        /// </summary>
+        /// <param name="source">The source date time as string.</param>
+        /// <param name="delimeter">The delimeter.</param>
+        /// <param name="isDisplayError">if set to <c>true</c> [is display error].</param>
+        /// <param name="dateTimeFormats">The date time formats, if not provided then date Month Year.</param>
+        /// <returns></returns>
+        /// <exception cref="System.InvalidCastException"></exception>
+        public static DateTime? ConvertToDateTime(string source, string delimeter = "/",
+            bool isDisplayError = false, params string[] dateTimeFormats)
+        {
+            var output = default(DateTime?);
+            var formats = dateTimeFormats?.ToList() ?? new List<string>();
+            if (!formats.Any())
+            {
+                formats.AddRange(new List<string>
+                {
+                    $"dd{delimeter}MM{delimeter}yyyy HH:mm:ss",
+                    $"dd{delimeter}MM{delimeter}yyyy H:mm:ss",
+                    $"dd{delimeter}MM{delimeter}yyyy hh:mm:ss tt",
+                    $"dd{delimeter}MM{delimeter}yyyy h:mm:ss tt",
+                    $"dd{delimeter}MM{delimeter}yyyy",
+
+                    $"dd{delimeter}M{delimeter}yyyy HH:mm:ss",
+                    $"dd{delimeter}M{delimeter}yyyy H:mm:ss",
+                    $"dd{delimeter}M{delimeter}yyyy hh:mm:ss tt",
+                    $"dd{delimeter}M{delimeter}yyyy h:mm:ss tt",
+                    $"dd{delimeter}M{delimeter}yyyy",
+
+                    $"d{delimeter}MM{delimeter}yyyy HH:mm:ss",
+                    $"d{delimeter}MM{delimeter}yyyy H:mm:ss",
+                    $"d{delimeter}MM{delimeter}yyyy hh:mm:ss tt",
+                    $"d{delimeter}MM{delimeter}yyyy h:mm:ss tt",
+                    $"d{delimeter}MM{delimeter}yyyy",
+
+                    $"d{delimeter}M{delimeter}yyyy HH:mm:ss",
+                    $"d{delimeter}M{delimeter}yyyy H:mm:ss",
+                    $"d{delimeter}M{delimeter}yyyy hh:mm:ss tt",
+                    $"d{delimeter}M{delimeter}yyyy h:mm:ss tt",
+                    $"d{delimeter}M{delimeter}yyyy",
+
+                    $"dd{delimeter}MMM{delimeter}yyyy HH:mm:ss",
+                    $"dd{delimeter}MMM{delimeter}yyyy H:mm:ss",
+                    $"dd{delimeter}MMM{delimeter}yyyy hh:mm:ss tt",
+                    $"dd{delimeter}MMM{delimeter}yyyy h:mm:ss tt",
+                    $"dd{delimeter}MMM{delimeter}yyyy",
+
+                    $"d{delimeter}MMM{delimeter}yyyy HH:mm:ss",
+                    $"d{delimeter}MMM{delimeter}yyyy H:mm:ss",
+                    $"d{delimeter}MMM{delimeter}yyyy hh:mm:ss tt",
+                    $"d{delimeter}MMM{delimeter}yyyy h:mm:ss tt",
+                    $"d{delimeter}MMM{delimeter}yyyy",
+
+                    $"dd{delimeter}MMMM{delimeter}yyyy HH:mm:ss",
+                    $"dd{delimeter}MMMM{delimeter}yyyy H:mm:ss",
+                    $"dd{delimeter}MMMM{delimeter}yyyy hh:mm:ss tt",
+                    $"dd{delimeter}MMMM{delimeter}yyyy h:mm:ss tt",
+                    $"dd{delimeter}MMMM{delimeter}yyyy",
+
+                    $"d{delimeter}MMMM{delimeter}yyyy HH:mm:ss",
+                    $"d{delimeter}MMMM{delimeter}yyyy H:mm:ss",
+                    $"d{delimeter}MMMM{delimeter}yyyy hh:mm:ss tt",
+                    $"d{delimeter}MMMM{delimeter}yyyy h:mm:ss tt",
+                    $"d{delimeter}MMMM{delimeter}yyyy",
+                });
+            }
+
+            DateTime result;
+            if (DateTime.TryParseExact(source, formats.ToArray(), CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out result))
+            {
+                output = result;
+            }
+            else if (isDisplayError)
+            {
+                var errMessage = $"Failed to convert string to date time {source}";
+                throw (new InvalidCastException(errMessage));
+            }
+
+            return (output);
         }
 
         /// <summary>
