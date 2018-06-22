@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata minClientVersion="2.8">
     <id>Ducksoft.SOA.Common</id>
-    <version>3.0.0.1</version>
+    <version>3.0.0.2</version>
     <title>Ducksoft.SOA.Common</title>
     <authors>hpsanampudi</authors>
     <owners>Duck Software Limited</owners>
@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/hpsanampudi/Ducksoft.SOA.Common</projectUrl>
     <iconUrl>https://www.gravatar.com/avatar/c66699de02a373b3835f8fe83d294328</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>Common utilities used across SOA application.</description>
+    <description>WCF Common utilities used across SOA application.</description>
     <copyright>Copyright © Duck Software Limited 2018</copyright>
     <developmentDependency>true</developmentDependency>
     <tags>Ducksoft SOA Common Utilities</tags>    

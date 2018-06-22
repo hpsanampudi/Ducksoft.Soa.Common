@@ -1,0 +1,46 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".nuspec" #>
+<#
+	const string appName = "Common";
+	var assemblyInfo = File.ReadAllText(Host.ResolvePath("AssemblyInfo.cs"));
+    var pattern = "AssemblyVersion\\(\"(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<build>\\d+)\\.(?<revision>\\d+)\"\\)";
+	var match = Regex.Match(assemblyInfo, pattern);
+	if (match.Success)
+	{
+		major = Convert.ToInt32(match.Groups["major"].Value);
+        minor = Convert.ToInt32(match.Groups["minor"].Value);
+        build = Convert.ToInt32(match.Groups["build"].Value);
+        revision = Convert.ToInt32(match.Groups["revision"].Value);
+	}
+#>
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata minClientVersion="2.8">
+    <id>Ducksoft.SOA.<#=appName#></id>
+    <version><#= $"{major}.{minor}.{build}.{revision}" #></version>
+    <title>Ducksoft.SOA.<#=appName#></title>
+    <authors>hpsanampudi</authors>
+    <owners>Duck Software Limited</owners>
+    <licenseUrl>https://github.com/hpsanampudi/Ducksoft.SOA.<#=appName#>/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/hpsanampudi/Ducksoft.SOA.<#=appName#></projectUrl>
+    <iconUrl>https://www.gravatar.com/avatar/c66699de02a373b3835f8fe83d294328</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>WCF <#=appName#> utilities used across SOA application.</description>
+    <copyright>Copyright © Duck Software Limited <#=DateTime.Now.Year#></copyright>
+    <developmentDependency>true</developmentDependency>
+    <tags>Ducksoft SOA <#=appName#> Utilities</tags>    
+  </metadata>
+</package>
+<#+
+    int major = 3;
+    int minor = 0;
+    int revision = 0;
+    int build = 0;
+#>

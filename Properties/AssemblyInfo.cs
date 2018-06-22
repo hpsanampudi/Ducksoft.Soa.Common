@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Ducksoft.SOA.Common")]
-[assembly: AssemblyDescription("Common utilities used across SOA application.")]
+[assembly: AssemblyDescription("WCF Common utilities used across SOA application.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Duck Software Limited")]
 [assembly: AssemblyProduct("Ducksoft.SOA.Common")]
@@ -24,12 +24,10 @@ using System.Runtime.InteropServices;
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
+//      Minor Version - Year
+//      Build Number - MonthDate
+//      Revision - HoursMinutes
 //
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.0.0.*")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: AssemblyVersion("3.0.0.2")]
+[assembly: AssemblyFileVersion("3.0.0.2")]
+

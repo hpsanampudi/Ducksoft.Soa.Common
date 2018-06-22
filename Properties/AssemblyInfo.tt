@@ -1,0 +1,81 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#@ parameter type="System.String" name="BuildConfiguration" #>
+<#
+
+	const string appName = "Common";
+
+	//Note: While compiling this T4 template first time, create new Guid and replace the below one.
+	//var appId = Guid.NewGuid();
+	var appId = "2c7414d6-c082-4276-a974-2b15a0cd03d6";
+
+	string configuration = Host.ResolveParameterValue("-", "-", "BuildConfiguration");
+	if (string.IsNullOrWhiteSpace(configuration))
+	{
+		var serviceProvider = (IServiceProvider)Host;
+		var dte = (EnvDTE.DTE)serviceProvider.GetService(typeof(EnvDTE.DTE));
+		configuration = dte.Solution.SolutionBuild.ActiveConfiguration.Name;
+	}
+
+	string data = File.ReadAllText(Host.ResolvePath("AssemblyInfo.cs"));
+    var pattern = "AssemblyVersion\\(\"(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<build>\\d+)\\.(?<revision>\\d+)\"\\)";
+	var match = Regex.Match(data, pattern);
+	if (match.Success)
+	{
+		major = Convert.ToInt32(match.Groups["major"].Value);
+        minor = Convert.ToInt32(match.Groups["minor"].Value);
+        build = Convert.ToInt32(match.Groups["build"].Value);
+        revision = Convert.ToInt32(match.Groups["revision"].Value);
+        if(configuration == "Release" )
+		{
+			revision++;
+		}            
+	}
+#>
+using System.Reflection;
+using System.Runtime.InteropServices;
+
+// General Information about an assembly is controlled through the following 
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
+[assembly: AssemblyTitle("Ducksoft.SOA.<#=appName#>")]
+[assembly: AssemblyDescription("WCF <#=appName#> utilities used across SOA application.")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Duck Software Limited")]
+[assembly: AssemblyProduct("Ducksoft.SOA.<#=appName#>")]
+[assembly: AssemblyCopyright("Copyright © Duck Software Limited <#=DateTime.Now.Year#>")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
+[assembly: ComVisible(false)]
+
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("<#=appId#>")]
+
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version - Year
+//      Build Number - MonthDate
+//      Revision - HoursMinutes
+//
+[assembly: AssemblyVersion("<#= $"{major}.{minor}.{build}.{revision}" #>")]
+[assembly: AssemblyFileVersion("<#= $"{major}.{minor}.{build}.{revision}" #>")]
+
+<#+
+    int major = 3;
+    int minor = 0;
+    int revision = 0;
+    int build = 0;
+#>
