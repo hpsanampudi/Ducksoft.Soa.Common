@@ -28,6 +28,6 @@ using System.Runtime.InteropServices;
 //      Build Number - MonthDate
 //      Revision - HoursMinutes
 //
-[assembly: AssemblyVersion("3.0.0.3")]
-[assembly: AssemblyFileVersion("3.0.0.3")]
+[assembly: AssemblyVersion("3.0.0.4")]
+[assembly: AssemblyFileVersion("3.0.0.4")]
 
