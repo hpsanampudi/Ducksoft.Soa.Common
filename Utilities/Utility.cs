@@ -1,10 +1,6 @@
-﻿using Ducksoft.SOA.Common.DataContracts;
-using Ducksoft.SOA.Common.Filters;
-using Microsoft.Win32;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
@@ -30,6 +26,11 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.Filters;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Ducksoft.SOA.Common.Utilities
 {
@@ -3960,5 +3961,30 @@ namespace Ducksoft.SOA.Common.Utilities
 
             return (optionType);
         }
+
+        /// <summary>
+        /// Gets the base URL path.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns></returns>
+        public static string GetBaseUrlPath(this HttpRequestBase request) =>
+            $"{request.Url.Scheme}://{request.Url.Authority}";
+
+        /// <summary>
+        /// Gets all URL query parms.
+        /// </summary>
+        /// <param name="queryUrlPath">The query URL path.</param>
+        /// <returns></returns>
+        /// <remarks>Usage: Request.Url.Query.GetAllUrlQueryParms();</remarks>
+        public static IDictionary<string, string> GetAllUrlQueryParms(this string queryUrlPath) =>
+            HttpUtility.ParseQueryString(queryUrlPath).ToDictionary();
+
+        /// <summary>
+        /// To the dictionary.
+        /// </summary>
+        /// <param name="collection">The collection.</param>
+        /// <returns></returns>
+        public static Dictionary<string, string> ToDictionary(this NameValueCollection collection) =>
+            collection.AllKeys.ToDictionary(K => K, K => collection[K]);
     }
 }
