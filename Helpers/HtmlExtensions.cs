@@ -643,11 +643,22 @@ namespace System.Web.Mvc
             return (htmlHelper.RadioButton(name, value, userDefinedAttributes));
         }
 
+        /// <summary>
+        /// Drops down list for.
+        /// </summary>
+        /// <typeparam name="TModel">The type of the model.</typeparam>
+        /// <typeparam name="TProperty">The type of the property.</typeparam>
+        /// <param name="htmlHelper">The HTML helper.</param>
+        /// <param name="expression">The expression.</param>
+        /// <param name="selectList">The select list.</param>
+        /// <param name="isEnabled">if set to <c>true</c> [is enabled].</param>
+        /// <param name="htmlAttributes">The HTML attributes.</param>
+        /// <returns></returns>
         public static MvcHtmlString DropDownListFor<TModel, TProperty>(
            this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression,
-           IEnumerable<SelectListItem> selectList, int defaultSelectedIndex = 0,
-           bool isEnabled = true, object htmlAttributes = null)
+           IEnumerable<SelectListItem> selectList, bool isEnabled = true, object htmlAttributes = null)
         {
+            var srcListItems = selectList?.ToList() ?? new List<SelectListItem>();
             var name = ExpressionHelper.GetExpressionText(expression);
 
             //Hp --> Logic: Exclude dropdownlist enabled/disabled state
@@ -663,26 +674,7 @@ namespace System.Web.Mvc
                 userDefinedAttributes.Add("disabled", "disabled");
             }
 
-            var defaultSelectedValue = string.Empty;
-            if (defaultSelectedIndex >= 0)
-            {
-                try
-                {
-                    defaultSelectedValue = selectList
-                        .ElementAt(defaultSelectedIndex)?.Value ?? string.Empty;
-                }
-                catch
-                {
-                    //Hp --> Do nothing
-                }
-
-                if (!string.IsNullOrWhiteSpace(defaultSelectedValue))
-                {
-                    userDefinedAttributes.Add("data-default-value", defaultSelectedValue);
-                }
-            }
-
-            return (htmlHelper.DropDownList(name, selectList, userDefinedAttributes));
+            return (htmlHelper.DropDownList(name, srcListItems, userDefinedAttributes));
         }
 
         /// <summary>
