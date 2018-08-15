@@ -1,5 +1,4 @@
-﻿using Ducksoft.SOA.Common.Utilities;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -9,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
+using Ducksoft.SOA.Common.Utilities;
 
 namespace System.Web.Mvc
 {
@@ -594,11 +594,8 @@ namespace System.Web.Mvc
             var value = modelMeta.Model as bool?;
             var isChecked = value ?? false;
 
-            var comparer = StringComparer.InvariantCultureIgnoreCase;
-            var customAttributes = new Dictionary<string, object>(comparer);
-            var userDefinedAttributes = htmlAttributes.GetUserDefinedHtmlAttributes();
-
             //Hp --> Logic: Exclude checkbox enabled/disabled state
+            var userDefinedAttributes = htmlAttributes.GetUserDefinedHtmlAttributes();
             if (userDefinedAttributes.ContainsKey("disabled"))
             {
                 userDefinedAttributes.Remove("disabled");
@@ -607,10 +604,10 @@ namespace System.Web.Mvc
             //Hp --> Logic: Override the checkbox enabled/disabled state based on user provided value.
             if (!isEnabled)
             {
-                customAttributes.Add("disabled", "disabled");
+                userDefinedAttributes.Add("disabled", "disabled");
             }
 
-            return (htmlHelper.CheckBox(name, isChecked, customAttributes));
+            return (htmlHelper.CheckBox(name, isChecked, userDefinedAttributes));
         }
 
         /// <summary>
@@ -629,11 +626,9 @@ namespace System.Web.Mvc
             TProperty value, bool isEnabled = true, object htmlAttributes = null)
         {
             var name = ExpressionHelper.GetExpressionText(expression);
-            var comparer = StringComparer.InvariantCultureIgnoreCase;
-            var customAttributes = new Dictionary<string, object>(comparer);
-            var userDefinedAttributes = htmlAttributes.GetUserDefinedHtmlAttributes();
 
             //Hp --> Logic: Exclude checkbox enabled/disabled state
+            var userDefinedAttributes = htmlAttributes.GetUserDefinedHtmlAttributes();
             if (userDefinedAttributes.ContainsKey("disabled"))
             {
                 userDefinedAttributes.Remove("disabled");
@@ -642,10 +637,52 @@ namespace System.Web.Mvc
             //Hp --> Logic: Override the checkbox enabled/disabled state based on user provided value.
             if (!isEnabled)
             {
-                customAttributes.Add("disabled", "disabled");
+                userDefinedAttributes.Add("disabled", "disabled");
             }
 
-            return (htmlHelper.RadioButton(name, value, customAttributes));
+            return (htmlHelper.RadioButton(name, value, userDefinedAttributes));
+        }
+
+        public static MvcHtmlString DropDownListFor<TModel, TProperty>(
+           this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression,
+           IEnumerable<SelectListItem> selectList, int defaultSelectedIndex = 0,
+           bool isEnabled = true, object htmlAttributes = null)
+        {
+            var name = ExpressionHelper.GetExpressionText(expression);
+
+            //Hp --> Logic: Exclude dropdownlist enabled/disabled state
+            var userDefinedAttributes = htmlAttributes.GetUserDefinedHtmlAttributes();
+            if (userDefinedAttributes.ContainsKey("disabled"))
+            {
+                userDefinedAttributes.Remove("disabled");
+            }
+
+            //Hp --> Logic: Override the dropdownlist enabled/disabled state based on user provided value.
+            if (!isEnabled)
+            {
+                userDefinedAttributes.Add("disabled", "disabled");
+            }
+
+            var defaultSelectedValue = string.Empty;
+            if (defaultSelectedIndex >= 0)
+            {
+                try
+                {
+                    defaultSelectedValue = selectList
+                        .ElementAt(defaultSelectedIndex)?.Value ?? string.Empty;
+                }
+                catch
+                {
+                    //Hp --> Do nothing
+                }
+
+                if (!string.IsNullOrWhiteSpace(defaultSelectedValue))
+                {
+                    userDefinedAttributes.Add("data-default-value", defaultSelectedValue);
+                }
+            }
+
+            return (htmlHelper.DropDownList(name, selectList, userDefinedAttributes));
         }
 
         /// <summary>
