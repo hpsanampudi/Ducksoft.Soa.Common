@@ -2370,6 +2370,7 @@ namespace Ducksoft.SOA.Common.Utilities
                 var childPaths = filePaths.Skip(1).Select(P => P.GetValidChildPath());
                 filePaths = filePaths.Take(1).Concat(childPaths).ToList();
             }
+            
             return Path.Combine(filePaths.ToArray());
         }
 
@@ -2382,11 +2383,16 @@ namespace Ducksoft.SOA.Common.Utilities
         {
             ErrorBase.CheckArgIsNullOrDefault(childPath, () => childPath);
             //Hp --> BugFix: Path.Combine fails to return file full path if child path starts with
-            //directort separator.
+            //directory separator.
             if (Path.IsPathRooted(childPath))
             {
-                childPath = childPath.TrimStart(Path.DirectorySeparatorChar)
-                    .TrimStart(Path.AltDirectorySeparatorChar);
+                var delimeters = new char[]
+                {
+                    Path.DirectorySeparatorChar,
+                    Path.AltDirectorySeparatorChar
+                };
+
+                childPath = childPath.TrimStart(delimeters);
             }
 
             return childPath;
