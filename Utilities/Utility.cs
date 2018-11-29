@@ -2353,7 +2353,7 @@ namespace Ducksoft.SOA.Common.Utilities
         {
             ErrorBase.CheckArgIsNullOrDefault(parentPath, () => parentPath);
             ErrorBase.CheckArgIsNullOrDefault(childPath, () => childPath);
-            return (Path.Combine(parentPath, childPath));
+            return Path.Combine(parentPath, childPath.GetValidChildPath());
         }
 
         /// <summary>
@@ -2361,10 +2361,35 @@ namespace Ducksoft.SOA.Common.Utilities
         /// </summary>
         /// <param name="paths">The list of paths to combine.</param>
         /// <returns>System.String.</returns>
-        public static string GetCombinedPath(params string[] paths)
+        public static string GetCombinedPath(string[] paths)
         {
             ErrorBase.CheckArgIsNullOrDefault(paths, () => paths);
-            return (Path.Combine(paths));
+            var filePaths = paths.ToList();
+            if (filePaths.Count > 1)
+            {
+                var childPaths = filePaths.Skip(1).Select(P => P.GetValidChildPath());
+                filePaths = filePaths.Take(1).Concat(childPaths).ToList();
+            }
+            return Path.Combine(filePaths.ToArray());
+        }
+
+        /// <summary>
+        /// Gets the valid child path.
+        /// </summary>
+        /// <param name="childPath">The child path.</param>
+        /// <returns></returns>
+        public static string GetValidChildPath(this string childPath)
+        {
+            ErrorBase.CheckArgIsNullOrDefault(childPath, () => childPath);
+            //Hp --> BugFix: Path.Combine fails to return file full path if child path starts with
+            //directort separator.
+            if (Path.IsPathRooted(childPath))
+            {
+                childPath = childPath.TrimStart(Path.DirectorySeparatorChar)
+                    .TrimStart(Path.AltDirectorySeparatorChar);
+            }
+
+            return childPath;
         }
 
         /// <summary>
