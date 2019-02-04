@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -887,7 +887,7 @@ namespace Ducksoft.SOA.Common.Utilities
         /// <typeparam name="TTarget">The type of the target.</typeparam>
         /// <param name="source">The source.</param>
         /// <returns></returns>
-        public static TTarget ChangeType<TTarget>(this object source) =>
+        public static TTarget To<TTarget>(this object source) =>
             (TTarget)Convert.ChangeType(source, typeof(TTarget));
 
         /// <summary>
