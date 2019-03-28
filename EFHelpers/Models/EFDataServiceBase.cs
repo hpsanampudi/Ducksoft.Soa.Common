@@ -8,6 +8,7 @@ using System.Data.Services;
 using System.Data.Services.Common;
 using System.Data.Services.Providers;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Web;
@@ -101,6 +102,78 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
 
             return (dataSource);
         }
+        
+        /// <summary>
+        /// Called when [before save changes].
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="operationType">Type of the operation.</param>
+        /// <param name="entitySetName">Name of the entity set.</param>
+        /// <exception cref="DataServiceException"></exception>
+        protected void OnBeforeSaveChanges(object entity, UpdateOperations operationType,
+            string entitySetName = "")
+        {
+            ErrorBase.CheckArgIsNull(entity, nameof(entity));
+
+            switch (operationType)
+            {
+                case UpdateOperations.Change:
+                    {
+                        //Hp --> Logic: Updates only the modified feild values of given entity in database.
+                        var dbEntityEntry = CurrentDataSource.Entry(entity);
+
+                        //Hp --> Logic: Check whether given entity is modified (or) not?
+                        //If not then just return.
+                        if (dbEntityEntry.State != EntityState.Modified)
+                        {
+                            return;
+                        }
+
+                        //Hp --> Logic: Filter only modified field values.
+                        foreach (string propName in dbEntityEntry.OriginalValues.PropertyNames)
+                        {
+                            var dbPropEntry = dbEntityEntry.Property(propName);
+                            var originalValue = dbPropEntry.OriginalValue;
+                            var modifiedValue = dbPropEntry.CurrentValue;
+
+                            //Hp --> Logic: Check whether the property value is same as orginal value.
+                            //If Yes, then reset the modified status as false otherwise true.
+                            if (dbPropEntry.IsModified && (originalValue?.Equals(modifiedValue) ??
+                                modifiedValue?.Equals(originalValue) ?? true))
+                            {
+                                dbPropEntry.IsModified = false;
+                            }
+                        }
+                    }
+                    break;
+
+                case UpdateOperations.Delete:
+                    {
+                        if (!entity.IsHavingAuditColumns(AuditColumnTypes.Delete))
+                        {
+                            //Hp --> Logic: User is not allowed to delete database record permanently.
+                            //Instead update the feild DeleteBy and DeleteDate.
+                            var statusCode = (int)HttpStatusCode.BadRequest;
+                            var errMessage = $"User is not allowed to delete {entitySetName} " +
+                                $"database record permanently.";
+
+                            throw new DataServiceException(statusCode, errMessage);
+                        }
+
+                        //TODO: Hp --> How to get name of the user who perform this action?
+                        //Hp --> Logic: Update deleted date timestamp.
+                        entity.SetPropertyValue("DeleteDate", DateTime.Now);
+                    }
+                    break;
+
+                case UpdateOperations.None:
+                case UpdateOperations.Add:
+                    {
+                        //Hp --> Do nothing, trigger default behaviour
+                    }
+                    break;
+            }
+        }        
 
         /// <summary>
         /// Called when [start processing request].
@@ -143,7 +216,8 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
                 else
                 {
                     // Return a new DataServiceException as "400: bad request."
-                    args.Exception = new DataServiceException(400, custMessage);
+                    var statusCode = (int)HttpStatusCode.BadRequest;
+                    args.Exception = new DataServiceException(statusCode, custMessage);
                 }
             }
             else
