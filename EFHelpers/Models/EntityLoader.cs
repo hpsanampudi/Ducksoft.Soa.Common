@@ -1,11 +1,4 @@
-﻿using Ducksoft.SOA.Common.DataContracts;
-using Ducksoft.SOA.Common.EFHelpers.Interfaces;
-using Ducksoft.SOA.Common.EFHelpers.ODataHelpers;
-using Ducksoft.SOA.Common.Filters;
-using Ducksoft.SOA.Common.Utilities;
-using Nelibur.ObjectMapper;
-using Nelibur.ObjectMapper.Bindings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Services.Client;
 using System.Data.Services.Common;
@@ -14,6 +7,13 @@ using System.Linq.Expressions;
 using System.ServiceModel;
 using System.Threading;
 using System.Web;
+using Ducksoft.SOA.Common.DataContracts;
+using Ducksoft.SOA.Common.EFHelpers.Interfaces;
+using Ducksoft.SOA.Common.EFHelpers.ODataHelpers;
+using Ducksoft.SOA.Common.Filters;
+using Ducksoft.SOA.Common.Utilities;
+using Nelibur.ObjectMapper;
+using Nelibur.ObjectMapper.Bindings;
 
 namespace Ducksoft.SOA.Common.EFHelpers.Models
 {
@@ -63,7 +63,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
         public EntityLoader(Uri dataServiceUrl)
             : this(dataServiceUrl, null)
         {
-            //Hp --> Logic: If connectionInfo is null then it takes value mentioned inside 
+            //Hp --> Logic: If connectionInfo is null then it takes value mentioned inside
             //corrsponding web.config file.
         }
 
@@ -93,7 +93,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
             //object because there is a chance it can overrriden at BL.
             var client = new DataServiceContext(dataServiceUrl) as TEntities;
 
-            //Hp --> Logic: If TEntities is derived from DataServiceContext then we need to use 
+            //Hp --> Logic: If TEntities is derived from DataServiceContext then we need to use
             //reflection to initialize the client object.
             if (null == client)
             {
@@ -155,7 +155,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
                 throw (new FaultException<CustomFault>(fault, fault.Reason));
             }
 
-            // Hp --> Logic: In order to get all records we need to loop untill data service 
+            // Hp --> Logic: In order to get all records we need to loop untill data service
             //continuation token is null.
             DataServiceQueryContinuation<TEntity> token = null;
             do
@@ -168,7 +168,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
                         cancelToken.ThrowIfCancellationRequested();
                     }
 
-                    // If nextLink is not null, then there is a new page to load. 
+                    // If nextLink is not null, then there is a new page to load.
                     if (token != null)
                     {
                         // Load the new page from the next link URI.
@@ -244,7 +244,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
                 }
 
                 var queryUri = new Uri(query, UriKind.RelativeOrAbsolute);
-                //Hp --> BugFix: Cannot materialize a collection of a primitives or complex 
+                //Hp --> BugFix: Cannot materialize a collection of a primitives or complex
                 //without the type 'T' being a collection.
                 //Comments: When calling a store procedure returning complex data type then pass
                 //other parameters of Execute method as shown below:
@@ -589,7 +589,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
                 DataSvcClient.AddObject(entitySetName, record);
                 var dbResponse = DataSvcClient.SaveChanges();
 
-                // Enumerate the returned responses. 
+                // Enumerate the returned responses.
                 foreach (ChangeOperationResponse change in dbResponse)
                 {
                     // Get the descriptor for the entity.
@@ -658,7 +658,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
 
             try
             {
-                // Hp --> Logic: The Context is not track user passed record entity, so we need 
+                // Hp --> Logic: The Context is not track user passed record entity, so we need
                 //to get the latest database record based on primary key and map the user supplied values.
                 if (!isTracked)
                 {
@@ -698,7 +698,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
                 DataSvcClient.UpdateObject(dbRecord);
                 var dbResponse = DataSvcClient.SaveChanges();
 
-                // Enumerate the returned responses. 
+                // Enumerate the returned responses.
                 foreach (ChangeOperationResponse change in dbResponse)
                 {
                     // Get the descriptor for the entity.
@@ -771,7 +771,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
 
             try
             {
-                // Hp --> Logic: The Context is not track user passed record entity, so we need 
+                // Hp --> Logic: The Context is not track user passed record entity, so we need
                 //to get the latest database record based on primary key and map the user supplied values.
                 if (!isTracked)
                 {
@@ -948,7 +948,7 @@ namespace Ducksoft.SOA.Common.EFHelpers.Models
             else if (typeof(TResult) == typeof(string))
             {
                 var strDefValue = defValue as string;
-                myDefValue = (strDefValue?.Trim() ?? string.Empty).ChangeType<TResult>();
+                myDefValue = (strDefValue?.Trim() ?? string.Empty).To<TResult>();
             }
             else
             {
