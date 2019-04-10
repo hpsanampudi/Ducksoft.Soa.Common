@@ -2132,12 +2132,37 @@ namespace Ducksoft.SOA.Common.Utilities
         /// Creates the directory.
         /// </summary>
         /// <param name="dirPath">The directory path.</param>
-        public static void CreateDirectory(string dirPath)
+        /// <param name="directorySecurity">The directory access control list (ACL) entries for a specified directory.</param>
+        public static void CreateDirectory(string dirPath, DirectorySecurity directorySecurity = null)
         {
-            if (!IsDirectoryExists(dirPath))
+            if (IsDirectoryExists(dirPath))
+            {
+                return;
+            }
+
+            if (directorySecurity == null)
             {
                 Directory.CreateDirectory(dirPath);
             }
+            else
+            {
+                Directory.CreateDirectory(dirPath, directorySecurity);
+            }
+        }
+
+        /// <summary>
+        /// Gets the directory access control list (ACL) entries for a specified directory.
+        /// </summary>
+        /// <param name="dirPath">The directory path.</param>
+        /// <returns></returns>
+        public static DirectorySecurity GetDirAccessControlList(string dirPath)
+        {
+            if (!IsDirectoryExists(dirPath))
+            {
+                return default(DirectorySecurity);
+            }
+
+            return Directory.GetAccessControl(dirPath);
         }
 
         /// <summary>
