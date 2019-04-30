@@ -3775,17 +3775,20 @@ namespace Ducksoft.SOA.Common.Utilities
         /// </summary>
         /// <param name="from">From.</param>
         /// <param name="dayOfWeek">The day of week.</param>
+        /// <param name="occurenceOfWeek">The occurence of a week.</param>
         /// <returns></returns>
-        public static DateTime NextDay(this DateTime from, DayOfWeek dayOfWeek, int interval = 1)
+        public static DateTime NextDay(DateTime from, DayOfWeek dayOfWeek, int occuranceOfWeek = 1)
         {
             int start = (int)from.DayOfWeek;
             int target = (int)dayOfWeek;
             if (target <= start)
             {
-                target += (7 * interval);
+                target += 7;
             }
 
-            return (from.AddDays(target - start));
+            //Hp --> Logic: Get number of days to add based on next occurence of given day of a week
+            var daysToAdd = target - start + (7 * (occurenceOfWeek <= 1 ? 0 : (occurenceOfWeek - 1)));
+            return from.AddDays(daysToAdd);
         }
 
         /// <summary>
