@@ -3777,7 +3777,7 @@ namespace Ducksoft.SOA.Common.Utilities
         /// <param name="dayOfWeek">The day of week.</param>
         /// <param name="occurenceOfWeek">The occurence of a week.</param>
         /// <returns></returns>
-        public static DateTime NextDay(DateTime from, DayOfWeek dayOfWeek, int occurenceOfWeek = 1)
+        public static DateTime NextDay(this DateTime from, DayOfWeek dayOfWeek, int occurenceOfWeek = 1)
         {
             int start = (int)from.DayOfWeek;
             int target = (int)dayOfWeek;
