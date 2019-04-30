@@ -3776,13 +3776,13 @@ namespace Ducksoft.SOA.Common.Utilities
         /// <param name="from">From.</param>
         /// <param name="dayOfWeek">The day of week.</param>
         /// <returns></returns>
-        public static DateTime NextDay(this DateTime from, DayOfWeek dayOfWeek)
+        public static DateTime NextDay(this DateTime from, DayOfWeek dayOfWeek, int interval = 1)
         {
             int start = (int)from.DayOfWeek;
             int target = (int)dayOfWeek;
             if (target <= start)
             {
-                target += 7;
+                target += (7 * interval);
             }
 
             return (from.AddDays(target - start));
