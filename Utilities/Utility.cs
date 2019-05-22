@@ -2747,7 +2747,8 @@ namespace Ducksoft.SOA.Common.Utilities
 
             //Returns an System.Object with the specified System.Type and whose value is
             //equivalent to the specified object.
-            propertyValue = Convert.ChangeType(propertyValue, targetType);
+            propertyValue = (propertyValue == null) ? null :
+                Convert.ChangeType(propertyValue, targetType);
 
             //Hp --> Logic: Using reflection set given property value by its name.
             propInfo.SetValue(srcObject, propertyValue, null);
