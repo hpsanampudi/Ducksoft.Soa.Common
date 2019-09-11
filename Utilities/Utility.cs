@@ -1983,6 +1983,34 @@ namespace Ducksoft.SOA.Common.Utilities
 
             return (fileContent);
         }
+        
+        /// <summary>
+        /// Reads all lines from file.
+        /// </summary>
+        /// <param name="srcFilePath">The source file path.</param>
+        /// <returns></returns>
+        public static IEnumerable<string> ReadAllLinesFrom(this string srcFilePath)
+        {
+            var lines = new List<string>();
+            if (!IsFileExists(srcFilePath))
+            {
+                return lines;
+            }
+
+            using (var currentFileStream = new FileStream(srcFilePath, FileMode.Open,
+                FileAccess.Read, FileShare.ReadWrite))
+            {
+                using (var reader = new StreamReader(currentFileStream))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        lines.Add(reader.ReadLine());
+                    }
+                }
+            }
+
+            return lines;
+        }
 
         /// <summary>
         /// Writes to file.
