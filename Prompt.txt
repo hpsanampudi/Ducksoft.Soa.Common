@@ -1,0 +1,44 @@
+Goal: Split a set of teams into groups labeled with playing-card suits, using a fixed rule for how many groups to create and randomly assigning teams by “picking a card.”
+Rules for number of groups (G) based on total teams (T):
+
+Min groups = 1, Max groups = 4
+Prefer even group counts (2 or 4)
+Use this rule exactly:
+
+If T ≤ 6, then G = 1
+If 7 ≤ T ≤ 12, then G = 2
+If T ≥ 13, then G = 4 (cap at 4 for any T, including >16)
+
+
+
+Group labels (based on G):
+
+G = 1: ♥ Hearts
+G = 2: ♥ Hearts, ♦ Diamonds
+G = 4: ♥ Hearts, ♦ Diamonds, ♣ Clubs, ♠ Spades
+
+Random assignment method (“picking a card”):
+
+Randomly shuffle the teams.
+Deal to groups in round‑robin order using the suits above (use only the first G suits).
+This ensures balanced sizes. If uneven (e.g., odd teams), earlier suits get one extra team in order: ♥, ♦, ♣, ♠.
+
+Output requirements:
+
+Show: Total teams (T), Groups used (G), Distribution by group (counts), and the Roster per group.
+Maintain the suit order: ♥, ♦, ♣, ♠.
+If team names are not provided, use Team 1, Team 2, … Team T.
+The allocation must be random each time (i.e., not deterministic ordering).
+
+Edge cases:
+
+Odd team counts: allowed; distribute as evenly as possible (differences of at most 1).
+T > 16: still use G = 4 and distribute evenly.
+
+Examples for validation:
+
+T = 6 → G = 1 (all in ♥)
+T = 8 → G = 2 (♥ & ♦)
+T = 12 → G = 2 (♥ & ♦)
+T = 14 → G = 4 (♥, ♦, ♣, ♠)
+T = 16 → G = 4 (♥, ♦, ♣, ♠)
